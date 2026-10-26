@@ -1,0 +1,5 @@
+V9.27 · Costos y ¿cuánto cobrar?
+- Nueva página costos.html (Herramientas → Costos y ¿cuánto cobrar?).
+- Lista de costos de proveedores con fecha de confirmación e historial de cambios de precio.
+- Calculadoras: acrílico y letreros, llaveros, bolsas. Envían a la cotización.
+- Requiere correr una vez costos.sql en Supabase (no está en el repo).

@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><meta name="theme-color" content="#191b22">
+<title>Costos y calculadoras · Tecnigráficas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<script src="avisos.js"></script><script src="quote-bridge.js"></script><script src="buscador.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script>
+<style>
+:root{--ink:#20222a;--muted:#6b7280;--line:#e3e7ee;--soft:#f5f7fb;--cyan:#00a6d6;--mag:#e6007e;--yel:#ffd500;--good:#16865a;--warn:#a86100;--bad:#c62f3a}
+*{box-sizing:border-box}html,body{margin:0}body{font-family:Inter,system-ui,sans-serif;background:var(--soft);color:var(--ink);font-size:15px}
+body.auth-pending main{visibility:hidden}
+.top{height:5px;background:linear-gradient(90deg,var(--mag),var(--yel),var(--cyan))}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 18px;background:#191b22;color:#fff;position:sticky;top:0;z-index:50}
+header .brand{display:flex;align-items:center;gap:10px}header img{height:30px;width:auto;object-fit:contain}header strong{display:block;font-size:15px}header span{font-size:12px;opacity:.7}
+header button{border:1.5px solid rgba(255,255,255,.3);background:transparent;color:#fff;border-radius:999px;padding:8px 14px;font:inherit;font-weight:800;font-size:13px;cursor:pointer}
+main{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
+h1{margin:4px 0 4px;font-size:26px;letter-spacing:-.5px}.sub{margin:0 0 14px;color:var(--muted)}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;scrollbar-width:none}
+.tabs button{flex:0 0 auto;border:2px solid var(--line);background:#fff;border-radius:16px;padding:11px 16px;font:inherit;font-weight:900;font-size:14.5px;cursor:pointer;color:var(--ink)}
+.tabs button.on{border-color:var(--cyan);background:#e9f7fc;color:#087a9a}
+@media(max-width:600px){.tabs{display:grid;grid-template-columns:1fr 1fr}.tabs button{padding:11px 8px;font-size:13.5px}header .bk{display:none}header strong{font-size:14px}}
+.rulesbox{margin-top:22px;border:1px solid var(--line);border-radius:16px;background:#fff;padding:0 14px}.rulesbox summary{cursor:pointer;font-weight:900;padding:14px 0;list-style:none}.rulesbox summary::-webkit-details-marker{display:none}.rulesbox .rules{margin-bottom:14px}
+.tab{display:none}.tab.on{display:block}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 8px 24px rgba(20,25,40,.05)}
+.calc{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;align-items:start}
+.calc .res{position:sticky;top:72px}
+@media(max-width:860px){.calc{grid-template-columns:1fr}.calc .res{position:static}}
+label{display:block;font-size:13px;font-weight:800;color:#4a5160;margin-bottom:5px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #d9dde6;border-radius:12px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}
+input:focus,select:focus{outline:2px solid var(--cyan);border-color:var(--cyan)}
+.f{margin-bottom:14px}.row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.row{grid-template-columns:1fr 1fr}}
+.hint{font-size:12px;color:var(--muted);margin-top:5px}
+.sec{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#087a9a;margin:18px 0 10px;padding-top:14px;border-top:1px dashed var(--line)}
+.sec:first-child{margin-top:0;padding-top:0;border-top:0}
+.pills{display:flex;gap:6px;flex-wrap:wrap}.pills button{border:2px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font:inherit;font-weight:800;font-size:13.5px;cursor:pointer}
+.pills button.on{border-color:var(--mag);background:#fde8f3;color:#a3005a}
+.checks{display:grid;gap:8px}.chk{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;font-weight:700;font-size:14px}
+.chk input{width:20px;height:20px;margin:0;flex:0 0 auto}.chk span{flex:1}.chk b{font-weight:800;color:var(--muted);font-size:13px}
+.mini{display:flex;align-items:center;gap:8px}.mini input{width:90px;text-align:center}
+.lines{display:grid;gap:2px;margin:6px 0 10px}.ln{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:6px 0;border-bottom:1px solid #f0f2f6}.ln span{color:#4a5160}.ln small{display:block;color:var(--muted);font-size:11.5px}
+.ln.tot{font-weight:900;border-bottom:0;font-size:15px}.ln.sv span{color:#087a9a}
+.big{background:linear-gradient(125deg,#e9f7fc,#fde8f3);border-radius:16px;padding:14px;margin:8px 0}
+.big .k{font-size:12px;font-weight:900;text-transform:uppercase;color:#4a5160;letter-spacing:.04em}.big .v{font-size:34px;font-weight:950;letter-spacing:-1px}.big .u{font-size:14px;color:#4a5160;font-weight:700}
+.cobrar{display:flex;align-items:center;border:2px solid var(--ink);border-radius:14px;background:#fff;padding-left:12px;margin-top:4px}.cobrar span{font-weight:900}.cobrar input{border:0;font-weight:900;font-size:20px;outline:0}
+.gain{font-size:13.5px;font-weight:800;margin-top:8px}.gain.ok{color:var(--good)}.gain.low{color:var(--bad)}
+.warn{background:#fff3dc;color:#7a4b00;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700;margin:8px 0}
+.acts{display:grid;gap:8px;margin-top:12px}.acts button{border:0;border-radius:14px;padding:14px;font:inherit;font-weight:900;font-size:15px;cursor:pointer}
+.b1{background:linear-gradient(125deg,var(--cyan),var(--mag));color:#fff}.b2{background:#eef1f6;color:var(--ink)}
+.btn{border:0;border-radius:12px;padding:10px 14px;font:inherit;font-weight:900;font-size:14px;cursor:pointer;background:#eef1f6;color:var(--ink)}.btn.p{background:linear-gradient(125deg,var(--cyan),var(--mag));color:#fff}
+/* Lista */
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}.tools input{flex:1;min-width:200px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}.chips button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 12px;font:inherit;font-weight:800;font-size:12.5px;cursor:pointer}.chips button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.grp{margin-bottom:18px}.grp h3{margin:0 0 8px;font-size:15px;display:flex;justify-content:space-between;align-items:center}.grp h3 small{color:var(--muted);font-weight:700}
+.crow{display:grid;grid-template-columns:1.4fr 1fr auto;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:6px}
+.crow .nm{font-weight:800}.crow .nm small{display:block;color:var(--muted);font-weight:600;font-size:12.5px}
+.crow .pr .cobrar{border-width:1px;border-color:#d9dde6}.crow .pr .cobrar input{font-size:16px;padding:9px 8px}.crow .pr .der{font-size:11.5px;color:var(--muted);margin-top:3px}
+.crow .st{display:flex;gap:6px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.tag{font-size:11.5px;font-weight:800;border-radius:999px;padding:5px 9px;white-space:nowrap}.tag.ok{background:#e3f6ec;color:var(--good)}.tag.warn{background:#fff3dc;color:var(--warn)}.tag.bad{background:#fde7e9;color:var(--bad)}
+.crow .st button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 10px;font:inherit;font-weight:800;font-size:12.5px;cursor:pointer}
+@media(max-width:700px){.crow{grid-template-columns:1fr}.crow .st{justify-content:flex-start}}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}@media(max-width:700px){.rules{grid-template-columns:1fr}}
+.rule{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px}.rule strong{display:block;margin-bottom:8px}.rule .row2 input{padding:9px}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.note{background:#fffdf3;border:1px solid #f3e7a6;border-left:5px solid var(--yel);border-radius:14px;padding:10px 12px;font-size:13.5px;margin-bottom:14px}
+.setup{background:#fde7e9;border:1px solid #f4b8be;color:#7d1b24;border-radius:16px;padding:16px;margin-bottom:16px;font-weight:700}
+/* Modal */
+.mback{position:fixed;inset:0;background:rgba(20,22,30,.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:20px;width:min(560px,100%);max-height:92vh;overflow:auto;padding:18px 20px}
+.modal h3{margin:0 0 12px;font-size:20px}.modal .foot{display:flex;gap:8px;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+.hist{font-size:12.5px;color:var(--muted);margin-top:10px}.hist div{padding:3px 0}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#20222a;color:#fff;padding:11px 16px;border-radius:12px;font-weight:700;font-size:13px;z-index:300}
+</style></head>
+<body class="auth-pending">
+<div class="top"></div>
+<header><div class="brand"><img src="logo-blanco.webp" alt=""><div><strong>Costos y calculadoras</strong><span>Tecnigráficas</span></div></div><button type="button" id="back">← <span class="bk">Volver al </span>sistema</button></header>
+<main>
+  <h1>¿Cuánto cobrar? 💲</h1>
+  <p class="sub">Los costos de los proveedores en un solo lugar. Cambias un precio y todas las calculadoras lo usan.</p>
+  <div id="setup"></div>
+  <nav class="tabs" id="tabs">
+    <button type="button" data-t="acr">🪧 Acrílico y letreros</button>
+    <button type="button" data-t="lla">🔑 Llaveros</button>
+    <button type="button" data-t="bol">🛍 Bolsas</button>
+    <button type="button" data-t="list">📋 Lista de costos</button>
+  </nav>
+
+  <!-- ACRÍLICO -->
+  <section class="tab" id="t-acr"><div class="calc">
+    <div class="card">
+      <div class="sec">1 · Material y medidas</div>
+      <div class="f"><label for="aMat">Material</label><select id="aMat" data-buscar></select></div>
+      <div class="row">
+        <div class="f"><label for="aW">Ancho (cm)</label><input id="aW" type="number" inputmode="decimal" min="0" value="60"></div>
+        <div class="f"><label for="aH">Alto (cm)</label><input id="aH" type="number" inputmode="decimal" min="0" value="40"></div>
+        <div class="f"><label for="aQ">¿Cuántos?</label><input id="aQ" type="number" inputmode="numeric" min="1" value="1"></div>
+      </div>
+      <div class="sec">2 · Impresión</div>
+      <div class="pills" id="aPrint"></div>
+      <div class="sec">3 · Extras</div>
+      <div class="checks">
+        <label class="chk"><input type="checkbox" id="aCut" checked><span>Corte</span><b id="aCutP"></b></label>
+        <div class="chk" style="cursor:default"><span>Dilatadores</span><div class="mini"><input id="aDil" type="number" min="0" value="0" inputmode="numeric"></div><b id="aDilP"></b></div>
+        <div class="chk" style="cursor:default"><span>Otro costo <small style="font-weight:600;color:var(--muted)">(herrero, maderita…)</small></span><div class="mini"><input id="aOther" type="text" inputmode="numeric" data-money value="" placeholder="$ 0" style="width:120px"></div></div>
+      </div>
+      <div class="sec">4 · Servicios que se cobran aparte</div>
+      <div class="checks" id="aSvc"></div>
+      <div class="hint">Estos se suman al final tal cual, no se multiplican.</div>
+      <div class="sec">Margen</div>
+      <div class="row2"><div class="f"><label for="aF">Multiplicar costo por</label><input id="aF" type="number" step="0.1" min="1" inputmode="decimal"></div><div class="f"><label for="aWaste">Desperdicio de material (%)</label><input id="aWaste" type="number" min="0" inputmode="numeric"></div></div>
+    </div>
+    <div class="card res" id="aRes"></div>
+  </div></section>
+
+  <!-- LLAVEROS -->
+  <section class="tab" id="t-lla"><div class="calc">
+    <div class="card">
+      <div class="sec">1 · Tamaño y cantidad</div>
+      <div class="row">
+        <div class="f"><label for="lW">Ancho (cm)</label><input id="lW" type="number" inputmode="decimal" min="0" value="5"></div>
+        <div class="f"><label for="lH">Alto (cm)</label><input id="lH" type="number" inputmode="decimal" min="0" value="5"></div>
+        <div class="f"><label for="lQ">¿Cuántos?</label><input id="lQ" type="number" inputmode="numeric" min="1" value="300"></div>
+      </div>
+      <div class="f"><label for="lMat">Material</label><select id="lMat" data-buscar></select></div>
+      <div class="sec">2 · Impresión</div>
+      <div class="pills" id="lPrint"></div>
+      <div class="f" style="margin-top:12px" id="lSidesWrap"><label>Caras impresas</label><div class="pills" id="lSides"><button type="button" data-v="1" class="on">Una cara</button><button type="button" data-v="2">Dos caras</button></div></div>
+      <div class="sec">3 · Extras</div>
+      <div class="checks">
+        <label class="chk"><input type="checkbox" id="lCut" checked><span>Corte láser</span><b id="lCutP"></b></label>
+        <label class="chk"><input type="checkbox" id="lRing" checked><span>Argolla</span><b id="lRingP"></b></label>
+      </div>
+      <div class="sec">Margen</div>
+      <div class="row2"><div class="f"><label for="lF">Multiplicar costo por</label><input id="lF" type="number" step="0.1" min="1" inputmode="decimal"></div><div class="f"><label for="lGap">Separación entre piezas (cm)</label><input id="lGap" type="number" step="0.1" min="0" value="0.3" inputmode="decimal"></div></div>
+    </div>
+    <div class="card res" id="lRes"></div>
+  </div></section>
+
+  <!-- BOLSAS -->
+  <section class="tab" id="t-bol"><div class="calc">
+    <div class="card">
+      <div class="sec">1 · Bolsa y cantidad</div>
+      <div class="f"><label for="bBag">Tipo de bolsa</label><select id="bBag" data-buscar></select></div>
+      <div class="f"><label for="bQ">¿Cuántas?</label><input id="bQ" type="number" inputmode="numeric" min="1" value="100"></div>
+      <div class="sec">2 · Estampado</div>
+      <div class="pills" id="bPrint"></div>
+      <div class="hint" id="bFixHint"></div>
+      <div class="sec">Margen</div>
+      <div class="f"><label for="bF">Multiplicar costo por</label><input id="bF" type="number" step="0.1" min="1" inputmode="decimal"></div>
+    </div>
+    <div class="card res" id="bRes"></div>
+  </div></section>
+
+  <!-- LISTA -->
+  <section class="tab" id="t-list">
+    <div class="note" id="listNote">💡 Cuando un proveedor te dé un precio nuevo, cámbialo aquí. Si sigue igual, toca <b>✓ Sigue igual</b> para que quede la fecha.</div>
+    <div class="tools"><input id="q" placeholder="🔎 Buscar: acrílico, MDF, bolsa, argolla…"><button class="btn p" id="addCost" type="button">＋ Agregar costo</button></div>
+    <div class="chips" id="chips"></div>
+    <div id="list"></div>
+    <details class="rulesbox"><summary>⚙ Margen de cada calculadora (por cuánto se multiplica el costo)</summary><div class="rules" id="rules"></div></details>
+  </section>
+</main>
+<script>
+const SB_URL="https://kqrfcdfygskzhsdzzcze.supabase.co",SB_KEY="sb_publishable_KfkIr6TlW6ivuT5cD0g9Kg_EuZwDKJ9";
+const db=window.supabase.createClient(SB_URL,SB_KEY);
+const $=id=>document.getElementById(id);
+const S={items:[],rules:{},canManage:false,cat:"",ready:false,print:{a:"",l:"",b:""},sides:1};
+const money=v=>"$ "+Math.round(Number(v)||0).toLocaleString("es-CO");
+const money2=v=>"$ "+(Number(v)||0).toLocaleString("es-CO",{maximumFractionDigits:2});
+const esc=t=>String(t==null?"":t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num=v=>{const n=Number(String(v??"").replace(",","."));return isFinite(n)?n:0};
+const digits=v=>Number(String(v||"").replace(/\D/g,""))||0;
+const roundUp=(v,step=500)=>v>0?Math.ceil(v/step)*step:0;
+function toast(t){const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
+function fmtMoneyInput(el){const d=String(el.value).replace(/\D/g,"");el.value=d?Number(d).toLocaleString("es-CO"):""}
+document.addEventListener("input",e=>{if(e.target.matches("input[data-money]"))fmtMoneyInput(e.target)});
+
+/* ---------- Datos ---------- */
+const kindTxt={lamina:"Lámina",unidad:"Unidad",paquete:"Paquete",fijo:"Fijo por pedido",servicio:"Servicio que cobramos"};
+function label(it){return [it.name,it.detail].filter(Boolean).join(" · ")+(it.unit_kind==="lamina"&&it.width_cm?` (${+it.width_cm}×${+it.height_cm} cm)`:"")}
+function unitPrice(it){return it.unit_kind==="paquete"&&num(it.pack_qty)>0?num(it.price)/num(it.pack_qty):num(it.price)}
+function perCm2(it){const a=num(it.width_cm)*num(it.height_cm);return a>0?num(it.price)/a:0}
+function derived(it){if(it.unit_kind==="lamina")return `= ${money2(perCm2(it))} el cm²`;if(it.unit_kind==="paquete")return `= ${money2(unitPrice(it))} c/u (paquete de ${(+it.pack_qty).toLocaleString("es-CO")})`;return kindTxt[it.unit_kind]||""}
+function fresh(it){if(!it.updated_on)return{c:"warn",t:"Sin confirmar"};const [y,m,d]=it.updated_on.split("-").map(Number);const days=Math.floor((Date.now()-new Date(y,m-1,d))/864e5);
+  if(days<=0)return{c:"ok",t:"✓ Confirmado hoy"};if(days<=60)return{c:"ok",t:`✓ Hace ${days} día${days===1?"":"s"}`};const mo=Math.round(days/30);return{c:days<=120?"warn":"bad",t:days<=120?`Hace ${mo} meses`:`Hace ${mo} meses · revisar`}}
+const byCat=c=>S.items.filter(i=>i.active&&i.category===c);
+const find=re=>S.items.find(i=>i.active&&re.test(i.name));
+function rule(code){return S.rules[code]||{factor:2,waste_pct:code==="acrilico"?10:0}}
+
+async function load(){
+  const [a,b,p1,p2]=await Promise.all([
+    db.from("cost_catalog").select("*").order("sort_order").order("name"),
+    db.from("pricing_rules").select("*"),
+    db.rpc("has_permission",{requested_permission:"calculators.manage"}),
+    db.rpc("has_permission",{requested_permission:"products.manage"})]);
+  if(a.error){$("setup").innerHTML=`<div class="setup">⚠ Todavía no está creada la lista de costos en la base de datos. Hay que correr una sola vez el archivo <b>costos.sql</b> en Supabase → SQL Editor.<br><small style="font-weight:600">${esc(a.error.message)}</small></div>`;S.items=[];}
+  else S.items=a.data||[];
+  S.rules={};(b.data||[]).forEach(r=>S.rules[r.code]=r);
+  S.canManage=!!(p1.data||p2.data);
+  S.ready=true;fillSelects();renderAll();
+}
+
+/* ---------- Selects ---------- */
+function opts(list,sel){return list.map(i=>`<option value="${i.id}"${i.id===sel?" selected":""}>${esc(label(i))} — ${money(i.price)}</option>`).join("")}
+function fillSelects(){
+  const lam=byCat("Láminas"),bags=byCat("Bolsas");
+  const keep=(id,list,def)=>{const el=$(id),cur=el.value&&list.some(i=>i.id===el.value)?el.value:(def&&def.id)||(list[0]&&list[0].id)||"";el.innerHTML=list.length?opts(list,cur):'<option value="">(no hay en la lista)</option>';el.value=cur};
+  keep("aMat",lam,lam.find(i=>/cristal/i.test(i.name)&&/^3/.test(i.detail||"")));
+  keep("lMat",lam,lam.find(i=>/cristal/i.test(i.name)&&/^3/.test(i.detail||"")&&+i.height_cm===180));
+  keep("bBag",bags);
+  const prints=byCat("Impresión");
+  const mk=(host,key,list,none)=>{if(!S.print[key]||(S.print[key]!=="none"&&!list.some(i=>i.id===S.print[key])))S.print[key]=key==="a"?"none":(list[0]?list[0].id:"none");
+    $(host).innerHTML=[`<button type="button" data-v="none">${none}</button>`].concat(list.map(i=>`<button type="button" data-v="${i.id}">${esc(i.name)}</button>`)).join("");paintPills(host,S.print[key])};
+  mk("aPrint","a",prints,"Sin impresión");mk("lPrint","l",prints,"Sin impresión");
+  const est=byCat("Estampado de bolsas").filter(i=>i.unit_kind==="unidad");
+  if(!S.print.b||(S.print.b!=="none"&&!est.some(i=>i.id===S.print.b)))S.print.b="none";
+  $("bPrint").innerHTML=[`<button type="button" data-v="none">Sin estampar</button>`].concat(est.map(i=>`<button type="button" data-v="${i.id}">${esc(i.name.replace(/^Estampado\s*/i,"").replace(/^./,c=>c.toUpperCase()))}</button>`)).join("");paintPills("bPrint",S.print.b);
+  const svc=byCat("Servicios que cobramos");const was=new Set([...document.querySelectorAll("#aSvc input:checked")].map(x=>x.value));
+  $("aSvc").innerHTML=svc.map(i=>`<label class="chk"><input type="checkbox" value="${i.id}"${was.has(i.id)?" checked":""}><span>${esc(i.name)}</span><b>${money(i.price)}</b></label>`).join("")||'<div class="hint">No hay servicios en la lista.</div>';
+  ["a","l","b"].forEach(k=>{const code={a:"acrilico",l:"llaveros",b:"bolsas"}[k],f=$(k+"F");if(!f.dataset.touched)f.value=rule(code).factor});
+  if(!$("aWaste").dataset.touched)$("aWaste").value=rule("acrilico").waste_pct;
+}
+function paintPills(host,v){$(host).querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v===v))}
+["aPrint","lPrint","bPrint"].forEach(h=>$(h).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S.print[h[0]]=b.dataset.v;paintPills(h,b.dataset.v);renderCalcs()}));
+$("lSides").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S.sides=+b.dataset.v;paintPills("lSides",b.dataset.v);renderCalcs()});
+["aF","lF","bF","aWaste"].forEach(id=>$(id).addEventListener("input",()=>$(id).dataset.touched="1"));
+document.querySelectorAll("#t-acr input,#t-acr select,#t-lla input,#t-lla select,#t-bol input,#t-bol select").forEach(el=>{el.addEventListener("input",renderCalcs);el.addEventListener("change",renderCalcs)});
+$("aSvc").addEventListener("change",renderCalcs);
+const byId=id=>S.items.find(i=>i.id===id);
+
+/* ---------- Resultado común ---------- */
+const lastCalc={};
+function result(key,o){
+  // o: {lines:[{t,s,v}], cost, factor, services:[{t,v}], qty, warn, productName, desc}
+  const svcT=o.services.reduce((s,x)=>s+x.v,0),sale=o.cost*o.factor,sug=roundUp(sale+svcT,o.qty>=50?100:500);
+  const prev=lastCalc[key],host=$(key+"Res");
+  let cobrar=sug;const inp=host.querySelector(".cobrar input");
+  if(prev&&inp&&inp.dataset.touched&&prev.sug===sug)cobrar=digits(inp.value);
+  lastCalc[key]={...o,sug,svcT,cobrar};
+  const gain=cobrar-o.cost-svcT,unit=o.qty>0?cobrar/o.qty:0;
+  host.innerHTML=`<div class="sec">Costo</div>
+    <div class="lines">${o.lines.map(l=>`<div class="ln"><span>${esc(l.t)}${l.s?`<small>${esc(l.s)}</small>`:""}</span><b>${money(l.v)}</b></div>`).join("")}
+    <div class="ln tot"><span>Nos cuesta</span><b>${money(o.cost)}</b></div>
+    <div class="ln"><span>× ${String(o.factor).replace(".",",")}</span><b>${money(sale)}</b></div>
+    ${o.services.map(s=>`<div class="ln sv"><span>+ ${esc(s.t)}</span><b>${money(s.v)}</b></div>`).join("")}</div>
+    ${o.warn?`<div class="warn">${o.warn}</div>`:""}
+    <div class="big"><div class="k">Precio sugerido</div><div class="v">${money(sug)}</div><div class="u">${o.qty>1?`${money(sug/o.qty)} c/u · `:""}con IVA ${money(sug*1.19)}</div></div>
+    <label>Lo que vas a cobrar <small style="font-weight:600;color:var(--muted)">(puedes cambiarlo)</small></label>
+    <div class="cobrar"><span>$</span><input inputmode="numeric" data-money value="${cobrar.toLocaleString("es-CO")}"${prev&&inp&&inp.dataset.touched&&prev.sug===sug?' data-touched="1"':""}></div>
+    <div class="gain ${gain>=o.cost*0.3?"ok":"low"}">${gain>=0?`Nos queda ${money(gain)}`:`⚠ Pierdes ${money(-gain)}`}${o.qty>1?` · ${money(unit)} c/u`:""}</div>
+    <div data-quote-bridge></div>
+    <div class="acts"><button type="button" class="b1" data-send="append">＋ Agregar a la cotización</button><button type="button" class="b2" data-send="new">Empezar cotización nueva con esto</button></div>`;
+  const ci=host.querySelector(".cobrar input");
+  ci.addEventListener("input",()=>{ci.dataset.touched="1";const c=digits(ci.value);lastCalc[key].cobrar=c;const g=c-o.cost-svcT,gl=host.querySelector(".gain");gl.className="gain "+(g>=o.cost*0.3?"ok":"low");gl.textContent=(g>=0?`Nos queda ${money(g)}`:`⚠ Pierdes ${money(-g)}`)+(o.qty>1?` · ${money(o.qty?c/o.qty:0)} c/u`:"")});
+  host.querySelectorAll("[data-send]").forEach(b=>b.onclick=()=>send(key,b.dataset.send));
+  window.TecniQuote&&TecniQuote.paint();
+}
+function emptyRes(key,msg){$(key+"Res").innerHTML=`<div class="empty">${msg}</div>`;lastCalc[key]=null}
+function send(key,mode){const c=lastCalc[key];if(!c||!c.cobrar||!c.qty)return alert("Primero completa el cálculo.");
+  TecniQuote.send({source:"costos_"+key,quantity:c.qty,unit:"Unidad",detail:c.productName,description:c.desc,unitPrice:c.cobrar/c.qty,total:c.cobrar,suggestedUnitPrice:c.sug/c.qty,unitCost:(c.cost+c.svcT)/c.qty},mode,"costos")}
+
+/* ---------- Acrílico ---------- */
+function calcA(){
+  const m=byId($("aMat").value),w=num($("aW").value),h=num($("aH").value),q=Math.max(0,Math.round(num($("aQ").value)));
+  if(!m||!w||!h||!q)return emptyRes("a","Escribe el material, las medidas y la cantidad.");
+  const waste=num($("aWaste").value)/100,area=w*h*q*(1+waste),lines=[];
+  lines.push({t:`${m.name} ${m.detail||""}`,s:`${w}×${h} cm × ${q}${waste?` + ${Math.round(waste*100)}% desperdicio`:""}`,v:area*perCm2(m)});
+  const pr=S.print.a!=="none"&&byId(S.print.a);if(pr)lines.push({t:pr.name,s:`${(w*h*q).toLocaleString("es-CO")} cm²`,v:w*h*q*(1+waste)*perCm2(pr)});
+  const cut=find(/corte de letrero/i);$("aCutP").textContent=cut?money(cut.price):"";if($("aCut").checked&&cut)lines.push({t:"Corte",v:num(cut.price)});
+  const dil=find(/dilatador/i),nd=Math.max(0,Math.round(num($("aDil").value)));$("aDilP").textContent=dil?`${money(dil.price)} c/u`:"";if(nd&&dil)lines.push({t:`Dilatadores × ${nd*q}`,s:`${nd} por pieza`,v:nd*q*unitPrice(dil)});
+  const other=digits($("aOther").value);if(other)lines.push({t:"Otro costo",v:other});
+  const services=[...document.querySelectorAll("#aSvc input:checked")].map(x=>byId(x.value)).filter(Boolean).map(i=>({t:i.name,v:num(i.price)}));
+  const fits=(w<=+m.width_cm&&h<=+m.height_cm)||(h<=+m.width_cm&&w<=+m.height_cm);
+  const cost=lines.reduce((s,l)=>s+l.v,0);
+  result("a",{lines,cost,factor:num($("aF").value)||1,services,qty:q,warn:fits?"":`⚠ La pieza no cabe en una lámina de ${+m.width_cm}×${+m.height_cm} cm. Toca hacerla por partes.`,
+    productName:`${/polietileno/i.test(m.name)?"Aviso":"Letrero"} en ${m.name.toLowerCase()} ${m.detail||""}`.trim(),
+    desc:[`${w} × ${h} cm`,pr?`impreso en ${pr.name.toLowerCase()}`:"",nd?`${nd} dilatadores`:"",...services.map(s=>"incluye "+s.t.toLowerCase())].filter(Boolean).join(" · ")});
+}
+/* ---------- Llaveros ---------- */
+function fitCount(W,H,w,h,g){if(!W||!H||!w||!h)return 0;const f=(a,b)=>Math.floor((W+g)/(a+g))*Math.floor((H+g)/(b+g));return Math.max(f(w,h),f(h,w))}
+function calcL(){
+  const m=byId($("lMat").value),w=num($("lW").value),h=num($("lH").value),q=Math.max(0,Math.round(num($("lQ").value))),g=num($("lGap").value);
+  if(!m||!w||!h||!q)return emptyRes("l","Escribe el tamaño, la cantidad y el material.");
+  const per=fitCount(+m.width_cm,+m.height_cm,w,h,g);if(!per)return emptyRes("l","El llavero no cabe en la lámina 🤔");
+  const sheets=Math.ceil(q/per),lines=[];
+  lines.push({t:`${m.name} ${m.detail||""}`,s:`Caben ${per.toLocaleString("es-CO")} por lámina · ${money2(num(m.price)/per)} c/u`,v:q*num(m.price)/per});
+  const cut=find(/corte l[aá]ser/i);$("lCutP").textContent=cut?`${money(cut.price)} por lámina`:"";if($("lCut").checked&&cut)lines.push({t:"Corte láser",s:`${money2(num(cut.price)/per)} c/u`,v:q*num(cut.price)/per});
+  const pr=S.print.l!=="none"&&byId(S.print.l);$("lSidesWrap").style.display=pr?"":"none";
+  if(pr){const pp=fitCount(+pr.width_cm,+pr.height_cm,w,h,g);if(pp){const n=q*(S.sides||1);lines.push({t:`${pr.name} · ${S.sides===2?"dos caras":"una cara"}`,s:`Caben ${pp} por pliego · ${money2(num(pr.price)/pp)} c/u`,v:n*num(pr.price)/pp})}}
+  const ring=find(/argolla/i);$("lRingP").textContent=ring?`${money2(unitPrice(ring))} c/u`:"";if($("lRing").checked&&ring)lines.push({t:"Argollas",s:`${money2(unitPrice(ring))} c/u`,v:q*unitPrice(ring)});
+  const cost=lines.reduce((s,l)=>s+l.v,0);
+  result("l",{lines,cost,factor:num($("lF").value)||1,services:[],qty:q,warn:sheets>1?`Necesitas ${sheets} láminas para ${q.toLocaleString("es-CO")} llaveros.`:"",
+    productName:`Llavero en ${m.name.toLowerCase()} ${m.detail||""}`.trim(),desc:[`${w} × ${h} cm`,pr?`${pr.name.toLowerCase()} ${S.sides===2?"dos caras":"una cara"}`:"",$("lRing").checked?"con argolla":""].filter(Boolean).join(" · ")});
+}
+/* ---------- Bolsas ---------- */
+function calcB(){
+  const b=byId($("bBag").value),q=Math.max(0,Math.round(num($("bQ").value)));
+  if(!b||!q)return emptyRes("b","Escoge la bolsa y la cantidad.");
+  const lines=[{t:`${b.name} ${b.detail||""}`,s:`${money2(unitPrice(b))} c/u`,v:q*unitPrice(b)}];
+  const pr=S.print.b!=="none"&&byId(S.print.b),fixed=byCat("Estampado de bolsas").filter(i=>i.unit_kind==="fijo");
+  $("bFixHint").textContent=fixed.length?`Al estampar se suma por pedido: ${fixed.map(f=>`${f.name.toLowerCase()} ${money(f.price)}`).join(" y ")}.`:"";
+  if(pr){lines.push({t:pr.name,s:`${money(pr.price)} por bolsa`,v:q*num(pr.price)});fixed.forEach(f=>lines.push({t:f.name,s:"Por pedido",v:num(f.price)}))}
+  const cost=lines.reduce((s,l)=>s+l.v,0);
+  result("b",{lines,cost,factor:num($("bF").value)||1,services:[],qty:q,warn:"",productName:`${b.name} ${b.detail||""}`.trim(),desc:pr?pr.name.toLowerCase():"sin estampar"});
+}
+function renderCalcs(){if(!S.ready)return;calcA();calcL();calcB()}
+
+/* ---------- Lista de costos ---------- */
+function renderRules(){
+  const codes=[["acrilico","🪧 Acrílico y letreros",true],["llaveros","🔑 Llaveros"],["bolsas","🛍 Bolsas"]];
+  $("rules").innerHTML=codes.map(([c,n,w])=>{const r=rule(c);return `<div class="rule"><strong>${n}</strong><div class="row2"><div><label>× factor</label><input data-rule="${c}" data-k="factor" type="number" step="0.1" min="1" value="${r.factor}"${S.canManage?"":" disabled"}></div>${w?`<div><label>% desperdicio</label><input data-rule="${c}" data-k="waste_pct" type="number" min="0" value="${r.waste_pct}"${S.canManage?"":" disabled"}></div>`:"<div></div>"}</div></div>`}).join("");
+}
+$("rules").addEventListener("change",async e=>{const i=e.target.closest("[data-rule]");if(!i)return;const c=i.dataset.rule,r={...rule(c),code:c,name:{acrilico:"Acrílico y letreros",llaveros:"Llaveros",bolsas:"Bolsas"}[c]};r[i.dataset.k]=num(i.value);
+  const {error}=await db.from("pricing_rules").upsert({code:c,name:r.name,factor:r.factor,waste_pct:r.waste_pct});if(error)return alert("No se pudo guardar: "+error.message);S.rules[c]=r;
+  const k={acrilico:"a",llaveros:"l",bolsas:"b"}[c];delete $(k+"F").dataset.touched;if(c==="acrilico")delete $("aWaste").dataset.touched;fillSelects();renderCalcs();toast("✓ Margen guardado")});
+function renderList(){
+  const q=$("q").value.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+  const act=S.items.filter(i=>i.active),cats=[...new Set(act.map(i=>i.category))];
+  $("chips").innerHTML=[`<button type="button" data-c=""${!S.cat?' class="on"':""}>Todo (${act.length})</button>`].concat(cats.map(c=>`<button type="button" data-c="${esc(c)}"${S.cat===c?' class="on"':""}>${esc(c)}</button>`)).join("");
+  const pending=act.filter(i=>fresh(i).c!=="ok").length;
+  $("listNote").innerHTML=`💡 Cuando un proveedor te dé un precio nuevo, cámbialo aquí. Si sigue igual, toca <b>✓ Sigue igual</b>.${pending?` <b>${pending} precio${pending===1?"":"s"} por confirmar.</b>`:" Todo está al día 🎉"}`;
+  $("addCost").style.display=S.canManage?"":"none";
+  const list=act.filter(i=>(!S.cat||i.category===S.cat)&&(!q||[i.category,i.name,i.detail,i.supplier].join(" ").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").includes(q)));
+  if(!list.length){$("list").innerHTML=`<div class="empty">${S.items.length?"No encontré nada con eso.":"La lista está vacía."}</div>`;return}
+  const groups=[...new Set(list.map(i=>i.category))];
+  $("list").innerHTML=groups.map(g=>{const rows=list.filter(i=>i.category===g);return `<div class="grp"><h3>${esc(g)} <small>${rows.length}</small></h3>${rows.map(i=>{const f=fresh(i);return `<div class="crow" data-id="${i.id}">
+    <div class="nm">${esc(i.name)}<small>${esc([i.detail,i.unit_kind==="lamina"&&i.width_cm?`${+i.width_cm} × ${+i.height_cm} cm`:"",i.supplier].filter(Boolean).join(" · "))}${i.notes?` · <i>${esc(i.notes)}</i>`:""}</small></div>
+    <div class="pr">${S.canManage?`<div class="cobrar"><span>$</span><input inputmode="numeric" data-money data-price="${i.id}" value="${Math.round(num(i.price)).toLocaleString("es-CO")}"></div>`:`<b>${money(i.price)}</b>`}<div class="der">${esc(derived(i))}</div></div>
+    <div class="st"><span class="tag ${f.c}">${f.t}</span>${S.canManage?`${f.c!=="ok"?`<button type="button" data-ok="${i.id}">✓ Sigue igual</button>`:""}<button type="button" data-edit="${i.id}" title="Editar">✎</button>`:""}</div></div>`}).join("")}</div>`}).join("");
+}
+$("chips").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;S.cat=b.dataset.c;renderList()});
+$("q").addEventListener("input",renderList);
+function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+async function patch(id,p,msg){const {data,error}=await db.from("cost_catalog").update(p).eq("id",id).select("*").single();if(error){alert("No se pudo guardar: "+error.message);return false}
+  const k=S.items.findIndex(i=>i.id===id);if(k>=0)S.items[k]=data||{...S.items[k],...p};fillSelects();renderAll();if(msg)toast(msg);return true}
+$("list").addEventListener("click",e=>{const ok=e.target.closest("[data-ok]"),ed=e.target.closest("[data-edit]");if(ok)patch(ok.dataset.ok,{updated_on:today()},"✓ Confirmado");if(ed)openEdit(byId(ed.dataset.edit))});
+$("list").addEventListener("change",e=>{const i=e.target.closest("[data-price]");if(!i)return;const it=byId(i.dataset.price),v=digits(i.value);if(!it||v===Math.round(num(it.price)))return;
+  if(!confirm(`¿Cambiar ${label(it)} de ${money(it.price)} a ${money(v)}?`)){i.value=Math.round(num(it.price)).toLocaleString("es-CO");return}patch(it.id,{price:v,updated_on:today()},"✓ Precio actualizado")});
+$("addCost").onclick=()=>openEdit(null);
+
+async function openEdit(it){
+  const isNew=!it;it=it||{category:S.cat||"",name:"",detail:"",supplier:"",unit_kind:"unidad",price:0};
+  const cats=[...new Set(S.items.map(i=>i.category))];
+  const b=document.createElement("div");b.className="mback";b.innerHTML=`<form class="modal" autocomplete="off"><h3>${isNew?"＋ Nuevo costo":"✎ Editar costo"}</h3>
+   <div class="f"><label>Grupo</label><input name="category" list="catList" required value="${esc(it.category)}" placeholder="Ej. Láminas, Bolsas…"><datalist id="catList">${cats.map(c=>`<option value="${esc(c)}">`).join("")}</datalist></div>
+   <div class="row2"><div class="f"><label>Nombre</label><input name="name" required value="${esc(it.name)}" placeholder="Ej. Acrílico cristal"></div><div class="f"><label>Detalle</label><input name="detail" value="${esc(it.detail||"")}" placeholder="Ej. 3 mm"></div></div>
+   <div class="f"><label>¿Cómo se compra?</label><select name="unit_kind">${Object.entries(kindTxt).map(([k,v])=>`<option value="${k}"${it.unit_kind===k?" selected":""}>${v}</option>`).join("")}</select></div>
+   <div class="row2" data-k="lamina"><div class="f"><label>Ancho de la lámina (cm)</label><input name="width_cm" type="number" step="0.1" value="${it.width_cm??""}"></div><div class="f"><label>Alto de la lámina (cm)</label><input name="height_cm" type="number" step="0.1" value="${it.height_cm??""}"></div></div>
+   <div class="f" data-k="paquete"><label>¿Cuántas trae el paquete?</label><input name="pack_qty" type="number" value="${it.pack_qty??""}"></div>
+   <div class="row2"><div class="f"><label>Precio</label><div class="cobrar"><span>$</span><input name="price" inputmode="numeric" data-money required value="${Math.round(num(it.price)).toLocaleString("es-CO")}"></div></div><div class="f"><label>Proveedor</label><input name="supplier" value="${esc(it.supplier||"")}" placeholder="Opcional"></div></div>
+   <div class="f"><label>Nota</label><input name="notes" value="${esc(it.notes||"")}" placeholder="Opcional"></div>
+   <div class="hist" id="hist"></div>
+   <div class="foot">${isNew?"<span></span>":'<button type="button" class="btn" data-off>Quitar de la lista</button>'}<div style="display:flex;gap:8px"><button type="button" class="btn" data-x>Cancelar</button><button class="btn p">✓ Guardar</button></div></div></form>`;
+  document.body.appendChild(b);const f=b.querySelector("form");
+  const kinds=()=>{const k=f.unit_kind.value;f.querySelectorAll("[data-k]").forEach(x=>x.style.display=x.dataset.k===k?"":"none")};kinds();f.unit_kind.onchange=kinds;
+  b.querySelector("[data-x]").onclick=()=>b.remove();b.addEventListener("mousedown",e=>{if(e.target===b)b.remove()});
+  const off=b.querySelector("[data-off]");if(off)off.onclick=async()=>{if(!confirm("¿Quitar este costo de la lista? Ya no saldrá en las calculadoras."))return;if(await patch(it.id,{active:false},"Quitado de la lista"))b.remove()};
+  if(!isNew){const h=await db.from("cost_catalog_history").select("*").eq("cost_id",it.id).order("changed_at",{ascending:false}).limit(8);
+    if(h.data&&h.data.length)$("hist").innerHTML="<b>Cambios de precio:</b>"+h.data.map(x=>`<div>${new Date(x.changed_at).toLocaleDateString("es-CO",{day:"numeric",month:"short",year:"numeric"})}: ${money(x.old_price)} → ${money(x.new_price)}</div>`).join("")}
+  f.onsubmit=async e=>{e.preventDefault();const k=f.unit_kind.value,p={category:f.category.value.trim(),name:f.name.value.trim(),detail:f.detail.value.trim()||null,supplier:f.supplier.value.trim()||null,unit_kind:k,
+      width_cm:k==="lamina"?num(f.width_cm.value)||null:null,height_cm:k==="lamina"?num(f.height_cm.value)||null:null,pack_qty:k==="paquete"?num(f.pack_qty.value)||null:null,price:digits(f.price.value),notes:f.notes.value.trim()||null};
+    if(!p.category||!p.name)return;if(k==="lamina"&&(!p.width_cm||!p.height_cm))return alert("Escribe el ancho y el alto de la lámina.");if(k==="paquete"&&!p.pack_qty)return alert("Escribe cuántas trae el paquete.");
+    if(isNew){p.updated_on=today();p.sort_order=1000;const {data,error}=await db.from("cost_catalog").insert(p).select("*").single();if(error)return alert("No se pudo guardar: "+error.message);S.items.push(data);fillSelects();renderAll();toast("✓ Costo agregado");b.remove()}
+    else{if(p.price!==Math.round(num(it.price)))p.updated_on=today();if(await patch(it.id,p,"✓ Guardado"))b.remove()}};
+  setTimeout(()=>f.name.focus(),50);
+}
+function renderAll(){renderRules();renderList();renderCalcs()}
+
+/* ---------- Pestañas ---------- */
+function tab(t){document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));document.querySelectorAll(".tab").forEach(s=>s.classList.toggle("on",s.id==="t-"+t));try{localStorage.setItem("tg-costos-tab",t)}catch(e){}}
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(b)tab(b.dataset.t)});
+let first="acr";try{first=localStorage.getItem("tg-costos-tab")||"acr"}catch(e){}const hashT=(location.hash||"").slice(1);tab(["acr","lla","bol","list"].includes(hashT)?hashT:first);
+$("back").onclick=()=>location.href="index.html#calculators";
+
+(async()=>{const {data:{session}}=await db.auth.getSession();if(!session){location.replace("index.html");return}document.body.classList.remove("auth-pending");try{await load()}catch(e){alert("No se pudo cargar: "+e.message)}})();
+window.__t={S,load,renderAll,lastCalc,fitCount};
+</script></body></html>

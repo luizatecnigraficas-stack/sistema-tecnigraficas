@@ -2465,7 +2465,7 @@
         .sort((a,b)=>(a.status===b.status?0:a.status==="open"?-1:1)||numberValue(b.balance)-numberValue(a.balance)||String(a.client_name).localeCompare(String(b.client_name),"es"));
       $("caGrid").innerHTML=rows.length?rows.map(r=>{
         const bal=numberValue(r.balance),closed=r.status==="closed",zero=!closed&&bal<=.01,last=[r.last_item_date,r.last_payment_date].filter(Boolean).sort().pop();
-        const flags=[numberValue(r.pending_delivery)?`<span class="ca-flag">📦 ${r.pending_delivery} sin entregar</span>`:"",numberValue(r.not_invoiced)&&!closed?`<span class="ca-flag inv">🧾 ${r.not_invoiced} sin facturar</span>`:""].join("");
+        const flags=[numberValue(r.pending_delivery)?`<span class="ca-flag">📦 ${r.pending_delivery} sin entregar</span>`:""].join("");
         return `<button type="button" class="ca-card${closed?" closed":zero?" zero":""}" data-ca="${r.client_account_id}"><div class="ca-top"><span class="ca-name">${escapeHTML(r.client_name)}</span><span class="ca-label">${escapeHTML(r.label)}${closed?" · cerrada":""}</span></div><span class="ca-due">${closed?"Cerrada "+caDate(r.closed_on):zero?"Al día ✓":formatCOP(bal)}</span><small>Entregado ${formatCOP(r.total)} · Abonado ${formatCOP(r.paid)}</small><small>${last?"Último movimiento: "+caDate(last):"Sin movimientos todavía"}</small>${flags?`<div class="ca-flags">${flags}</div>`:""}</button>`
       }).join(""):`<div class="pgrid-empty">${f==="due"?"Nadie nos debe en cuentas 🎉 Toca <strong>+ Abrir cuenta</strong> para empezar una.":"No hay cuentas con ese filtro."}</div>`;
     }
@@ -2548,6 +2548,8 @@
       if(a.status==="closed"){if(!confirm("¿Reabrir esta cuenta para seguir anotando?"))return;const {error}=await db.from("client_accounts").update({status:"open",closed_on:null,updated_at:new Date().toISOString()}).eq("id",a.id);if(error)return alert(error.message);showToast("Cuenta reabierta");await caOpen(a.id);return loadCartera()}
       if(!skipAsk&&!confirm(t.balance>.01?`Esta cuenta todavía debe ${formatCOP(t.balance)}. ¿Cerrarla de todas formas?`:`¿Cerrar la cuenta ${a.label}? Queda guardada en el historial del cliente.`))return;
       loading(true,"Cerrando cuenta…");try{const {error}=await db.from("client_accounts").update({status:"closed",closed_on:todayISO(),updated_at:new Date().toISOString()}).eq("id",a.id);if(error)throw error}catch(err){loading(false);return alert(err.message)}loading(false);
+      const sinFac=ca.items.filter(i=>!i.invoiced).length;
+      if(sinFac&&confirm(`🧾 ¿Esta cuenta ya se facturó?\n\nSi tocas Aceptar, marco ${sinFac===1?"el producto":`los ${sinFac} productos`} como facturados.\nSi tocas Cancelar, quedan sin facturar.`)){const {error}=await db.from("client_account_items").update({invoiced:true}).eq("account_id",a.id).eq("invoiced",false);if(error)alert("La cuenta se cerró, pero no pude marcar la facturación: "+error.message)}
       showToast(`✓ Cuenta ${a.label} cerrada`);await loadCartera();
       const next=caNextLabel(a.client_name,a.label);
       if(confirm(`¿Abrir de una vez la siguiente cuenta para ${a.client_name} (“${next}”)?`)){loading(true,"Abriendo cuenta…");try{const {data,error}=await db.from("client_accounts").insert({client_id:a.client_id,client_name:a.client_name,label:next,tax_rate:a.tax_rate}).select("id").single();if(error)throw error;await loadCartera();loading(false);await caOpen(data.id);showToast(`✓ Cuenta ${next} abierta`)}catch(err){loading(false);alert(err.message)}}

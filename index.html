@@ -536,6 +536,9 @@
     @media(max-width:760px){.inv-grid{grid-template-columns:1fr 1fr;gap:10px}.inv-stock b{font-size:20px}.inv-body{padding:10px 11px 12px}.inv-name{font-size:13px}.inv-acts button{font-size:12px;padding:9px 4px}.inv-badge{font-size:10px;left:6px;bottom:6px}.mv-dir button{font-size:16px}}
     .tq-newc-row{display:flex;gap:6px;align-items:stretch;width:100%}.tq-newc-row input{flex:1;min-width:0}
     .tq-newc{border:1.5px solid #8edcf0;background:#e9f7fc;color:#087a9a;border-radius:11px;padding:0 12px;font-weight:900;font-size:12.5px;cursor:pointer;white-space:nowrap;font-family:inherit}.tq-newc:hover{background:#d4f0fa}
+    /* V9.28 la X de cerrar siempre a la vista */
+    .modal>.modal-head{position:sticky;top:-20px;z-index:20;background:#fff;margin:-20px -20px 14px;padding:14px 20px 12px;border-bottom:1px solid #eef0f4;border-radius:20px 20px 0 0}
+    .modal>.modal-head .modal-close{width:42px;height:42px;font-size:22px;font-weight:700;flex:0 0 auto}
     /* V9.19 Productos unificados */
     .pchips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
     .pchip{border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;font-weight:800;font-size:14px;cursor:pointer;min-height:44px}
@@ -1637,8 +1640,8 @@
     function escapeHTML(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
     function formatCOP(v){return new Intl.NumberFormat("es-CO",{style:"currency",currency:"COP",maximumFractionDigits:0}).format(Number(v)||0)}
     function formatDate(v){if(!v)return "—";return new Intl.DateTimeFormat("es-CO",{day:"2-digit",month:"short",year:"numeric"}).format(new Date(v+"T12:00:00"))}
-    function openModal(id){if(id==="productModal"||id==="catalogProductModal")prepareProductTabs(id);$(id).classList.remove("hidden");requestAnimationFrame(()=>autoGrowAll($(id)))}
-    function closeModal(id){$(id).classList.add("hidden")}
+    function openModal(id){delete $(id).dataset.dirty;if(id==="productModal"||id==="catalogProductModal")prepareProductTabs(id);$(id).classList.remove("hidden");requestAnimationFrame(()=>autoGrowAll($(id)))}
+    function closeModal(id){$(id).classList.add("hidden");delete $(id).dataset.dirty}
     function hasPermission(code){return state.permissions.get(code)===true}
     function canViewFinance(){return state.permissions instanceof Map&&state.permissions.has("finance.view")?hasPermission("finance.view"):["owner","admin"].includes(state.profile?.role)}
     function canManageFinance(){return canViewFinance()}
@@ -2731,6 +2734,13 @@
       $("inventoryMinimumStockField").querySelector("label").textContent="Avísame cuando queden menos de…";
     }
     try{wireInventoryV923()}catch(e){console.error("Inventario V9.23",e)}
+    // V9.28: tocar afuera de una ventana la cierra (si escribiste algo, pregunta antes)
+    (function(){let downOn=null;
+      document.addEventListener("mousedown",e=>{downOn=e.target},true);
+      document.addEventListener("input",e=>{const b=e.target.closest&&e.target.closest(".modal-backdrop");if(b)b.dataset.dirty="1"},true);
+      document.addEventListener("click",e=>{const b=e.target;if(!b.classList||!b.classList.contains("modal-backdrop")||b.classList.contains("hidden")||downOn!==b||!b.id)return;
+        if(b.dataset.dirty==="1"&&!confirm("¿Cerrar sin guardar lo que escribiste?"))return;closeModal(b.id)});
+    })();
     // V9.09: venta rápida, comprobantes y niveles de acceso
     function financePermsInstalled(){return state.permissions instanceof Map&&state.permissions.has("finance.view")}
     function supportsEnabled(){return financePermsInstalled()}

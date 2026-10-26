@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="es">
+<head><script src="arrastrar.js" defer></script><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Tecni"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#191b22">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TecniCut — Contornos para stickers | Tecnigráficas</title>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--text:#172033;--muted:#667085;--line:#dde3ec;--blue:#2563eb;--red:#be123c}
+*{box-sizing:border-box} html:not(.auth-ready) body{visibility:hidden}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,#101827,#27364e);color:#fff;padding:20px 28px}.headerbar{max-width:1520px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:18px}.headercopy{min-width:0} header h1{margin:0;font-size:26px} header p{margin:5px 0 0;color:#d7dfeb;font-size:14px}.backSystem{flex:0 0 auto;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;padding:10px 14px}.backSystem:hover{background:rgba(255,255,255,.2)}
+main{max-width:1520px;margin:auto;padding:20px;display:grid;grid-template-columns:390px 1fr;gap:18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 28px rgba(16,24,40,.06)} .panel,.viewer{padding:18px}
+.panel h2{font-size:15px;margin:0 0 12px} .drop{border:2px dashed #aab6c8;border-radius:14px;padding:22px;text-align:center;background:#fafcff;cursor:pointer}
+.drop.drag{border-color:var(--blue);background:#eef4ff} .drop strong{display:block;font-size:16px} .drop span{display:block;color:var(--muted);font-size:12px;margin-top:5px}
+input[type=file]{display:none} .row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:13px 0 7px;font-size:14px} input[type=range]{width:100%}
+input[type=number],select{width:116px;padding:8px;border:1px solid var(--line);border-radius:9px;background:#fff} .check{display:flex;gap:8px;align-items:flex-start;margin:11px 0;font-size:13px;line-height:1.35}
+button{border:0;border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer} .primary{background:var(--blue);color:#fff;width:100%} .secondary{background:#edf1f6;color:#172033}
+.danger{background:#fff1f2;color:var(--red)} .good{background:#ecfdf3;color:#166534} button:disabled{opacity:.45;cursor:not-allowed} .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.filelist{max-height:250px;overflow:auto;border:1px solid var(--line);border-radius:12px} .fileitem{padding:10px 12px;border-bottom:1px solid var(--line);font-size:12px;cursor:pointer} .fileitem:last-child{border-bottom:0} .fileitem.active{background:#eef4ff;color:#1d4ed8;font-weight:700}
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px} .badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px} .badge{padding:6px 9px;border-radius:999px;background:#eef2f7;color:#475467;font-size:11px}
+.canvases{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px} .previewBox{border:1px solid var(--line);border-radius:14px;overflow:hidden} .previewBox h3{margin:0;padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px}
+.canvasWrap{height:470px;display:flex;align-items:center;justify-content:center;overflow:auto;background-color:#f3f4f6;background-image:linear-gradient(45deg,#ddd 25%,transparent 25%),linear-gradient(-45deg,#ddd 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ddd 75%),linear-gradient(-45deg,transparent 75%,#ddd 75%);background-size:26px 26px;background-position:0 0,0 13px,13px -13px,-13px 0}
+canvas{max-width:94%;max-height:94%} .status{margin-top:12px;padding:11px 13px;border-radius:10px;background:#f8fafc;color:#475467;font-size:13px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.note{font-size:12px;color:var(--muted);line-height:1.45;margin-top:10px} .mode{display:block;border:1px solid var(--line);border-radius:11px;padding:12px 12px 10px 14px;margin-bottom:10px;line-height:1.25;background:#fff}.mode input{margin-right:8px;vertical-align:middle}.mode b{display:inline-block;vertical-align:middle}.mode span{display:block;margin-left:28px;color:var(--muted);font-size:12px;margin-top:4px;line-height:1.3}
+.zipbox{margin-top:12px;padding:12px;border:1px dashed #b8c4d8;border-radius:12px;background:#fafcff}
+@media(max-width:1100px){.canvases{grid-template-columns:1fr}.canvasWrap{height:380px}} @media(max-width:850px){main{grid-template-columns:1fr}.headerbar{align-items:flex-start}.backSystem{white-space:nowrap}} @media(max-width:600px){.headerbar{display:block}.backSystem{margin-top:14px;width:100%}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script>
+<script>
+(async()=>{
+  try{
+    const authDb=window.supabase.createClient("https://kqrfcdfygskzhsdzzcze.supabase.co","sb_publishable_KfkIr6TlW6ivuT5cD0g9Kg_EuZwDKJ9");
+    const {data:{session}}=await authDb.auth.getSession();
+    if(!session){location.replace("index.html#design");return}
+    document.documentElement.classList.add("auth-ready");
+  }catch(error){console.error(error);location.replace("index.html#design")}
+})();
+</script>
+</head>
+<body>
+<header><div class="headerbar"><div class="headercopy"><h1>✂ TecniCut <small style="font-size:13px;color:#bcd0ef">v2.8.3</small></h1><p>Generador de contornos y líneas de corte para stickers.</p></div><button id="backToSystem" class="backSystem" type="button">← Volver a Herramientas de diseño</button></div></header>
+<main>
+<section class="card panel">
+<h2>1. Cargar pedido</h2>
+<div id="drop" class="drop"><strong>Arrastra aquí tus JPG o PNG</strong><span>También puedes seleccionar una carpeta completa</span></div>
+<input id="files" type="file" accept="image/*" multiple>
+<div class="grid2" style="margin-top:10px"><button id="pickFiles" class="secondary">Archivos</button><button id="pickFolder" class="secondary">Carpeta</button></div>
+<h2 style="margin-top:20px">2. Preparación</h2>
+<div class="row"><span>Tolerancia del fondo</span><b id="tolVal">95</b></div><input id="tolerance" type="range" min="5" max="95" value="95">
+<div class="row"><span>Borde blanco</span><span><input id="borderMm" type="number" min="0" max="8" value="1" step="any" inputmode="decimal"> mm</span></div>
+<div class="row"><span>Resolución</span><select id="dpi"><option>150</option><option selected>300</option><option>600</option></select></div>
+<label class="check"><input id="removeHalo" type="checkbox" checked><span>Reducir bordes blancos o sombras claras existentes.</span></label>
+<div class="note" style="margin-top:-4px;margin-bottom:8px">Protección inteligente: los colores claros del diseño ya no se confunden con el fondo.</div>
+<label class="check"><input id="groupParts" type="checkbox" checked><span><b>Agrupar texto y partes separadas</b> que pertenezcan al mismo sticker.</span></label>
+<label class="check"><input id="includeSmallText" type="checkbox" checked><span>Conservar letras pequeñas, subtítulos y frases finas.</span></label>
+<label class="check"><input id="preserveSoftEdges" type="checkbox" checked><span><b>Preservar bordes suaves</b> (cabello, pelaje, plumas y fotos recortadas).</span></label>
+<label class="check"><input id="edgeSafetyMargin" type="checkbox" checked><span><b>Añadir margen de seguridad</b> cuando el sticker toque el borde de la foto.</span></label>
+<label class="check"><input id="preserveCorners" type="checkbox"><span><b>Preservar esquinas rectas</b> (termos, cajas, marcos y objetos geométricos).</span></label>
+<label class="check"><input id="lineArtMode" type="checkbox"><span><b>Unir trazos abiertos</b> (muñequitos, doodles, dibujos lineales y trazos separados).</span></label>
+<label class="check"><input id="outerBehind" type="checkbox"><span><b>Crear una sola silueta exterior</b> (similar a crear un fondo blanco, soldarlo y enviarlo atrás en Corel).</span></label>
+<label class="check"><input id="autoJoinOuter" type="checkbox"><span><b>Unir automáticamente hasta obtener una sola pieza</b>.</span></label>
+<div class="row"><span>Distancia mínima para unir</span><span><input id="joinDistanceMm" type="number" min="0" max="20" value="1" step="any" inputmode="decimal"> mm</span></div>
+<div class="note" style="margin-top:8px">Preset “Estilo Manual Seguro”: borde blanco 1 mm, calidad Profesional y suavidad 2. La unión automática queda desactivada para evitar bordes gruesos, cuadrados o toscos. Actívala solo en diseños sueltos que realmente necesiten una sola silueta exterior.</div>
+<h2 style="margin-top:18px">3. Calidad del contorno</h2>
+<label class="mode"><input type="radio" name="quality" value="production"><b> Producción</b><span>Más fiel al detalle.</span></label>
+<label class="mode"><input type="radio" name="quality" value="balanced" checked><b> Profesional</b><span>Equilibrio recomendado.</span></label>
+<label class="mode"><input type="radio" name="quality" value="premium"><b> Premium</b><span>Menos nodos y curvas suaves.</span></label>
+<div class="row"><span>Suavidad adicional</span><b id="smoothVal">2</b></div><input id="smooth" type="range" min="0" max="8" value="2">
+<div class="note" style="margin-top:8px;margin-bottom:10px"><b>Importante:</b> una suavidad muy alta no siempre mejora la línea; puede deformar corazones, textos y esquinas. El valor 2 es el recomendado para el acabado manual.</div>
+<button id="refresh" class="primary" disabled>Actualizar vista previa</button>
+<h2 style="margin-top:20px">4. Imágenes</h2>
+<div id="fileList" class="filelist"><div class="fileitem">Aún no hay imágenes.</div></div>
+<div class="zipbox"><button id="processZip" class="good" disabled>Procesar todo y descargar ZIP</button><div class="note">Genera un único archivo .zip con todos los PNG y SVG. También mejora el borde blanco en stickers fotográficos.</div></div>
+<div class="zipbox">
+<div class="row"><span>Medir cada sticker por</span><select id="sizeMode"><option value="longest" selected>Lado más largo</option><option value="height">Altura</option><option value="width">Ancho</option></select></div>
+<div class="row"><span>Medida individual</span><span><input id="targetSizeCm" type="number" min="0.5" max="30" value="4" step="any" inputmode="decimal"> cm</span></div>
+<div class="row"><span>Organización</span><select id="layoutDirection"><option value="vertical" selected>Vertical centrada</option><option value="horizontal">Horizontal centrada</option><option value="compact">Compacta por filas</option></select></div>
+<div class="row"><span>Separación entre stickers</span><span><input id="layoutGapCm" type="number" min="0" max="10" value="0.5" step="any" inputmode="decimal"> cm</span></div>
+<div class="row"><span>Rotar 90° automáticamente</span><select id="autoRotate"><option value="no" selected>No</option><option value="yes">Sí</option></select></div>
+<div class="row"><span>Orientación del lado de medida</span><select id="measureOrientation"><option value="auto" selected>Automática</option><option value="vertical">Vertical</option><option value="horizontal">Horizontal</option></select></div>
+<div class="grid2"><button id="layoutSvg" class="secondary" disabled>Descargar montaje para Corel (.zip)</button><button id="layoutPdf" class="good" disabled>Abrir hoja para PDF</button></div>
+<div class="note">Ejemplo: si un sticker mide 8 × 4 y eliges “lado más largo = 4 cm” con orientación vertical y rotación automática, saldrá proporcional y girado para que el lado de 4 cm quede vertical.</div>
+</div>
+</section>
+<section class="card viewer">
+<div class="toolbar"><div><strong id="currentName">Sin imagen seleccionada</strong><div class="badges"><span id="countBadge" class="badge">0 imágenes</span><span id="nodeBadge" class="badge">0 nodos</span><span id="partBadge" class="badge">0 partes</span></div></div><button id="clear" class="danger" disabled>Limpiar</button></div>
+<div class="canvases"><div class="previewBox"><h3>Original</h3><div class="canvasWrap"><canvas id="original"></canvas></div></div><div class="previewBox"><h3>Procesado</h3><div class="canvasWrap"><canvas id="result"></canvas></div></div><div class="previewBox"><h3>Contorno optimizado</h3><div class="canvasWrap"><canvas id="outline"></canvas></div></div></div>
+<div id="status" class="status">Carga imágenes para comenzar.</div>
+<div class="actions"><button id="downloadPng" class="secondary" disabled>Descargar PNG actual</button><button id="downloadSvg" class="secondary" disabled>Descargar SVG actual</button></div>
+<div class="note">Para composiciones con muchas letras o elementos, activa “Crear una sola silueta exterior”; funciona como un contorno enviado atrás y soldado.</div>
+</section>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+$("#backToSystem").onclick=()=>location.href="index.html#design";
+const filesInput=$("#files"),drop=$("#drop");
+const originalCanvas=$("#original"),resultCanvas=$("#result"),outlineCanvas=$("#outline");
+const octx=originalCanvas.getContext("2d"),rctx=resultCanvas.getContext("2d"),xctx=outlineCanvas.getContext("2d");
+let items=[],current=-1,lastOutput=null;
+function setStatus(m){$("#status").textContent=m}
+function median(a){a.sort((x,y)=>x-y);return a[Math.floor(a.length/2)]||0}
+function estimateBg(data,w,h){const rs=[],gs=[],bs=[],band=Math.max(2,Math.floor(Math.min(w,h)/80));const add=(x,y)=>{const i=(y*w+x)*4;rs.push(data[i]);gs.push(data[i+1]);bs.push(data[i+2]);};for(let y=0;y<band;y++)for(let x=0;x<w;x++)add(x,y);for(let y=h-band;y<h;y++)for(let x=0;x<w;x++)add(x,y);for(let y=0;y<h;y++)for(let x=0;x<band;x++)add(x,y);for(let y=0;y<h;y++)for(let x=w-band;x<w;x++)add(x,y);return [median(rs),median(gs),median(bs)]}
+function floodBackground(data,w,h,tol){const bg=estimateBg(data,w,h),cand=new Uint8Array(w*h),out=new Uint8Array(w*h);for(let p=0;p<w*h;p++){const i=p*4,dr=data[i]-bg[0],dg=data[i+1]-bg[1],db=data[i+2]-bg[2];cand[p]=Math.hypot(dr,dg,db)<=tol?1:0;}const q=new Int32Array(w*h);let head=0,tail=0;const push=p=>{if(cand[p]&&!out[p]){out[p]=1;q[tail++]=p}};for(let x=0;x<w;x++){push(x);push((h-1)*w+x)}for(let y=0;y<h;y++){push(y*w);push(y*w+w-1)}while(head<tail){const p=q[head++],x=p%w,y=(p/w)|0;if(x)push(p-1);if(x<w-1)push(p+1);if(y)push(p-w);if(y<h-1)push(p+w)}return out}
+function erode(mask,w,h){const out=new Uint8Array(w*h);for(let y=0;y<h;y++)for(let x=0;x<w;x++){let ok=1;for(let yy=Math.max(0,y-1);yy<=Math.min(h-1,y+1)&&ok;yy++){for(let xx=Math.max(0,x-1);xx<=Math.min(w-1,x+1);xx++){if(!mask[yy*w+xx]){ok=0;break}}}out[y*w+x]=ok}return out}
+function dilate(mask,w,h,r){if(r<=0)return mask.slice();const out=new Uint8Array(w*h),rr=r*r;for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(mask[y*w+x])for(let yy=Math.max(0,y-r);yy<=Math.min(h-1,y+r);yy++)for(let xx=Math.max(0,x-r);xx<=Math.min(w-1,x+r);xx++)if((xx-x)*(xx-x)+(yy-y)*(yy-y)<=rr)out[yy*w+xx]=1;return out}
+function dilateSquare(mask,w,h,r){if(r<=0)return mask.slice();const out=new Uint8Array(w*h);for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(mask[y*w+x])for(let yy=Math.max(0,y-r);yy<=Math.min(h-1,y+r);yy++)for(let xx=Math.max(0,x-r);xx<=Math.min(w-1,x+r);xx++)out[yy*w+xx]=1;return out}
+function erodeSquare(mask,w,h,r){if(r<=0)return mask.slice();const out=new Uint8Array(w*h);for(let y=0;y<h;y++)for(let x=0;x<w;x++){let ok=1;for(let yy=Math.max(0,y-r);yy<=Math.min(h-1,y+r)&&ok;yy++)for(let xx=Math.max(0,x-r);xx<=Math.min(w-1,x+r);xx++){if(!mask[yy*w+xx]){ok=0;break}}out[y*w+x]=ok}return out}
+function fillHoles(mask,w,h){const bg=new Uint8Array(w*h),q=new Int32Array(w*h);let head=0,tail=0;const push=p=>{if(!mask[p]&&!bg[p]){bg[p]=1;q[tail++]=p}};for(let x=0;x<w;x++){push(x);push((h-1)*w+x)}for(let y=0;y<h;y++){push(y*w);push(y*w+w-1)}while(head<tail){const p=q[head++],x=p%w,y=(p/w)|0;if(x)push(p-1);if(x<w-1)push(p+1);if(y)push(p-w);if(y<h-1)push(p+w)}const out=mask.slice();for(let p=0;p<w*h;p++)if(!mask[p]&&!bg[p])out[p]=1;return out}
+function closeMaskSquare(mask,w,h,r){return erodeSquare(dilateSquare(mask,w,h,r),w,h,r)}
+function integralMask(mask,w,h){const stride=w+1,sum=new Uint32Array((w+1)*(h+1));for(let y=1;y<=h;y++){let row=0;for(let x=1;x<=w;x++){row+=mask[(y-1)*w+(x-1)];sum[y*stride+x]=sum[(y-1)*stride+x]+row;}}return {sum,stride};}
+function rectSum(integ,x1,y1,x2,y2){const {sum,stride}=integ;return sum[(y2+1)*stride+(x2+1)]-sum[y1*stride+(x2+1)]-sum[(y2+1)*stride+x1]+sum[y1*stride+x1];}
+function boxDilateFast(mask,w,h,r){if(r<=0)return mask.slice();const integ=integralMask(mask,w,h),out=new Uint8Array(w*h);for(let y=0;y<h;y++){const y1=Math.max(0,y-r),y2=Math.min(h-1,y+r);for(let x=0;x<w;x++){const x1=Math.max(0,x-r),x2=Math.min(w-1,x+r);out[y*w+x]=rectSum(integ,x1,y1,x2,y2)>0?1:0;}}return out;}
+function boxErodeFast(mask,w,h,r){if(r<=0)return mask.slice();const integ=integralMask(mask,w,h),out=new Uint8Array(w*h);for(let y=0;y<h;y++){const y1=Math.max(0,y-r),y2=Math.min(h-1,y+r);for(let x=0;x<w;x++){const x1=Math.max(0,x-r),x2=Math.min(w-1,x+r),area=(x2-x1+1)*(y2-y1+1);out[y*w+x]=rectSum(integ,x1,y1,x2,y2)===area?1:0;}}return out;}
+function closeMaskFast(mask,w,h,r){return boxErodeFast(boxDilateFast(mask,w,h,r),w,h,r);}
+function meaningfulComponentCount(mask,w,h){const {comps}=labelComponents(mask,w,h);const minArea=Math.max(20,w*h*0.00002);return comps.filter(c=>c.area>=minArea).length;}
+function largestComponentOnly(mask,w,h){
+  const {labels,comps}=labelComponents(mask,w,h);
+  if(!comps.length)return mask;
+  let largest=comps[0];
+  for(const c of comps)if(c.area>largest.area)largest=c;
+  const out=new Uint8Array(w*h);
+  for(let p=0;p<w*h;p++)if(labels[p]===largest.id)out[p]=1;
+  return out;
+}
+function makeSingleBackingMask(seed,w,h,borderPx,minJoinPx,autoJoin){
+  let joinPx=Math.max(borderPx,minJoinPx,1);
+  const maxJoinPx=Math.max(joinPx,Math.round(Math.min(w,h)*0.32));
+  let expanded=boxDilateFast(seed,w,h,joinPx);
+  let count=meaningfulComponentCount(expanded,w,h);
+  if(autoJoin){
+    while(count>1 && joinPx<maxJoinPx){
+      joinPx=Math.min(maxJoinPx,Math.max(joinPx+2,Math.round(joinPx*1.28)));
+      expanded=boxDilateFast(seed,w,h,joinPx);
+      count=meaningfulComponentCount(expanded,w,h);
+    }
+  }
+  expanded=fillHoles(expanded,w,h);
+  // Erode as much as possible without reopening the composition.
+  const maxErode=Math.max(0,joinPx-borderPx);
+  let best=expanded,lo=0,hi=maxErode;
+  while(lo<=hi){
+    const mid=Math.floor((lo+hi)/2);
+    let candidate=mid>0?boxErodeFast(expanded,w,h,mid):expanded;
+    candidate=fillHoles(candidate,w,h);
+    const c=meaningfulComponentCount(candidate,w,h);
+    if(c<=1){best=candidate;lo=mid+1;}else{hi=mid-1;}
+  }
+  // Final gentle smoothing while keeping one piece.
+  const smoothR=Math.max(1,Math.round(borderPx*0.12));
+  let smooth=closeMaskFast(best,w,h,smoothR);
+  smooth=fillHoles(smooth,w,h);
+  if(meaningfulComponentCount(smooth,w,h)<=1)best=smooth;
+  return largestComponentOnly(best,w,h);
+}
+function blurMask(mask,w,h,amount){let cur=mask.slice();for(let n=0;n<amount;n++){const out=new Uint8Array(w*h);for(let y=0;y<h;y++)for(let x=0;x<w;x++){let s=0,c=0;for(let yy=Math.max(0,y-1);yy<=Math.min(h-1,y+1);yy++)for(let xx=Math.max(0,x-1);xx<=Math.min(w-1,x+1);xx++){s+=cur[yy*w+xx];c++}out[y*w+x]=(s/c)>=.5?1:0}cur=out}return cur}
+function removeLightHalo(data,mask,w,h,tolerance){
+  let out=mask.slice();
+  const bg=estimateBg(data,w,h);
+  const soft=$("#preserveSoftEdges")?$("#preserveSoftEdges").checked:false;
+  const layers=soft?1:Math.max(1,Math.min(4,Math.round(Math.min(w,h)*0.004)));
+  const baseTol=Math.max(12,Number(tolerance)||28);
+  const haloTol=soft?Math.max(16,baseTol*1.15):Math.max(22,baseTol*1.65);
+  for(let l=0;l<layers;l++){
+    const inner=erode(out,w,h);
+    let changed=0;
+    for(let p=0;p<w*h;p++){
+      if(out[p]&&!inner[p]){
+        const i=p*4;
+        const dr=data[i]-bg[0],dg=data[i+1]-bg[1],db=data[i+2]-bg[2];
+        const distance=Math.hypot(dr,dg,db);
+        if(distance<=haloTol){out[p]=0;changed++;}
+      }
+    }
+    if(!changed)break;
+  }
+  return out
+}
+function labelComponents(mask,w,h){const labels=new Int32Array(w*h),comps=[],q=new Int32Array(w*h);let id=0;for(let p=0;p<w*h;p++)if(mask[p]&&!labels[p]){id++;let head=0,tail=0;q[tail++]=p;labels[p]=id;let area=0,x1=w,y1=h,x2=0,y2=0;while(head<tail){const v=q[head++],x=v%w,y=(v/w)|0;area++;x1=Math.min(x1,x);y1=Math.min(y1,y);x2=Math.max(x2,x);y2=Math.max(y2,y);const ns=[v-1,v+1,v-w,v+w];for(const n of ns){if(n<0||n>=w*h)continue;if((n===v-1&&x===0)||(n===v+1&&x===w-1))continue;if(mask[n]&&!labels[n]){labels[n]=id;q[tail++]=n}}}comps.push({id,area,x1,y1,x2,y2,cx:(x1+x2)/2,cy:(y1+y2)/2,w:x2-x1+1,h:y2-y1+1})}return {labels,comps}}
+function bboxGap(a,b){const dx=Math.max(0,Math.max(a.x1,b.x1)-Math.min(a.x2,b.x2)-1);const dy=Math.max(0,Math.max(a.y1,b.y1)-Math.min(a.y2,b.y2)-1);return Math.hypot(dx,dy)}
+function verticalOverlap(a,b){return Math.max(0,Math.min(a.y2,b.y2)-Math.max(a.y1,b.y1)+1)/Math.max(1,Math.min(a.h,b.h))}
+function horizontalOverlap(a,b){return Math.max(0,Math.min(a.x2,b.x2)-Math.max(a.x1,b.x1)+1)/Math.max(1,Math.min(a.w,b.w))}
+function groupComposition(mask,w,h){const {labels,comps}=labelComponents(mask,w,h);if(!comps.length)return {mask,parts:0};comps.sort((a,b)=>b.area-a.area);const keep=new Set(),queue=[],total=w*h,maxDim=Math.max(w,h);for(const c of comps){const minArea=$("#includeSmallText").checked?Math.max(4,total*0.000008):Math.max(18,total*0.00004);if(c.area>=minArea&&(c.area>=comps[0].area*0.012||c.w>=w*0.018||c.h>=h*0.018)){keep.add(c.id);queue.push(c)}}if(!keep.size){keep.add(comps[0].id);queue.push(comps[0])}const gapLimit=maxDim*0.075,chainLimit=maxDim*0.13;while(queue.length){const a=queue.shift();for(const b of comps){if(keep.has(b.id))continue;const smallOk=$("#includeSmallText").checked?b.area>=3:b.area>=12;if(!smallOk)continue;const gap=bboxGap(a,b),aligned=(verticalOverlap(a,b)>.12||horizontalOverlap(a,b)>.12),center=Math.hypot(a.cx-b.cx,a.cy-b.cy);if(gap<=gapLimit||(aligned&&center<=chainLimit)){keep.add(b.id);queue.push(b)}}}let x1=w,y1=h,x2=0,y2=0;for(const c of comps)if(keep.has(c.id)){x1=Math.min(x1,c.x1);y1=Math.min(y1,c.y1);x2=Math.max(x2,c.x2);y2=Math.max(y2,c.y2)}const pad=maxDim*.045;for(const c of comps){if(!keep.has(c.id)&&c.cx>=x1-pad&&c.cx<=x2+pad&&c.cy>=y1-pad&&c.cy<=y2+pad){if(c.area>=($("#includeSmallText").checked?3:12))keep.add(c.id)}}const out=new Uint8Array(w*h);for(let p=0;p<w*h;p++)if(keep.has(labels[p]))out[p]=1;return {mask:out,parts:keep.size}}
+function bounds(mask,w,h){let x1=w,y1=h,x2=-1,y2=-1;for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(mask[y*w+x]){x1=Math.min(x1,x);y1=Math.min(y1,y);x2=Math.max(x2,x);y2=Math.max(y2,y)}return x2<0?null:{x1,y1,x2,y2}}
+function loadImage(file){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>res(img);img.onerror=rej;img.src=URL.createObjectURL(file)})}
+function fitCanvas(c,img){const s=Math.min(1,1500/Math.max(img.naturalWidth,img.naturalHeight));c.width=Math.round(img.naturalWidth*s);c.height=Math.round(img.naturalHeight*s)}
+function traceContour(mask,w,h){const pw=w+2,ph=h+2,pad=new Uint8Array(pw*ph);for(let y=0;y<h;y++)for(let x=0;x<w;x++)pad[(y+1)*pw+x+1]=mask[y*w+x];let sx=-1,sy=-1;outer:for(let y=1;y<ph-1;y++)for(let x=1;x<pw-1;x++)if(pad[y*pw+x]&&!pad[y*pw+x-1]){sx=x;sy=y;break outer}if(sx<0)return [];const dirs=[[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]],pts=[];let px=sx,py=sy,bx=sx-1,by=sy,startBx=bx,startBy=by,steps=0;do{pts.push([px-1,py-1]);let si=0;for(let i=0;i<8;i++)if(px+dirs[i][0]===bx&&py+dirs[i][1]===by){si=i;break}let found=false,nx=px,ny=py,nbx=bx,nby=by;for(let k=1;k<=8;k++){const idx=(si+k)%8,cx=px+dirs[idx][0],cy=py+dirs[idx][1];if(pad[cy*pw+cx]){const prev=(idx+7)%8;nbx=px+dirs[prev][0];nby=py+dirs[prev][1];nx=cx;ny=cy;found=true;break}}if(!found)break;bx=nbx;by=nby;px=nx;py=ny;steps++;if(steps>pw*ph*4)break}while(!(px===sx&&py===sy&&bx===startBx&&by===startBy));return pts}
+function pointLineDistance(p,a,b){const dx=b[0]-a[0],dy=b[1]-a[1];if(!dx&&!dy)return Math.hypot(p[0]-a[0],p[1]-a[1]);let t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/(dx*dx+dy*dy);t=Math.max(0,Math.min(1,t));return Math.hypot(p[0]-(a[0]+t*dx),p[1]-(a[1]+t*dy))}
+function rdp(points,e){if(points.length<3)return points;let dm=0,idx=0;for(let i=1;i<points.length-1;i++){const d=pointLineDistance(points[i],points[0],points[points.length-1]);if(d>dm){dm=d;idx=i}}if(dm>e){const a=rdp(points.slice(0,idx+1),e),b=rdp(points.slice(idx),e);return a.slice(0,-1).concat(b)}return [points[0],points[points.length-1]]}
+function simplifyClosed(points,e){if(points.length<8)return points;let l=0,r=0;for(let i=1;i<points.length;i++){if(points[i][0]<points[l][0])l=i;if(points[i][0]>points[r][0])r=i}const a=[];let i=l;while(true){a.push(points[i]);if(i===r)break;i=(i+1)%points.length}const b=[];let j=r;while(true){b.push(points[j]);if(j===l)break;j=(j+1)%points.length}return rdp(a,e).slice(0,-1).concat(rdp(b,e).slice(0,-1))}
+function chaikin(points){const out=[];for(let i=0;i<points.length;i++){const p=points[i],q=points[(i+1)%points.length];out.push([.75*p[0]+.25*q[0],.75*p[1]+.25*q[1]]);out.push([.25*p[0]+.75*q[0],.25*p[1]+.75*q[1]])}return out}
+function pathFor(points,t=.88){if(points.length<3)return "";let d=`M ${points[0][0].toFixed(2)} ${points[0][1].toFixed(2)}`;const n=points.length;for(let i=0;i<n;i++){const p0=points[(i-1+n)%n],p1=points[i],p2=points[(i+1)%n],p3=points[(i+2)%n];const c1=[p1[0]+(p2[0]-p0[0])*t/6,p1[1]+(p2[1]-p0[1])*t/6],c2=[p2[0]-(p3[0]-p1[0])*t/6,p2[1]-(p3[1]-p1[1])*t/6];d+=` C ${c1[0].toFixed(2)} ${c1[1].toFixed(2)} ${c2[0].toFixed(2)} ${c2[1].toFixed(2)} ${p2[0].toFixed(2)} ${p2[1].toFixed(2)}`}return d+" Z"}
+function pathForExport(points){if(points.length<3)return "";let d=`M ${points[0][0].toFixed(2)} ${points[0][1].toFixed(2)}`;for(let i=1;i<points.length;i++){d+=` L ${points[i][0].toFixed(2)} ${points[i][1].toFixed(2)}`;}return d+" Z";}
+function settings(){const q=document.querySelector('input[name="quality"]:checked').value;const corners=$("#preserveCorners")&&$("#preserveCorners").checked;if(corners){if(q==="production")return {e:.45,ch:false,t:.55};if(q==="premium")return {e:1.2,ch:false,t:.62};return {e:.75,ch:false,t:.58};}if(q==="production")return {e:.7,ch:false,t:.78};if(q==="premium")return {e:3.2,ch:true,t:.95};return {e:1.65,ch:true,t:.88}}
+function drawOutline(points,w,h){outlineCanvas.width=w;outlineCanvas.height=h;xctx.clearRect(0,0,w,h);xctx.strokeStyle="#ff00ff";xctx.lineWidth=Math.max(1,w/900);xctx.beginPath();points.forEach((p,i)=>i?xctx.lineTo(p[0],p[1]):xctx.moveTo(p[0],p[1]));xctx.closePath();xctx.stroke()}
+function makeCRCTable(){let c,table=new Uint32Array(256);for(let n=0;n<256;n++){c=n;for(let k=0;k<8;k++)c=((c&1)?(0xEDB88320^(c>>>1)):(c>>>1));table[n]=c>>>0}return table} const CRC_TABLE=makeCRCTable();
+function crc32(bytes){let crc=0xFFFFFFFF;for(let i=0;i<bytes.length;i++)crc=CRC_TABLE[(crc^bytes[i])&0xFF]^(crc>>>8);return (crc^0xFFFFFFFF)>>>0}
+function u32be(n){return new Uint8Array([(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255])}
+async function patchPngDpi(blob,dpi){const buf=new Uint8Array(await blob.arrayBuffer());const ppm=Math.round(dpi/0.0254);const type=new TextEncoder().encode("pHYs");const data=new Uint8Array(9);data.set(u32be(ppm),0);data.set(u32be(ppm),4);data[8]=1;const crcInput=new Uint8Array(13);crcInput.set(type,0);crcInput.set(data,4);const crc=crc32(crcInput);const chunk=new Uint8Array(21);chunk.set(u32be(9),0);chunk.set(type,4);chunk.set(data,8);chunk.set(u32be(crc),17);let parts=[buf.slice(0,8)],pos=8;while(pos<buf.length){const len=(buf[pos]<<24)|(buf[pos+1]<<16)|(buf[pos+2]<<8)|buf[pos+3];const typeStr=String.fromCharCode(buf[pos+4],buf[pos+5],buf[pos+6],buf[pos+7]);const end=pos+12+len;if(typeStr!=="pHYs")parts.push(buf.slice(pos,end));pos=end}let cleanedLen=parts.reduce((a,b)=>a+b.length,0),cleaned=new Uint8Array(cleanedLen),off=0;for(const p of parts){cleaned.set(p,off);off+=p.length}const ihdrLen=(cleaned[8]<<24)|(cleaned[9]<<16)|(cleaned[10]<<8)|cleaned[11];const insertPos=8+4+4+ihdrLen+4;const out=new Uint8Array(cleaned.length+chunk.length);out.set(cleaned.slice(0,insertPos),0);out.set(chunk,insertPos);out.set(cleaned.slice(insertPos),insertPos+chunk.length);return new Blob([out],{type:"image/png"})}
+function u16le(n){return new Uint8Array([n&255,(n>>>8)&255])} function u32le(n){return new Uint8Array([n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255])}
+function concatUint8(arrs){const total=arrs.reduce((a,b)=>a+b.length,0),out=new Uint8Array(total);let off=0;for(const a of arrs){out.set(a,off);off+=a.length}return out}
+async function buildZip(entries){const enc=new TextEncoder();const localParts=[],centralParts=[];let offset=0;for(const entry of entries){const nameBytes=enc.encode(entry.name);const data=entry.data instanceof Uint8Array?entry.data:new Uint8Array(entry.data);const crc=crc32(data),size=data.length;const local=concatUint8([u32le(0x04034b50),u16le(20),u16le(0),u16le(0),u16le(0),u16le(0),u32le(crc),u32le(size),u32le(size),u16le(nameBytes.length),u16le(0),nameBytes]);localParts.push(local,data);const central=concatUint8([u32le(0x02014b50),u16le(20),u16le(20),u16le(0),u16le(0),u16le(0),u16le(0),u32le(crc),u32le(size),u32le(size),u16le(nameBytes.length),u16le(0),u16le(0),u16le(0),u16le(0),u32le(0),u32le(offset),nameBytes]);centralParts.push(central);offset+=local.length+size}const centralDir=concatUint8(centralParts),localData=concatUint8(localParts),end=concatUint8([u32le(0x06054b50),u16le(0),u16le(0),u16le(entries.length),u16le(entries.length),u32le(centralDir.length),u32le(localData.length),u16le(0)]);return new Blob([localData,centralDir,end],{type:"application/zip"})}
+async function processItem(item,preview=true){const img=await loadImage(item.file);const dpi=+$("#dpi").value,borderPx=Math.max(0,Math.round(+$("#borderMm").value/25.4*dpi));const preserveCorners=$("#preserveCorners")&&$("#preserveCorners").checked;const lineArtMode=$("#lineArtMode")&&$("#lineArtMode").checked;const base=document.createElement("canvas");fitCanvas(base,img);const bctx=base.getContext("2d",{willReadFrequently:true});bctx.drawImage(img,0,0,base.width,base.height);const baseId=bctx.getImageData(0,0,base.width,base.height);const bgc=estimateBg(baseId.data,base.width,base.height);const safetyPad=$("#edgeSafetyMargin")&&$("#edgeSafetyMargin").checked?Math.max(12,borderPx+8):0;const work=document.createElement("canvas");work.width=base.width+safetyPad*2;work.height=base.height+safetyPad*2;const ctx=work.getContext("2d",{willReadFrequently:true});ctx.fillStyle=`rgb(${bgc[0]},${bgc[1]},${bgc[2]})`;ctx.fillRect(0,0,work.width,work.height);ctx.drawImage(base,safetyPad,safetyPad);const id=ctx.getImageData(0,0,work.width,work.height),w=work.width,h=work.height;const bg=floodBackground(id.data,w,h,+$("#tolerance").value);let fg=new Uint8Array(w*h);for(let p=0;p<w*h;p++)fg[p]=bg[p]?0:1;if($("#removeHalo").checked)fg=removeLightHalo(id.data,fg,w,h,+$("#tolerance").value);let parts=1;if($("#groupParts").checked){const grouped=groupComposition(fg,w,h);fg=grouped.mask;parts=grouped.parts}const effectiveSmooth=preserveCorners?Math.max(0,+$("#smooth").value-2):+$("#smooth").value;fg=blurMask(fg,w,h,effectiveSmooth);const grow=preserveCorners?dilateSquare:dilate;const renderFg=$("#preserveSoftEdges").checked&&!preserveCorners?dilate(fg,w,h,1):fg;let contourSeed=fg;if(lineArtMode){const joinR=Math.max(6,Math.round(Math.min(w,h)*0.026));const bridgeR=Math.max(2,Math.round(joinR*0.45));let merged=dilateSquare(fg,w,h,joinR);merged=fillHoles(merged,w,h);merged=closeMaskSquare(merged,w,h,bridgeR);merged=fillHoles(merged,w,h);merged=groupComposition(merged,w,h).mask;contourSeed=merged;}let outer=grow(contourSeed,w,h,borderPx);if($("#outerBehind")&&$("#outerBehind").checked){const joinMm=Math.max(0,+$("#joinDistanceMm").value||0);const joinPx=Math.max(0,Math.round(joinMm/25.4*dpi));const autoJoin=$("#autoJoinOuter")?$("#autoJoinOuter").checked:true;outer=makeSingleBackingMask(contourSeed,w,h,borderPx,joinPx,autoJoin);}const b=bounds(outer,w,h);if(!b)throw new Error("No se detectó un objeto.");const pad=8,x1=Math.max(0,b.x1-pad),y1=Math.max(0,b.y1-pad),x2=Math.min(w-1,b.x2+pad),y2=Math.min(h-1,b.y2+pad),ow=x2-x1+1,oh=y2-y1+1,out=document.createElement("canvas");out.width=ow;out.height=oh;const outCtx=out.getContext("2d"),od=outCtx.createImageData(ow,oh),cm=new Uint8Array(ow*oh);for(let y=0;y<oh;y++)for(let x=0;x<ow;x++){const sp=(y+y1)*w+x+x1,si=sp*4,dp=(y*ow+x)*4;cm[y*ow+x]=outer[sp];od.data[dp+3]=outer[sp]?255:0;if(renderFg[sp]){od.data[dp]=id.data[si];od.data[dp+1]=id.data[si+1];od.data[dp+2]=id.data[si+2]}else{od.data[dp]=255;od.data[dp+1]=255;od.data[dp+2]=255}}outCtx.putImageData(od,0,0);let pts=traceContour(cm,ow,oh);if(pts.length<3)throw new Error("No se pudo seguir la silueta.");const s=settings(),scale=Math.max(1,Math.min(ow,oh)/500);pts=simplifyClosed(pts,s.e*scale);if(s.ch)pts=chaikin(pts);const path=pathForExport(pts);const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${(ow/dpi*25.4).toFixed(3)}mm" height="${(oh/dpi*25.4).toFixed(3)}mm" viewBox="0 0 ${ow} ${oh}"><path d="${path}" fill="none" stroke="#ff00ff" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"/></svg>`;const pngBlobRaw=await new Promise(r=>out.toBlob(r,"image/png"));const pngBlob=await patchPngDpi(pngBlobRaw,dpi);const result={pngBlob,svg,path,filename:item.file.name.replace(/\.[^.]+$/ ,""),pts,ow,oh,parts,out,dpi};if(preview){fitCanvas(originalCanvas,img);octx.clearRect(0,0,originalCanvas.width,originalCanvas.height);octx.drawImage(img,0,0,originalCanvas.width,originalCanvas.height);resultCanvas.width=ow;resultCanvas.height=oh;rctx.clearRect(0,0,ow,oh);rctx.drawImage(out,0,0);drawOutline(pts,ow,oh);lastOutput=result;$("#downloadPng").disabled=false;$("#downloadSvg").disabled=false;$("#nodeBadge").textContent=`${pts.length} nodos`;$("#partBadge").textContent=`${parts} partes`}return result}
+async function blobToDataURL(blob){return await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=rej;fr.readAsDataURL(blob);});}
+async function collectOutputs(){const outputs=[];for(let i=0;i<items.length;i++){setStatus(`Procesando ${i+1} de ${items.length}: ${items[i].file.name}`);outputs.push(await processItem(items[i],false));}return outputs}
+function getTargetSizeMm(){return Math.max(5,(+$("#targetSizeCm").value||4)*10)}
+function getLayoutGapMm(){return Math.max(0,(+$("#layoutGapCm").value||0)*10)}
+function getSizeMode(){return $("#sizeMode").value||"longest"}
+function getLayoutDirection(){return $("#layoutDirection").value||"vertical"}
+function getAutoRotate(){return $("#autoRotate")?$("#autoRotate").value:"no"}
+function getMeasureOrientation(){return $("#measureOrientation")?$("#measureOrientation").value:"auto"}
+function finalSizeFor(out){
+  const target=getTargetSizeMm();
+  const ratio=out.ow/out.oh;
+  const mode=getSizeMode();
+  const autoRotate=getAutoRotate()==="yes";
+  const orientation=getMeasureOrientation();
+  let w,h,rotated=false;
+
+  if(mode==="width"){
+    w=target;h=target/ratio;
+  }else if(mode==="height"){
+    h=target;w=target*ratio;
+  }else{
+    // measure by longest side
+    const isLandscape=ratio>=1;
+    if(orientation==="vertical"){
+      h=target;
+      w=isLandscape?target/ratio:target*ratio;
+      if(autoRotate && isLandscape)rotated=true;
+    }else if(orientation==="horizontal"){
+      w=target;
+      h=isLandscape?target/ratio:target*ratio;
+      if(autoRotate && !isLandscape)rotated=true;
+    }else{
+      if(isLandscape){w=target;h=target/ratio;}
+      else{h=target;w=target*ratio;}
+    }
+  }
+
+  // For width/height modes, optionally rotate to fit requested orientation visually.
+  if(mode!=="longest" && autoRotate){
+    if(orientation==="vertical" && w>h) rotated=true;
+    if(orientation==="horizontal" && h>w) rotated=true;
+  }
+  return {w,h,rotated};
+}
+function packMontage(outputs){
+  const pageW=210,pageH=297,margin=10,gap=getLayoutGapMm(),direction=getLayoutDirection();
+  const pages=[[]];
+  if(direction==="vertical"){
+    let y=margin;
+    for(const out of outputs){
+      let {w,h,rotated}=finalSizeFor(out);
+      if(w>pageW-margin*2){const s=(pageW-margin*2)/w;w*=s;h*=s;}
+      if(h>pageH-margin*2){const s=(pageH-margin*2)/h;w*=s;h*=s;}
+      if(y+h>pageH-margin && pages[pages.length-1].length){pages.push([]);y=margin;}
+      const x=(pageW-w)/2;
+      pages[pages.length-1].push({out,x,y,w,h,rotated});
+      y+=h+gap;
+    }
+  }else if(direction==="horizontal"){
+    let x=margin;
+    for(const out of outputs){
+      let {w,h,rotated}=finalSizeFor(out);
+      if(w>pageW-margin*2){const s=(pageW-margin*2)/w;w*=s;h*=s;}
+      if(h>pageH-margin*2){const s=(pageH-margin*2)/h;w*=s;h*=s;}
+      if(x+w>pageW-margin && pages[pages.length-1].length){pages.push([]);x=margin;}
+      const y=(pageH-h)/2;
+      pages[pages.length-1].push({out,x,y,w,h,rotated});
+      x+=w+gap;
+    }
+  }else{
+    let x=margin,y=margin,rowH=0;
+    for(const out of outputs){
+      let {w,h,rotated}=finalSizeFor(out);
+      if(w>pageW-margin*2){const s=(pageW-margin*2)/w;w*=s;h*=s;}
+      if(h>pageH-margin*2){const s=(pageH-margin*2)/h;w*=s;h*=s;}
+      if(x+w>pageW-margin){x=margin;y+=rowH+gap;rowH=0;}
+      if(y+h>pageH-margin){pages.push([]);x=margin;y=margin;rowH=0;}
+      pages[pages.length-1].push({out,x,y,w,h,rotated});
+      x+=w+gap;rowH=Math.max(rowH,h);
+    }
+  }
+  return {pages,pageW,pageH,targetSize:getTargetSizeMm(),gap,direction,sizeMode:getSizeMode(),autoRotate:getAutoRotate(),measureOrientation:getMeasureOrientation()};
+}
+async function buildMontageAssets(outputs){const enriched=[];for(const out of outputs){enriched.push({...out,dataUrl:await blobToDataURL(out.pngBlob)});}return packMontage(enriched)}
+function escapeHtml(s){return s.replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m]));}
+function makePageSvg(page,pageW,pageH,pageIndex){
+  let groups=`<rect x="0.5" y="0.5" width="${pageW-1}" height="${pageH-1}" fill="white" stroke="#d9dee8" stroke-width="0.5"/>`;
+  for(const item of page){
+    const rotated=!!item.rotated;
+    const drawW=rotated?item.h:item.w;
+    const drawH=rotated?item.w:item.h;
+    const ix=item.x+(item.w-drawW)/2;
+    const iy=item.y+(item.h-drawH)/2;
+    const sx=drawW/item.out.ow, sy=drawH/item.out.oh;
+    const transform=rotated?`translate(${ix} ${iy}) scale(${sx} ${sy}) rotate(90 ${item.out.ow/2} ${item.out.oh/2})`:`translate(${ix} ${iy}) scale(${sx} ${sy})`;
+    const imgTransform=rotated?`rotate(90 ${item.x+item.w/2} ${item.y+item.h/2})`:``;
+    groups+=`<g id="sticker_${escapeHtml(item.out.filename)}" data-grouped="true"><g class="stickerGroup"><image href="${item.dataUrl}" x="${ix}" y="${iy}" width="${drawW}" height="${drawH}" transform="${imgTransform}"/><path d="${item.out.path}" transform="${transform}" fill="none" stroke="#ff00ff" stroke-width="0.6" vector-effect="non-scaling-stroke"/></g></g>`;
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${pageW}mm" height="${pageH}mm" viewBox="0 0 ${pageW} ${pageH}">${groups}</svg>`;
+}
+async function openMontagePdf(){if(!items.length)return;setStatus("Preparando hoja de entrega para PDF...");const packed=await buildMontageAssets(await collectOutputs());let pagesHtml='';packed.pages.forEach((page,idx)=>{let stickers='';for(const item of page){const rotated=!!item.rotated;const rotateCss=rotated?`transform:rotate(90deg);transform-origin:center center;`:``;const innerW=rotated?item.h:item.w;const innerH=rotated?item.w:item.h;const offsetL=(item.w-innerW)/2;const offsetT=(item.h-innerH)/2;stickers+=`<div class="sticker" style="left:${item.x}mm;top:${item.y}mm;width:${item.w}mm;height:${item.h}mm"><img src="${item.dataUrl}" alt="" style="left:${offsetL}mm;top:${offsetT}mm;width:${innerW}mm;height:${innerH}mm;${rotateCss}"><svg viewBox="0 0 ${item.out.ow} ${item.out.oh}" preserveAspectRatio="none" style="left:${offsetL}mm;top:${offsetT}mm;width:${innerW}mm;height:${innerH}mm;${rotateCss}"><path d="${item.out.path}" fill="none" stroke="#ff00ff" stroke-width="1" vector-effect="non-scaling-stroke"/></svg></div>`;}pagesHtml+=`<section class="sheet">${stickers}</section>`;});const html=`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>TecniCut - Hoja PDF</title><style>@page{size:A4;margin:0}*{box-sizing:border-box}html,body{margin:0;padding:0;background:#e5e7eb}.sheet{width:210mm;height:297mm;margin:0 auto;position:relative;background:white;page-break-after:always;overflow:hidden}.sheet:last-child{page-break-after:auto}.sticker{position:absolute}.sticker img,.sticker svg{position:absolute;left:0;top:0;width:100%;height:100%;display:block}.sticker svg{z-index:2}.sticker img{z-index:1}@media print{html,body{background:white}.sheet{margin:0}}</style></head><body>${pagesHtml}<script>window.addEventListener('load',()=>{const imgs=[...document.images];Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(r=>{img.onload=r;img.onerror=r;}))).then(()=>setTimeout(()=>window.print(),350));});<\/script></body></html>`;const win=window.open('','_blank');if(!win){throw new Error('El navegador bloqueó la ventana emergente. Permite ventanas emergentes para este archivo.');}win.document.open();win.document.write(html);win.document.close();setStatus("Hoja abierta. En la ventana nueva guarda como PDF y desactiva encabezados y pies de página.");}
+async function downloadMontageSvg(){
+  if(!items.length)return;
+  setStatus("Preparando paquete para Corel...");
+  const outputs=await collectOutputs();
+  const packed=packMontage(outputs);
+  const entries=[];
+  const enc=new TextEncoder();
+  const gapBetweenPages=10;
+  const totalH=packed.pages.length*packed.pageH+(packed.pages.length-1)*gapBetweenPages;
+  let body='';
+  let imageIndex=0;
+
+  for(let pageIndex=0;pageIndex<packed.pages.length;pageIndex++){
+    const page=packed.pages[pageIndex];
+    const yOff=pageIndex*(packed.pageH+gapBetweenPages);
+    body+=`<g id="pagina_${pageIndex+1}">`;
+
+    for(const item of page){
+      imageIndex++;
+      const cleanBase=(item.out.filename||`sticker_${imageIndex}`)
+        .replace(/[^a-zA-Z0-9_-]+/g,"_")
+        .replace(/^_+|_+$/g,"")
+        .slice(0,80) || `sticker_${imageIndex}`;
+      const imageName=`${String(imageIndex).padStart(3,"0")}_${cleanBase}.png`;
+      const imagePath=`imagenes/${imageName}`;
+      const imageBytes=new Uint8Array(await item.out.pngBlob.arrayBuffer());
+      entries.push({name:imagePath,data:imageBytes});
+
+      const rotated=!!item.rotated;
+      const x=item.x;
+      const y=item.y+yOff;
+      const drawW=rotated?item.h:item.w;
+      const drawH=rotated?item.w:item.h;
+      const ix=x+(item.w-drawW)/2;
+      const iy=y+(item.h-drawH)/2;
+      const sx=drawW/item.out.ow;
+      const sy=drawH/item.out.oh;
+      const scaledPts=item.out.pts.map(p=>[p[0]*sx,p[1]*sy]);
+      let absolutePath;
+      if(rotated){
+        const cx=x+item.w/2, cy=y+item.h/2;
+        const rotPts=scaledPts.map(p=>{const px=ix+p[0], py=iy+p[1]; return [cx-(py-cy), cy+(px-cx)];});
+        absolutePath=pathForExport(rotPts);
+      }else{
+        const absPts=scaledPts.map(p=>[ix+p[0], iy+p[1]]);
+        absolutePath=pathForExport(absPts);
+      }
+      const strokeForCorel=Math.max(0.25, 0.6*Math.min(sx,sy));
+      const imgTransform=rotated?`rotate(90 ${x+item.w/2} ${y+item.h/2})`:``;
+
+      body+=`<g id="sticker_${String(imageIndex).padStart(3,"0")}_${escapeHtml(cleanBase)}" data-grouped="true"><image href="${imagePath}" xlink:href="${imagePath}" x="${ix}" y="${iy}" width="${drawW}" height="${drawH}" preserveAspectRatio="none" transform="${imgTransform}"/><path d="${absolutePath}" fill="none" stroke="#ff00ff" stroke-width="${strokeForCorel}" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></g>`;
+    }
+    body+='</g>';
+  }
+
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${packed.pageW}mm" height="${totalH}mm" viewBox="0 0 ${packed.pageW} ${totalH}">${body}</svg>`;
+  const readme=`TECNICUT v2.8.3 - MONTAJE PARA COREL
+
+1. Descomprime este archivo ZIP completo.
+2. No muevas el SVG por separado de la carpeta "imagenes".
+3. En CorelDRAW importa: TecniCut_Montaje_Corel.svg
+4. Cada sticker está dentro de un grupo con su imagen PNG y su línea de corte magenta.
+5. Si activas rotación automática, el sticker puede girar 90° para que todos respeten el mismo lado de medida.
+6. La medida objetivo usada fue: ${getTargetSizeMm()/10} cm.
+`;
+  entries.unshift({name:"TecniCut_Montaje_Corel.svg", data:enc.encode(svg)});
+  entries.push({name:"LEEME_IMPORTAR_EN_COREL.txt", data:enc.encode(readme)});
+  const zipBlob=await buildZip(entries);
+  download(zipBlob,"TecniCut_Montaje_Corel_v2_8_3.zip");
+  setStatus("¡Listo! Descomprime el ZIP e importa TecniCut_Montaje_Corel.svg en Corel.");
+}
+function renderList(){const box=$("#fileList");box.innerHTML="";if(!items.length){box.innerHTML='<div class="fileitem">Aún no hay imágenes.</div>';return}items.forEach((it,i)=>{const d=document.createElement("div");d.className="fileitem"+(i===current?" active":"");d.textContent=it.file.name;d.onclick=()=>select(i);box.appendChild(d)});$("#countBadge").textContent=`${items.length} imágenes`}
+async function select(i){current=i;renderList();$("#currentName").textContent=items[i].file.name;setStatus("Analizando imagen...");try{await processItem(items[i],true);setStatus("Vista previa lista. El PNG y el SVG ahora salen con la misma resolución de trabajo.")}catch(e){setStatus("Error: "+e.message)}}
+function addFiles(list){const arr=[...list].filter(f=>f.type.startsWith("image/"));items.push(...arr.map(file=>({file})));["refresh","processZip","clear","layoutSvg","layoutPdf"].forEach(id=>$("#"+id).disabled=!items.length);renderList();if(current<0&&items.length)select(0)}
+function download(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1200)}
+$("#pickFiles").onclick=()=>{filesInput.removeAttribute("webkitdirectory");filesInput.click()}; $("#pickFolder").onclick=()=>{filesInput.setAttribute("webkitdirectory","");filesInput.click()}; filesInput.onchange=e=>addFiles(e.target.files); drop.onclick=()=>$("#pickFiles").click(); ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")})); ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")})); drop.addEventListener("drop",e=>addFiles(e.dataTransfer.files));
+$("#tolerance").oninput=e=>$("#tolVal").textContent=e.target.value; $("#smooth").oninput=e=>$("#smoothVal").textContent=e.target.value; $("#refresh").onclick=()=>current>=0&&select(current); document.querySelectorAll('input[name="quality"]').forEach(el=>el.onchange=()=>current>=0&&select(current)); ["groupParts","includeSmallText","removeHalo","preserveSoftEdges","edgeSafetyMargin","preserveCorners","lineArtMode","outerBehind","autoJoinOuter"].forEach(id=>$("#"+id).onchange=()=>current>=0&&select(current));$("#joinDistanceMm").onchange=()=>current>=0&&select(current);
+$("#clear").onclick=()=>{items=[];current=-1;lastOutput=null;renderList();$("#currentName").textContent="Sin imagen seleccionada";$("#countBadge").textContent="0 imágenes";$("#nodeBadge").textContent="0 nodos";$("#partBadge").textContent="0 partes";[originalCanvas,resultCanvas,outlineCanvas].forEach(c=>c.getContext("2d").clearRect(0,0,c.width,c.height));["refresh","processZip","clear","downloadPng","downloadSvg","layoutSvg","layoutPdf"].forEach(id=>$("#"+id).disabled=true);setStatus("Carga imágenes para comenzar.")};
+$("#downloadPng").onclick=()=>lastOutput&&download(lastOutput.pngBlob,lastOutput.filename+"_LISTO.png"); $("#downloadSvg").onclick=()=>lastOutput&&download(new Blob([lastOutput.svg],{type:"image/svg+xml"}),lastOutput.filename+"_CORTE_OPTIMIZADO.svg");
+$("#processZip").onclick=async()=>{if(!items.length)return;$("#processZip").disabled=true;setStatus("Procesando pedido y empaquetando ZIP...");try{const entries=[];for(let i=0;i<items.length;i++){setStatus(`Procesando ${i+1} de ${items.length}: ${items[i].file.name}`);const out=await processItem(items[i],false);entries.push({name:out.filename+"_LISTO.png",data:new Uint8Array(await out.pngBlob.arrayBuffer())});entries.push({name:out.filename+"_CORTE_OPTIMIZADO.svg",data:new TextEncoder().encode(out.svg)})}const dpi=+$("#dpi").value;const info=`TecniCut v1.8\n\nLos PNG de este ZIP llevan DPI incrustado: ${dpi}.\nLos SVG fueron exportados con tamaño físico basado en ese mismo DPI.\nIncluye además una opción de montaje para PDF o SVG, útil para importar a Corel con cada sticker agrupado, alineado con su línea de corte y escalado a la altura indicada.\n`;entries.push({name:"LEEME_MEDIDAS.txt",data:new TextEncoder().encode(info)});const zipBlob=await buildZip(entries);download(zipBlob,"TecniCut_Pedido_v1_8.zip");setStatus("¡Listo! Se descargó un único archivo ZIP con todos los PNG y SVG.")}catch(e){console.error(e);setStatus("Error al generar el ZIP: "+e.message)}$("#processZip").disabled=false};
+
+$("#layoutPdf").onclick=async()=>{if(!items.length)return;$("#layoutPdf").disabled=true;try{await openMontagePdf()}catch(e){console.error(e);setStatus("Error al generar la hoja PDF: "+e.message)}$("#layoutPdf").disabled=false};
+$("#layoutSvg").onclick=async()=>{if(!items.length)return;$("#layoutSvg").disabled=true;try{await downloadMontageSvg()}catch(e){console.error(e);setStatus("Error al generar el montaje SVG: "+e.message)}$("#layoutSvg").disabled=false};
+</script>
+</body>
+</html>

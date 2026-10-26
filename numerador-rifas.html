@@ -1,0 +1,404 @@
+<!doctype html><html lang="es"><head><script src="arrastrar.js" defer></script><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Tecni"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#191b22">
+<script src="avisos.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TecniRifas — Numerador de boletas | Tecnigráficas</title><style>
+*{box-sizing:border-box}html:not(.auth-ready) body{visibility:hidden}body{margin:0;background:#f4f7fb;color:#17233a;font-family:Arial,sans-serif}header{padding:22px 5%;color:#fff;background:linear-gradient(120deg,#0e347f,#1971c8)}header h1{margin:4px 0}header small{color:#9ce8f3;letter-spacing:.15em;font-weight:bold}.app{display:grid;grid-template-columns:350px 1fr;gap:20px;max-width:1400px;margin:22px auto;padding:0 20px}.card{background:#fff;border:1px solid #dce4ef;border-radius:16px;padding:19px;box-shadow:0 6px 24px #123e9112}h2{font-size:16px;color:#123e91;margin:14px 0 8px}label{display:block;font-size:13px;font-weight:bold;margin:10px 0}select,input{width:100%;padding:10px;border:1px solid #ccd8e8;border-radius:9px;margin-top:5px}.row{display:flex;gap:8px}.row>*{flex:1}.check{display:flex;gap:8px;align-items:center}.check input{width:auto}.calc{background:#edf5ff;border-left:4px solid #20b9d7;padding:12px;border-radius:9px;margin:12px 0}.calc b{font-size:22px;color:#123e91}.calc span,.calc em{display:block;font-size:12px;color:#68758a;margin-top:3px}.calc em{color:#a35c00}.btn{width:100%;padding:12px;border-radius:10px;border:0;font-weight:bold;cursor:pointer;margin-top:8px}.primary{background:#123e91;color:white}.secondary{background:white;color:#123e91;border:1px solid #9eb4d3}.chips,.aligners{display:flex;flex-wrap:wrap;gap:5px}.chips button,.aligners button{padding:7px;border:1px solid #ccd8e8;background:#fff;border-radius:7px}.chips .on{background:#123e91;color:#fff}.aligners button{font-size:11px;color:#123e91;font-weight:700}.keyHelp{font-size:11px;background:#fff8df;border:1px solid #f2d98a;border-radius:8px;padding:7px;color:#735800;margin:7px 0}.preview{position:relative;aspect-ratio:2.333/1;border:2px dashed #9fb3cf;border-radius:12px;overflow:hidden;background:#fbfdff;display:grid;place-items:center;color:#738299}.preview img{width:100%;height:100%;object-fit:fill}.num{position:absolute;transform:translate(-50%,-50%);background:white;border:2px solid #c90000;border-radius:5px;padding:1px 4px;color:#d00000;font-family:"Times New Roman",Times,serif;font-weight:700;line-height:1}.num.active{outline:4px solid #ffbf1970}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.stat{padding:12px;background:#f6f8fb;border:1px solid #dce4ef;border-radius:10px}.stat b{font-size:22px;display:block}.good b{color:#159565}.bad b{color:#d33}.approved{background:#e8f9f1;color:#08794d;border:1px solid #a9e7cd;padding:10px;border-radius:9px;font-weight:bold;margin-top:12px}.table{max-height:260px;overflow:auto;margin-top:12px;border:1px solid #dce4ef;border-radius:9px}table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:7px;border-bottom:1px solid #e6ecf4;text-align:center}th{position:sticky;top:0;background:#eef5ff}.actions{display:flex;gap:8px}.note{font-size:12px;color:#68758a}
+.layoutBox{background:#f7fbff;border:1px solid #d8e7f4;border-radius:12px;padding:11px;margin-top:8px}
+.layoutGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.layoutSummary{margin-top:9px;padding:10px;border-radius:9px;background:#edf5ff;color:#24466d;font-size:12px;line-height:1.45}
+.layoutSummary strong{color:#123e91}
+.sheetPreviewBox{margin-top:12px;border:1px solid #dce4ef;border-radius:14px;padding:13px;background:#f8fbff}
+.sheetPreviewHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;font-size:12px;color:#68758a}
+.sheetPreviewHead strong{color:#123e91}
+.sheetCanvas{width:100%;display:grid;place-items:center;overflow:hidden;background:#eef3f8;border-radius:10px;padding:12px}
+.sheetCanvas svg{display:block;max-width:100%;max-height:460px;background:#fff;box-shadow:0 6px 20px #123e911c}
+.sheetPreviewLegend{font-size:11px;color:#68758a;margin-top:9px;line-height:1.45}
+
+@media(max-width:520px){.layoutGrid{grid-template-columns:1fr}}.headerbar{max-width:1400px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:18px}.headercopy{min-width:0}.backSystem{flex:0 0 auto;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;padding:10px 14px;border-radius:10px;font-weight:bold;cursor:pointer}.backSystem:hover{background:rgba(255,255,255,.22)}@media(max-width:850px){.app{grid-template-columns:1fr}.headerbar{align-items:flex-start}}@media(max-width:600px){.headerbar{display:block}.backSystem{width:100%;margin-top:14px}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script>
+<script>
+(async()=>{
+  try{
+    const authDb=window.supabase.createClient("https://kqrfcdfygskzhsdzzcze.supabase.co","sb_publishable_KfkIr6TlW6ivuT5cD0g9Kg_EuZwDKJ9");
+    const {data:{session}}=await authDb.auth.getSession();
+    if(!session){location.replace("index.html#design");return}
+    document.documentElement.classList.add("auth-ready");
+  }catch(error){console.error(error);location.replace("index.html#design")}
+})();
+</script></head><body><header><div class="headerbar"><div class="headercopy"><small>TECNIGRÁFICAS</small><h1>№ TecniRifas — Numerador de boletas</h1><div>PDF y tabla de control sin números repetidos ni faltantes</div></div><button id="backToSystem" class="backSystem" type="button">← Volver a Herramientas de diseño</button></div></header><div class="app"><aside class="card">
+<h2>1. Medidas de impresión</h2>
+<div class="layoutBox">
+  <label>Medida estándar<select id="printPreset"><option value="custom">Personalizada</option><option value="cabida10Tabloide">Cabida 10 en tabloide</option></select></label>
+  <p class="note" id="printPresetHelp">Puedes escoger una medida estándar o ajustar las medidas manualmente.</p>
+  <div class="layoutGrid">
+    <label>Ancho de la boleta (cm)<input id="ticketW" type="number" min=".1" step="any" inputmode="decimal" value="16.01"></label>
+    <label>Alto de la boleta (cm)<input id="ticketH" type="number" min=".1" step="any" inputmode="decimal" value="6.863"></label>
+  </div>
+  <label>Tamaño del papel<select id="paperPreset"><option value="office" selected>Oficio · 21,59 × 33,02 cm</option><option value="letter">Carta · 21,59 × 27,94 cm</option><option value="a4">A4 · 21 × 29,7 cm</option><option value="custom">Personalizado</option></select></label>
+  <div class="layoutGrid">
+    <label>Ancho papel (cm)<input id="paperW" type="number" min=".1" step="any" inputmode="decimal" value="21.59"></label>
+    <label>Alto papel (cm)<input id="paperH" type="number" min=".1" step="any" inputmode="decimal" value="33.02"></label>
+    <label>Margen exterior (cm)<input id="paperMargin" type="number" min="0" step="any" inputmode="decimal" value=".5"></label>
+    <label>Separación entre boletas (cm)<input id="sheetGap" type="number" min="0" step="any" inputmode="decimal" value=".2"></label>
+  </div>
+  <label class="check"><input id="allowRotate" type="checkbox"> <strong>Girar toda la boleta 90°</strong> · desmarcado = conservar el arte horizontal/original</label>
+  <div id="layoutSummary" class="layoutSummary">Calculando cabida…</div>
+  <p class="note" style="margin:8px 2px 0"><strong>Regla:</strong> desmarcado = mantiene el arte exactamente en su orientación original. Marcado = gira TODA la boleta 90° y recalcula la cabida.</p>
+</div>
+
+<h2>2. Numeración</h2>
+<label>Cantidad de cifras<select id="digits"><option value="2">2 · 00–99</option><option value="3" selected>3 · 000–999</option><option value="4">4 · 0000–9999</option></select></label>
+<label>Oportunidades por boleta<input id="opps" type="number" min="1" max="10" value="3" step="any" inputmode="decimal"></label>
+<label>Número final <span style="font-weight:500;color:#7b8494">(opcional)</span><input id="endNumber" type="number" min="0" step="1" inputmode="numeric" placeholder="Vacío = usar todo el rango"></label>
+<p class="note" id="endNumberNote">Déjalo vacío para conservar el comportamiento normal según la cantidad de cifras. Ej.: con 3 cifras, escribe 250 para numerar del 000 al 250.</p>
+<p class="note" id="oppsModeNote">Con 2 o más oportunidades, los números se mezclan aleatoriamente.</p>
+<label>Orden de imposición
+<select id="impositionMode">
+  <option value="normal">Normal · llenar hoja por hoja</option>
+  <option value="stack" selected>Apilable para refilar · consecutivos por posición</option>
+</select>
+</label>
+<p class="note" id="impositionNote">Apilable: al refilar cada posición, la pila queda en orden consecutivo sin compaginar.</p>
+<label class="check"><input id="zero" type="checkbox" checked> Incluir el número <span id="zeroLabel">000</span></label>
+<div class="calc"><b id="count">334 boletas</b><span id="detail">Calculando hojas…</span><em id="warning">La última boleta tendrá 2 espacios “NO JUEGA”.</em></div>
+
+<h2>3. Diseño de la boleta</h2><input id="file" type="file" accept="image/*"><p class="note">PNG o JPG sin numeración. La vista previa y el PDF respetarán las medidas que escribas arriba.</p>
+<h2>4. Posición de números</h2>
+<label>¿Dónde imprimir la numeración?
+<select id="numberingPlacement">
+  <option value="body" selected>Solo cuerpo · una numeración por oportunidad</option>
+  <option value="body_stub">Cuerpo + colilla · repetir la misma numeración</option>
+</select>
+</label>
+<p class="note" id="numberingPlacementNote">Solo cuerpo: cada oportunidad se imprime una sola vez. Ideal para bonos, talonarios y piezas sin colilla numerada.</p>
+<div class="chips" id="chips"></div><div class="keyHelp">Clic en un número + ← ↑ ↓ → para mover · Shift mueve más rápido · Puedes girar uno solo o todos · Ctrl + Z deshace.</div><div class="aligners"><button id="alignH">Alinear grupo ↔</button><button id="alignV">Alinear grupo ↕</button><button id="centerH">Centrar seleccionado ↔</button><button id="centerV">Centrar seleccionado ↕</button><button type="button" id="rotateSelectedNumber">Girar seleccionado +90°</button><button type="button" id="resetSelectedRotation">Enderezar seleccionado 0°</button><button type="button" id="rotateAllNumbers">Girar TODOS +90°</button><button type="button" id="resetAllRotations">Enderezar TODOS 0°</button></div><label>Tamaño<input id="size" type="range" min="10" max="52" value="22"></label><button class="btn primary" id="generate">Mezclar y validar</button>
+</aside><main>
+<section class="card">
+<h2>Vista previa de cabida</h2>
+<p class="note">Sin numeración. Sirve solo para confirmar tamaño, orientación, márgenes y separación antes de exportar.</p>
+<div class="sheetPreviewBox">
+<div class="sheetPreviewHead"><strong id="sheetPreviewTitle">Cabida</strong><span id="sheetPreviewMeasure">—</span></div>
+<div id="sheetPreview" class="sheetCanvas">Configura las medidas para ver la cabida.</div>
+<div id="sheetPreviewLegend" class="sheetPreviewLegend">La exportación usará esta misma distribución.</div>
+</div>
+</section>
+<section class="card" style="margin-top:20px"><h2>Vista previa de la boleta y posición de números</h2><div id="preview" class="preview">Carga la imagen de la boleta</div></section><section class="card" style="margin-top:20px"><h2>Control de seguridad</h2><div class="stats"><div class="stat"><b id="assigned">0</b>Asignados</div><div class="stat good"><b id="dupes">0</b>Repetidos</div><div class="stat good"><b id="missing">—</b>Faltantes</div></div><div id="approved"></div><div class="table"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div><div class="actions"><button class="btn primary" id="print">Imprimir / guardar PDF</button><button class="btn secondary" id="csv">Descargar tabla CSV</button></div></section></main></div>
+<script>
+let img='',tickets=[],active=0,positions=[],undoStack=[];
+const $=id=>document.getElementById(id),pad=(n,d)=>String(n).padStart(d,'0');
+const cmNum=id=>{const v=Number(String($(id).value||'').replace(',','.'));return Number.isFinite(v)?v:0};
+
+function snapshot(){undoStack.push(positions.map(p=>({...p})));if(undoStack.length>100)undoStack.shift()}
+function undo(){const previous=undoStack.pop();if(!previous)return;positions=previous;renderChips();renderPreview()}
+
+function paperPreset(){
+  const p=$('paperPreset').value;
+  const sizes={office:[21.59,33.02],letter:[21.59,27.94],a4:[21,29.7]};
+  if(sizes[p]){[$('paperW').value,$('paperH').value]=sizes[p]}
+  $('paperW').disabled=p!=='custom';$('paperH').disabled=p!=='custom';
+  refreshLayout()
+}
+
+// Medidas estándar de TecniRifas. Añadir futuras cabidas en este catálogo.
+const printPresets={cabida10Tabloide:{paperW:31,paperH:49,ticketW:15.5,ticketH:9.8,paperMargin:0,sheetGap:0,rotate:false}};
+function applyPrintPreset(){
+  const preset=printPresets[$('printPreset').value];
+  if(preset){
+    $('paperPreset').value='custom';
+    for(const id of ['paperW','paperH','ticketW','ticketH','paperMargin','sheetGap'])$(id).value=String(preset[id]);
+    $('paperW').disabled=false;$('paperH').disabled=false;
+    $('allowRotate').checked=preset.rotate;
+  }
+  refreshLayout();
+}
+function syncPrintPreset(){
+  const selected=$('printPreset').value,preset=printPresets[selected];
+  if(preset&&(['paperW','paperH','ticketW','ticketH','paperMargin','sheetGap'].some(id=>Math.abs(cmNum(id)-preset[id])>1e-9)||$('allowRotate').checked!==preset.rotate))$('printPreset').value='custom';
+  $('printPresetHelp').textContent=$('printPreset').value==='cabida10Tabloide'?'Papel 31 × 49 cm · Boletas 15,5 × 9,8 cm · 2 columnas × 5 filas. Sin margen ni separación. Imprime al 100 %, sin ajustar a página; verifica el área imprimible de tu equipo.':'Puedes escoger una medida estándar o ajustar las medidas manualmente.';
+}
+$('printPreset').addEventListener('change',applyPrintPreset);
+
+function candidateLayout(pageW,pageH,tW,tH,margin,gap,rotated){
+  const w=rotated?tH:tW,h=rotated?tW:tH;
+  const usableW=Math.max(0,pageW-2*margin),usableH=Math.max(0,pageH-2*margin);
+  const cols=Math.floor((usableW+gap)/(w+gap)+1e-9),rows=Math.floor((usableH+gap)/(h+gap)+1e-9);
+  const cap=Math.max(0,cols)*Math.max(0,rows);
+  if(!cap)return{cap:0,cols:0,rows:0,w,h,rotated};
+  const gridW=cols*w+(cols-1)*gap,gridH=rows*h+(rows-1)*gap;
+  return{cap,cols,rows,w,h,rotated,gridW,gridH,startX:(pageW-gridW)/2,startY:(pageH-gridH)/2}
+}
+function getLayout(){
+  const pageW=cmNum('paperW'),pageH=cmNum('paperH'),tW=cmNum('ticketW'),tH=cmNum('ticketH'),margin=Math.max(0,cmNum('paperMargin')),gap=Math.max(0,cmNum('sheetGap'));
+  if(pageW<=0||pageH<=0||tW<=0||tH<=0)return null;
+  const normalLayout=candidateLayout(pageW,pageH,tW,tH,margin,gap,false);
+  const rotatedLayout=candidateLayout(pageW,pageH,tW,tH,margin,gap,true);
+
+  // La decisión es 100% del usuario.
+  // DESMARCADO = orientación original.
+  // MARCADO = giro 90° forzado.
+  const forceRotate=$('allowRotate').checked;
+  const chosen=forceRotate?rotatedLayout:normalLayout;
+
+  // IMPORTANTE: `chosen.rotated` es el booleano real de orientación.
+  // Antes se sobrescribía accidentalmente con el objeto rotatedLayout,
+  // por eso el sistema decía "GIRO FORZADO 90°" aunque el checkbox estuviera vacío.
+  return{
+    ...chosen,
+    pageW,pageH,tW,tH,margin,gap,
+    normalLayout,
+    rotatedLayout,
+    forceRotate
+  }
+}
+function renderSheetPreview(){
+  const l=getLayout(),box=$('sheetPreview'),title=$('sheetPreviewTitle'),measure=$('sheetPreviewMeasure'),legend=$('sheetPreviewLegend');
+  if(!box)return;
+  if(!l||!l.cap){
+    box.innerHTML='No hay una cabida válida con estas medidas.';
+    title.textContent='Sin cabida';measure.textContent='—';legend.textContent='Revisa tamaño, papel, margen o separación.';
+    return;
+  }
+  const scale=20,W=l.pageW*scale,H=l.pageH*scale;
+  let content=`<rect x="0" y="0" width="${W}" height="${H}" fill="#fff"/>`;
+  content+=`<rect x="${l.margin*scale}" y="${l.margin*scale}" width="${Math.max(0,(l.pageW-2*l.margin)*scale)}" height="${Math.max(0,(l.pageH-2*l.margin)*scale)}" fill="none" stroke="#9fb3cf" stroke-dasharray="5 4" stroke-width="1.2"/>`;
+  for(let i=0;i<l.cap;i++){
+    const row=Math.floor(i/l.cols),col=i%l.cols;
+    const x=(l.startX+col*(l.w+l.gap))*scale,y=(l.startY+row*(l.h+l.gap))*scale,w=l.w*scale,h=l.h*scale;
+    content+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff" stroke="#123e91" stroke-width="1"/>`;
+    if(img){
+      if(l.rotated){
+        const cx=x+w/2,cy=y+h/2,iw=l.tW*scale,ih=l.tH*scale;
+        content+=`<image href="${img}" x="${cx-iw/2}" y="${cy-ih/2}" width="${iw}" height="${ih}" preserveAspectRatio="none" transform="rotate(90 ${cx} ${cy})"/>`;
+      }else{
+        content+=`<image href="${img}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="none"/>`;
+      }
+    }
+  }
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" aria-label="Vista previa de cabida">${content}</svg>`;
+  title.textContent=`${l.cap} boleta${l.cap===1?'':'s'} · ${l.cols} × ${l.rows}`;
+  measure.textContent=`Papel ${l.pageW} × ${l.pageH} cm`;
+  legend.innerHTML=`Boleta original ${l.tW} × ${l.tH} cm · <strong>${l.rotated?'GIRO 90° ACTIVADO':'SIN GIRO · ARTE ORIGINAL'}</strong> · margen ${l.margin} cm · separación ${l.gap} cm.`;
+}
+function refreshLayout(){
+  syncPrintPreset();
+  const l=getLayout();
+  const preview=$('preview');
+  if(l){preview.style.aspectRatio=`${l.tW}/${l.tH}`;const orientation=l.rotated?'GIRO 90° ACTIVADO':'SIN GIRO · ARTE ORIGINAL';$('layoutSummary').innerHTML=l.cap?`<strong>${l.cap} boleta${l.cap===1?'':'s'} por hoja</strong> · ${l.cols} columna${l.cols===1?'':'s'} × ${l.rows} fila${l.rows===1?'':'s'} · <strong>${orientation}</strong>.`:`<strong>No cabe ninguna boleta.</strong> Revisa las medidas, margen o papel.`}
+  cfg(false);renderPreview();renderSheetPreview();updateImpositionNote()
+}
+function numberingCopies(){return $('numberingPlacement')?.value==='body_stub'?2:1}
+function ensureNumberingPositions(o){
+  const copies=numberingCopies(),needed=o*copies,old=positions.map(p=>({...p}));
+  const next=[];
+  for(let copy=0;copy<copies;copy++){
+    for(let opportunity=0;opportunity<o;opportunity++){
+      const oldIndex=copy*o+opportunity;
+      if(old[oldIndex]){
+        next.push({...old[oldIndex]});
+      }else if(copy===0){
+        next.push({x:55+35*opportunity/Math.max(o-1,1),y:18,rotation:0});
+      }else{
+        next.push({x:8+12*opportunity/Math.max(o-1,1),y:18,rotation:0});
+      }
+    }
+  }
+  positions=next;
+  if(active>=positions.length)active=Math.max(0,positions.length-1);
+}
+function updateNumberingPlacementNote(){
+  const both=numberingCopies()===2,note=$('numberingPlacementNote');
+  if(note)note.textContent=both
+    ?'Cuerpo + colilla: cada oportunidad se repite dos veces con el mismo número, una en el cuerpo y otra en la colilla.'
+    :'Solo cuerpo: cada oportunidad se imprime una sola vez. Ideal para bonos, talonarios y piezas sin colilla numerada.';
+}
+function numberingRange(){
+  const d=+$('digits').value,start=$('zero').checked?0:1,max=10**d-1,raw=String($('endNumber')?.value??'').trim();
+  let end=raw===''?max:Math.floor(Number(raw));
+  const valid=Number.isFinite(end)&&end>=start&&end<=max;
+  if(!valid)end=max;
+  return{d,start,end,max,total:end-start+1,custom:raw!=='',valid}
+}
+function updateEndNumberUI(){
+  const r=numberingRange(),input=$('endNumber'),note=$('endNumberNote');
+  if(input){input.max=r.max;input.min=r.start;input.placeholder=`Vacío = ${pad(r.max,r.d)}`}
+  if(note){
+    if(r.custom&&!r.valid)note.innerHTML=`El número final debe estar entre <strong>${pad(r.start,r.d)}</strong> y <strong>${pad(r.max,r.d)}</strong>.`;
+    else if(r.custom)note.innerHTML=`Rango actual: <strong>${pad(r.start,r.d)} a ${pad(r.end,r.d)}</strong> · ${r.total.toLocaleString('es-CO')} números.`;
+    else note.innerHTML=`Rango completo: <strong>${pad(r.start,r.d)} a ${pad(r.max,r.d)}</strong>. Puedes escribir un número final menor si el trabajo no usa todo el rango.`;
+  }
+}
+function cfg(resetTickets=true){
+  const r=numberingRange(),d=r.d,o=Math.max(1,Math.min(10,Math.round(+$('opps').value||1))),total=r.total,count=Math.ceil(total/o),layout=getLayout(),cap=layout?.cap||0,pages=cap?Math.ceil(count/cap):0;
+  $('zeroLabel').textContent='0'.repeat(d);updateEndNumberUI();
+  $('count').textContent=count.toLocaleString('es-CO')+' boletas';
+  const modeNote=$('oppsModeNote');if(modeNote)modeNote.textContent=o===1?'1 oportunidad: numeración consecutiva, sin mezcla aleatoria.':'2 o más oportunidades: números mezclados aleatoriamente y validados sin repetidos.';
+  $('detail').textContent=cap?`${total.toLocaleString('es-CO')} números · ${pad(r.start,d)}–${pad(r.end,d)} · ${cap} boletas/hoja · ${pages} hoja${pages===1?'':'s'} · ${$('impositionMode')?.value==='stack'?'apilable':'normal'}`:`${total.toLocaleString('es-CO')} números · ${pad(r.start,d)}–${pad(r.end,d)} · revisa la cabida`;
+  $('warning').textContent=!r.valid?'Corrige el número final antes de generar.':(total%o?'La última boleta tendrá '+(o-total%o)+' espacio(s) “NO JUEGA”.':'División exacta: todas las boletas quedan completas.');
+  ensureNumberingPositions(o);updateNumberingPlacementNote();
+  renderChips();renderPreview();updateImpositionNote();if(resetTickets){tickets=[];audit();renderTable()}
+}
+function positionCopyLabel(i,o){return numberingCopies()===2&&i>=o?'Colilla':'Cuerpo'}
+function renderChips(){
+  const o=+$('opps').value;
+  $('chips').innerHTML=positions.map((_,i)=>`<button class="${i===active?'on':''}" data-i="${i}">Op. ${(i%o)+1} · ${positionCopyLabel(i,o)}</button>`).join('');
+  $('chips').querySelectorAll('button').forEach(b=>b.onclick=()=>{active=+b.dataset.i;renderChips();renderPreview()})
+}
+function renderPreview(){
+  const d=+$('digits').value,o=+$('opps').value,s=+$('size').value;
+  $('preview').innerHTML=(img?`<img src="${img}">`:'Carga la imagen de la boleta')+(img?positions.map((p,i)=>`<b class="num ${i===active?'active':''}" data-i="${i}" title="Op. ${(i%o)+1} · ${positionCopyLabel(i,o)} · giro ${Number(p.rotation||0)}°" style="left:${p.x}%;top:${p.y}%;font-size:${s}px;transform:translate(-50%,-50%) rotate(${Number(p.rotation||0)}deg)">${pad((i%o)?(i%o)*127:90,d)}</b>`).join(''):'');
+  $('preview').querySelectorAll('.num').forEach(n=>n.onclick=e=>{e.stopPropagation();active=+n.dataset.i;renderChips();renderPreview()})
+}
+
+$('file').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader;r.onload=()=>{img=r.result;renderPreview();renderSheetPreview()};r.readAsDataURL(f)};
+$('preview').onclick=e=>{if(!img)return;snapshot();const r=e.currentTarget.getBoundingClientRect(),prev=positions[active]||{};positions[active]={...prev,x:(e.clientX-r.left)/r.width*100,y:(e.clientY-r.top)/r.height*100};renderPreview()};
+// Ampliar el tamaño conservando el mismo valor para vista previa e impresión.
+$('size').max='200';
+const sizeValue=document.createElement('input');
+sizeValue.id='sizeValue';sizeValue.type='number';sizeValue.min='10';sizeValue.max='200';sizeValue.step='1';sizeValue.value=$('size').value;sizeValue.inputMode='numeric';sizeValue.setAttribute('aria-label','Tamaño exacto del número');
+$('size').insertAdjacentElement('afterend',sizeValue);
+const sizeHelp=document.createElement('span');sizeHelp.className='note';sizeHelp.textContent='De 10 a 200. Desliza o escribe el tamaño exacto.';sizeValue.insertAdjacentElement('afterend',sizeHelp);
+$('size').oninput=()=>{sizeValue.value=$('size').value;renderPreview()};
+sizeValue.oninput=()=>{if(sizeValue.value!==''&&sizeValue.validity.valid){$('size').value=sizeValue.value;renderPreview()}};
+sizeValue.onchange=()=>{const value=sizeValue.value===''?+$('size').value:Math.max(10,Math.min(200,Math.round(Number(sizeValue.value))));$('size').value=String(value);sizeValue.value=$('size').value;renderPreview()};
+['digits','opps','zero'].forEach(id=>$(id).onchange=()=>cfg(true));$('endNumber').addEventListener('input',()=>cfg(true));$('numberingPlacement').onchange=()=>{snapshot();cfg(false)};
+['ticketW','ticketH','paperMargin','sheetGap','paperW','paperH'].forEach(id=>$(id).addEventListener('input',refreshLayout));
+$('allowRotate').onchange=refreshLayout;$('paperPreset').onchange=paperPreset;$('impositionMode').onchange=()=>{updateImpositionNote();renderTable()};
+
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName)){e.preventDefault();undo();return}if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)||['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;e.preventDefault();snapshot();const step=e.shiftKey?1:.15,p=positions[active];if(e.key==='ArrowLeft')p.x-=step;if(e.key==='ArrowRight')p.x+=step;if(e.key==='ArrowUp')p.y-=step;if(e.key==='ArrowDown')p.y+=step;p.x=Math.max(0,Math.min(100,p.x));p.y=Math.max(0,Math.min(100,p.y));renderPreview()});
+function activeGroup(){const o=+$('opps').value;if(numberingCopies()===1)return positions.slice(0,o);const start=active<o?0:o;return positions.slice(start,start+o)}
+$('alignH').onclick=()=>{snapshot();const g=activeGroup(),y=g.reduce((s,p)=>s+p.y,0)/g.length;g.forEach(p=>p.y=y);renderPreview()};
+$('alignV').onclick=()=>{snapshot();const g=activeGroup(),x=g.reduce((s,p)=>s+p.x,0)/g.length;g.forEach(p=>p.x=x);renderPreview()};
+$('centerH').onclick=()=>{snapshot();positions[active].x=50;renderPreview()};$('centerV').onclick=()=>{snapshot();positions[active].y=50;renderPreview()};
+$('rotateSelectedNumber').onclick=()=>{if(!positions[active])return;snapshot();positions[active].rotation=(Number(positions[active].rotation||0)+90)%360;renderPreview()};
+$('resetSelectedRotation').onclick=()=>{if(!positions[active])return;snapshot();positions[active].rotation=0;renderPreview()};
+$('rotateAllNumbers').onclick=()=>{if(!positions.length)return;snapshot();positions.forEach(p=>p.rotation=(Number(p.rotation||0)+90)%360);renderPreview()};
+$('resetAllRotations').onclick=()=>{if(!positions.length)return;snapshot();positions.forEach(p=>p.rotation=0);renderPreview()};
+
+$('generate').onclick=()=>{
+  const r=numberingRange();if(!r.valid)return alert(`El número final debe estar entre ${pad(r.start,r.d)} y ${pad(r.max,r.d)}.`);
+  const d=r.d,o=+$('opps').value,start=r.start,end=r.end;
+  const a=Array.from({length:end-start+1},(_,i)=>i+start);
+  if(o>1){
+    for(let i=a.length-1;i;i--){
+      const x=new Uint32Array(1);
+      crypto.getRandomValues(x);
+      const j=x[0]%(i+1);
+      [a[i],a[j]]=[a[j],a[i]]
+    }
+  }
+  tickets=[];
+  for(let i=0;i<a.length;i+=o){
+    tickets.push({id:tickets.length+1,nums:Array.from({length:o},(_,j)=>a[i+j]===undefined?null:pad(a[i+j],d))})
+  }
+  audit();renderTable();updateImpositionNote()
+};
+function audit(){const r=numberingRange(),total=r.total,v=tickets.flatMap(t=>t.nums).filter(Boolean),u=new Set(v);$('assigned').textContent=v.length;$('dupes').textContent=v.length-u.size;$('missing').textContent=tickets.length?total-u.size:'—';$('approved').className=tickets.length&&v.length===u.size&&u.size===total?'approved':'';$('approved').textContent=$('approved').className?'✓ APROBADO PARA IMPRESIÓN · Sin repetidos ni faltantes':''}
+
+function impositionInfo(){
+  const cap=getLayout()?.cap||1,total=tickets.length,pages=Math.max(1,Math.ceil(total/cap)),mode=$('impositionMode')?.value||'normal';
+  return{cap,total,pages,mode}
+}
+function sheetIndex(i){
+  const {cap,pages,mode}=impositionInfo();
+  if(mode==='stack'){
+    return{page:(i%pages)+1,pos:Math.floor(i/pages)+1}
+  }
+  return{page:Math.floor(i/cap)+1,pos:(i%cap)+1}
+}
+function ticketsForPage(pageIndex){
+  const {cap,total,pages,mode}=impositionInfo();
+  if(mode!=='stack')return tickets.slice(pageIndex*cap,pageIndex*cap+cap);
+  const pageTickets=[];
+  for(let pos=0;pos<cap;pos++){
+    const ticketIndex=pos*pages+pageIndex;
+    pageTickets.push(ticketIndex<total?tickets[ticketIndex]:null)
+  }
+  return pageTickets
+}
+function updateImpositionNote(){
+  const l=getLayout(),cap=l?.cap||0,r=numberingRange(),total=tickets.length||Math.ceil(r.total/Math.max(1,+$('opps').value)),pages=cap?Math.ceil(total/cap):0,mode=$('impositionMode')?.value||'normal';
+  const note=$('impositionNote');if(!note)return;
+  if(mode==='stack'){
+    note.textContent=cap?`Apilable: ${cap} posiciones × ${pages} hojas. La posición 1 lleva las primeras ${Math.min(pages,total)} boletas consecutivas; luego continúa la posición 2, y así sucesivamente.`:'Apilable: configura una cabida válida primero.';
+  }else{
+    note.textContent='Normal: el sistema llena posición 1, 2, 3… dentro de cada hoja y luego pasa a la siguiente hoja.';
+  }
+}function renderTable(){const o=+$('opps').value,d=Math.max(3,String(tickets.length).length);$('thead').innerHTML='<tr><th>Boleta</th>'+Array.from({length:o},(_,i)=>`<th>Oportunidad ${i+1}</th>`).join('')+'<th>Hoja</th><th>Pos.</th></tr>';$('tbody').innerHTML=tickets.map((t,i)=>{const x=sheetIndex(i);return`<tr><td>${pad(t.id,d)}</td>${t.nums.map(n=>`<td>${n||'NO JUEGA'}</td>`).join('')}<td>${x.page}</td><td>${x.pos}</td></tr>`}).join('')}
+$('csv').onclick=()=>{if(!tickets.length)return alert('Primero genera las combinaciones.');const o=+$('opps').value,rows=[['Boleta',...Array.from({length:o},(_,i)=>'Oportunidad '+(i+1)),'Hoja','Posición'],...tickets.map((t,i)=>{const x=sheetIndex(i);return[t.id,...t.nums.map(n=>n||'NO JUEGA'),x.page,x.pos]})],b=new Blob(['\ufeff'+rows.map(r=>r.join(';')).join('\n')],{type:'text/csv'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='control-rifa.csv';a.click()};
+
+function ticketSvg(t,o,fontPx,previewWidth,tW,tH,imageHref){
+  // `positions` contiene solo cuerpo, o cuerpo+colilla según la opción elegida.
+
+  const W=1600,H=W*(tH/tW),font=Math.max(14,fontPx*W/Math.max(previewWidth,1));
+  const labels=positions.map((p,j)=>{const value=t.nums[j%o]||'NO JUEGA',boxW=Math.max(font*2.15,value.length*font*.64+font*.5),boxH=font*1.32,cx=p.x/100*W,cy=p.y/100*H,x=cx-boxW/2,y=cy-boxH/2,rotation=Number(p.rotation||0);return `<g transform="rotate(${rotation} ${cx} ${cy})"><foreignObject x="${x}" y="${y}" width="${boxW}" height="${boxH}"><div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;box-sizing:border-box;background:#fff;border:${Math.max(2,font*.075)}px solid #d00000;border-radius:${font*.18}px;color:#d00000;font:${font}px/1 'Times New Roman',Times,serif;font-weight:700;white-space:nowrap">${value}</div></foreignObject></g>`}).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><image href="${imageHref}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="none"/>${labels}</svg>`
+}
+$('print').onclick=async()=>{
+  if(!tickets.length||!img)return alert('Carga la boleta y genera las combinaciones.');
+  if(!$('approved').className)return alert('La numeración debe estar aprobada antes de imprimir.');
+  const l=getLayout();if(!l||!l.cap)return alert('Con esas medidas no cabe ninguna boleta en el papel.');
+
+  const w=open('','_blank');
+  if(!w)return alert('El navegador bloqueó la ventana de impresión. Permite ventanas emergentes para este sitio.');
+
+  try{
+    const artBlob=await fetch(img).then(r=>r.blob());
+    const artURL=URL.createObjectURL(artBlob);
+    const s=+$('size').value,o=+$('opps').value,previewWidth=$('preview').clientWidth;
+
+    w.document.open();
+    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Rifa lista para imprimir</title><style>
+      @page{size:${l.pageW}cm ${l.pageH}cm;margin:0}
+      *{box-sizing:border-box}
+      html,body{margin:0!important;padding:0!important;width:${l.pageW}cm;background:#fff}
+      .sheet{position:relative;width:${l.pageW}cm;height:${l.pageH}cm;overflow:hidden;break-after:page;page-break-after:always}
+      .sheet:last-child{break-after:auto;page-break-after:auto}
+      .slot{position:absolute;overflow:hidden;background:#fff}
+      .slot>svg{display:block;width:100%;height:100%}
+      .rotwrap{position:absolute;inset:0;overflow:hidden}
+      .rotwrap .rotatedTicket{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center}
+      .rotwrap .rotatedTicket>svg{display:block;width:100%;height:100%}
+      @media print{html,body{width:${l.pageW}cm!important}.sheet{width:${l.pageW}cm!important;height:${l.pageH}cm!important}}
+    </style></head><body>`);
+
+    const totalPages=Math.ceil(tickets.length/l.cap);
+    for(let page=0;page<totalPages;page++){
+      const group=ticketsForPage(page);
+      const slots=group.map((t,i)=>{
+        if(!t)return '';
+
+        const row=Math.floor(i/l.cols),col=i%l.cols;
+        const left=l.startX+col*(l.w+l.gap),top=l.startY+row*(l.h+l.gap);
+        const svg=ticketSvg(t,o,s,previewWidth,l.tW,l.tH,artURL);
+
+        if(!l.rotated){
+          return `<div class="slot" style="left:${left}cm;top:${top}cm;width:${l.w}cm;height:${l.h}cm">${svg}</div>`;
+        }
+
+        // Slot physical size is rotated dimensions: width=ticketH, height=ticketW.
+        // Content retains original ticket dimensions, then rotates inside the slot.
+        return `<div class="slot" style="left:${left}cm;top:${top}cm;width:${l.w}cm;height:${l.h}cm">
+          <div class="rotwrap">
+            <div class="rotatedTicket" style="width:${l.tW}cm;height:${l.tH}cm">${svg}</div>
+          </div>
+        </div>`;
+      }).join('');
+      w.document.write(`<section class="sheet">${slots}</section>`);
+    }
+
+    w.document.write('</body></html>');
+    w.document.close();
+
+    setTimeout(()=>{
+      w.focus();
+      w.print();
+      setTimeout(()=>URL.revokeObjectURL(artURL),30000);
+    },1200);
+  }catch(error){
+    console.error(error);
+    try{w.close()}catch(_){}
+    alert('No fue posible preparar el PDF: '+error.message);
+  }
+};
+document.getElementById('backToSystem').onclick=()=>location.href='index.html#design';
+paperPreset();cfg(true);
+</script></body></html>

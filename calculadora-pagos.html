@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es"><head><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Tecni"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#191b22"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Datáfono / enlace · Tecnigráficas</title>
+<style>
+:root{--ink:#172033;--muted:#748094;--line:#e2e8f0;--primary:#143f92;--soft:#f6f8fb;--good:#0b8f63;--warn:#a86100}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f6f8fb;color:var(--ink)}
+.top{height:5px;background:linear-gradient(90deg,#ec168c,#ffd33d,#12bfd7,#6f58d9)}
+.header{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}.brand{display:flex;align-items:center;gap:12px}.brand img{width:42px;height:42px;object-fit:contain}.brand strong{display:block}.brand span{font-size:12px;color:var(--muted)}
+button{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}.secondary{background:#fff;border:1px solid var(--line);color:var(--ink)}.primary{background:var(--primary);color:#fff}
+.wrap{max-width:980px;margin:28px auto;padding:0 18px}.intro h1{margin:0 0 5px;font-size:28px}.intro p{margin:0;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;margin-top:20px}.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 28px rgba(15,23,42,.05)}
+label{font-size:12px;font-weight:700;display:block;margin-bottom:7px}input,select{width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:10px;font-size:15px;color:var(--ink);background:#fff}.field{margin-bottom:14px}.hint{font-size:11px;color:var(--muted);margin-top:6px}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.big{font-size:38px;font-weight:800;letter-spacing:-1px;margin:8px 0}.label{font-size:12px;color:var(--muted);font-weight:700}.result{padding:16px;border-radius:16px;background:linear-gradient(135deg,#eef6ff,#fff4fa);border:1px solid #dfe7f4}.net{color:var(--good);font-weight:800}.breakdown{margin-top:14px;border-top:1px dashed #d7dee8}.line{display:flex;justify-content:space-between;gap:20px;padding:9px 0;border-bottom:1px solid #edf0f4;font-size:13px}.line strong{white-space:nowrap}.notice{margin-top:14px;padding:12px;border-radius:12px;background:#fff7e8;color:#835000;font-size:12px;line-height:1.4}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.copybox{margin-top:14px;padding:12px;border:1px solid #dce3ee;border-radius:12px;background:#fff;font-size:13px;line-height:1.45}
+.pills{display:flex;gap:8px;margin-bottom:14px}.pill{padding:8px 11px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;font-weight:700}.pill.active{background:#eaf2ff;border-color:#a9c2ef;color:#103d8f}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}.header{padding:14px}.big{font-size:32px}}
+</style></head><body>
+<div class="top"></div><header class="header"><div class="brand"><img src="logo.png" alt="Tecnigráficas"><div><strong>Tecnigráficas</strong><span>Calculadora de cobro con tarjeta / enlace</span></div></div><button class="secondary" id="back">← Volver al sistema</button></header>
+<main class="wrap"><div class="intro"><h1>Datáfono / enlace de pago 💳</h1><p>Calcula cuánto cobrar para que, después de las retenciones y comisiones, a Tecni le llegue el valor que realmente debe recibir.</p></div>
+<div class="grid">
+<section class="card">
+  <div class="pills"><button class="pill active" data-mode="datafono">Datáfono</button><button class="pill" data-mode="enlace">Enlace de pago</button></div>
+  <div class="field"><label>Valor que Tecni necesita recibir</label><input id="net" type="number" min="0" step="100" value="160000" inputmode="decimal"><div class="hint">Ejemplo: si el cliente debe $160.000, escribe 160000.</div></div>
+  <div class="row">
+    <div class="field"><label>Comisión (%)</label><input id="fee" type="number" min="0" step="0.01" value="1.99"></div>
+    <div class="field"><label>IVA sobre la comisión (%)</label><input id="vat" type="number" min="0" step="0.01" value="19"></div>
+  </div>
+  <div class="field"><label>Retefuente de la venta (%)</label><input id="withholding" type="number" min="0" step="0.01" value="1.5"><div class="hint">Los porcentajes iniciales vienen de tu archivo “Tarifa datafono o enlace.xlsx”. Puedes cambiarlos si la tarifa cambia.</div></div>
+  <div class="field"><label>Redondeo recomendado</label><select id="round"><option value="1">Al peso</option><option value="100" selected>Hacia arriba a $100</option><option value="1000">Hacia arriba a $1.000</option></select></div>
+</section>
+<section class="card">
+  <div class="result"><div class="label">Cobrar al cliente</div><div class="big" id="gross">$ 0</div><div class="label">A Tecni le quedarían aproximadamente</div><div class="net" id="netResult">$ 0</div></div>
+  <div class="breakdown">
+    <div class="line"><span>Comisión</span><strong id="feeAmount">$ 0</strong></div>
+    <div class="line"><span>IVA de la comisión</span><strong id="vatAmount">$ 0</strong></div>
+    <div class="line"><span>Retefuente</span><strong id="withholdingAmount">$ 0</strong></div>
+    <div class="line"><span>Total descuentos estimados</span><strong id="totalFees">$ 0</strong></div>
+  </div>
+  <div class="copybox" id="message">Si pagas con tarjeta o enlace, el total sería…</div>
+  <div class="actions"><button class="primary" id="copy">Copiar mensaje para cliente</button><button class="secondary" id="copyValue">Copiar valor</button></div>
+  <div class="notice">Cálculo interno estimado. Si Wompi, el banco o el medio de pago modifica sus tarifas o retenciones, actualiza los porcentajes antes de informar el valor al cliente.</div>
+</section>
+</div></main>
+<script>
+const $=id=>document.getElementById(id);let mode='datafono';
+const money=v=>new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(Number(v)||0);
+function calc(){
+ const target=Number($('net').value||0),fee=Number($('fee').value||0)/100,vat=Number($('vat').value||0)/100,withh=Number($('withholding').value||0)/100,round=Math.max(1,Number($('round').value||1));
+ const effective=fee+(fee*vat)+withh;
+ let exact=effective<1?target/(1-effective):0;
+ let gross=round>1?Math.ceil(exact/round)*round:Math.ceil(exact);
+ const feeA=gross*fee,vatA=feeA*vat,withA=gross*withh,total=feeA+vatA+withA,received=gross-total;
+ $('gross').textContent=money(gross);$('netResult').textContent=money(received);$('feeAmount').textContent=money(feeA);$('vatAmount').textContent=money(vatA);$('withholdingAmount').textContent=money(withA);$('totalFees').textContent=money(total);
+ const label=mode==='datafono'?'datáfono':'enlace de pago';$('message').textContent=`Si pagas con ${label}, el total sería ${money(gross)}.`;
+ $('gross').dataset.value=String(gross);
+}
+['net','fee','vat','withholding','round'].forEach(id=>$(id).addEventListener('input',calc));
+document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===b));calc()}));
+$('copy').onclick=async()=>{await navigator.clipboard.writeText($('message').textContent);$('copy').textContent='Copiado ✓';setTimeout(()=>$('copy').textContent='Copiar mensaje para cliente',1200)};
+$('copyValue').onclick=async()=>{await navigator.clipboard.writeText($('gross').dataset.value||'');$('copyValue').textContent='Copiado ✓';setTimeout(()=>$('copyValue').textContent='Copiar valor',1200)};
+$('back').onclick=()=>location.href='index.html#calculators';calc();
+</script></body></html>

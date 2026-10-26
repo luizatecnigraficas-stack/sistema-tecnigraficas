@@ -1,0 +1,21 @@
+Sistema Tecnigráficas V9.18 — Página web en sastecnigraficas.com
+
+- El sistema ya tiene ícono propio (Don Fer 👍) y nombre "Tecni" para instalarlo en el celular.
+  iPhone: Safari → Compartir → "Agregar a pantalla de inicio".
+  Android: Chrome → menú ⋮ → "Instalar aplicación" o "Agregar a pantalla principal".
+- Se abre a pantalla completa, sin la barra del navegador.
+- Incluye todo lo de la V9.10 (calculadoras conectadas a la cotización en curso).
+No hay que correr SQL.
+- V9.12: el botón de ubicación en links.html ahora abre https://maps.app.goo.gl/Uru6MEqHwzwhdLVY8
+- V9.13: en el catálogo, el texto inicial termina en "Diseñamos e imprimimos contigo." (sin "sin vueltas y sin cuentos").
+- V9.14: en cualquier campo de foto o comprobante puedes ARRASTRAR el archivo encima o PEGARLO con Ctrl+V (Cmd+V en Mac). Archivo nuevo: arrastrar.js (no lo borres).
+  Si en la ventana hay varios campos de foto, pasa el mouse o toca el campo donde va y luego pega.
+- V9.15: en Finanzas "Gasto" ahora se llama "Egreso".
+  Botón 🛵 Domicilio en el Resumen de Finanzas: abre el egreso ya listo (Egreso variable · Domicilios · Efectivo), solo escribes el valor.
+  Corre egresos-y-domicilios.sql una vez (renombra categorías y crea el concepto Domicilios).
+  "🔑 Cambiar mi contraseña" abajo en el menú; y aviso de "¿Olvidaste tu contraseña?" en la entrada.
+- V9.16: en el celular, cada producto de la cotización se ve en columna: descripción grande, cantidad y unidad lado a lado, valor unitario completo.
+  Página de links: el botón ahora dice "Página web".
+  Al guardar una venta rápida, Finanzas se refresca sola.
+- V9.17: el menú de la izquierda arranca con todos los grupos cerrados; abres el que necesites.
+- V9.18: los botones del sistema (ver catálogo, copiar link Tecni) ahora usan sastecnigraficas.com; los links viejos sistema.../catalogo.html y /links.html redirigen solos al dominio nuevo (archivo _redirects, no lo borres).

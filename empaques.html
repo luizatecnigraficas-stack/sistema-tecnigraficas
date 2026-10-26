@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="es">
+<head><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Tecni"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#191b22">
+<script src="avisos.js"></script><script src="quote-bridge.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Empaques · Tecnigráficas</title>
+<style>
+:root{--cyan:#00a6d6;--magenta:#e6007e;--ink:#172033;--muted:#6e7888;--line:#dfe5ec;--soft:#f5f8fb}
+*{box-sizing:border-box}body{margin:0;background:#eef3f8;color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif;font-size:12px}
+header{background:#111a2b;color:#fff;padding:13px 18px}.header{max-width:1460px;margin:auto;display:flex;justify-content:space-between;gap:14px;align-items:center}
+header small{letter-spacing:.12em;font-weight:850;opacity:.72}header h1{font-size:18px;margin:2px 0}.back{border:1px solid #ffffff45;background:#ffffff12;color:#fff;border-radius:9px;padding:9px 12px;font-weight:800;cursor:pointer}
+.app{max-width:1460px;margin:14px auto;padding:0 12px 28px}.tabs{display:flex;gap:7px;margin-bottom:10px}.tab{border:1px solid var(--line);background:#fff;padding:8px 12px;border-radius:9px;font-weight:850;cursor:pointer}.tab.active{border-color:#8edcf0;background:#eaf9fd;color:#087d9e}
+.panel{display:none}.panel.active{display:block}.grid{display:grid;grid-template-columns:minmax(390px,470px) 1fr;gap:12px;align-items:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:0 4px 16px #1720330b}.card h2{font-size:13px;margin:0 0 9px}.note{font-size:10px;color:var(--muted);line-height:1.4}
+.compact{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.compact.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+label{display:grid;gap:4px;font-size:9px;font-weight:850;color:#596475}input,select,button{font:inherit}input,select{width:100%;border:1px solid var(--line);border-radius:8px;padding:7px;background:#fff;color:var(--ink);min-width:0}
+.btn{border:0;border-radius:9px;padding:8px 11px;font-weight:900;cursor:pointer}.primary{background:linear-gradient(110deg,var(--cyan),#1185c8);color:#fff}.secondary{background:#eef3f8;color:#263449;border:1px solid var(--line)}
+.calc-result{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.metric{background:var(--soft);border:1px solid #e4eaf1;border-radius:10px;padding:8px}.metric span{display:block;font-size:8px;color:var(--muted);text-transform:uppercase;font-weight:900}.metric strong{display:block;font-size:13px;margin-top:2px}
+.status-row{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}.pill{padding:4px 7px;border-radius:999px;background:#eef3f8;font-size:8px;font-weight:850;color:#5d697b}.pill.ok{background:#e6f8f0;color:#08794d}.pill.no{background:#fdecec;color:#a62d2d}
+.cost-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:10px}.cost-table th,.cost-table td{border-bottom:1px solid #edf0f4;padding:5px 4px;text-align:left}.cost-table th{font-size:8px;color:#6e7888;text-transform:uppercase}.cost-table .money{text-align:right}.manual-badge{font-size:7px;color:#b36b00;font-weight:900}
+.viz-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:10px}.viz{background:#f8fbff;border:1px solid #dfe7ef;border-radius:12px;padding:9px}.viz h3{font-size:10px;margin:0 0 6px}.viz svg{display:block;width:100%;height:auto;max-height:330px}
+.tariffs{margin-top:12px}.tariff-head{display:flex;justify-content:space-between;align-items:center;gap:8px}.tariff-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:9px}.tariff-table th,.tariff-table td{border-bottom:1px solid #edf0f4;padding:4px}.tariff-table th{color:#68758a;font-size:8px}.tariff-table input{padding:5px;border-radius:6px;font-size:9px}.tariff-table button{padding:5px 7px;border-radius:7px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:8px;font-weight:850}
+.warning{padding:8px;border-radius:9px;background:#fff6df;border:1px solid #f0d794;color:#7b5915;font-size:9px;margin-top:7px}.goodnote{padding:8px;border-radius:9px;background:#eaf9f3;border:1px solid #bfe9d7;color:#126944;font-size:9px;margin-top:7px}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.hidden{display:none!important}.coming{padding:35px;text-align:center;color:var(--muted)}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}.compact{grid-template-columns:repeat(3,1fr)}}@media(max-width:620px){.compact,.compact.four,.calc-result,.viz-grid{grid-template-columns:1fr 1fr}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script>
+</head>
+<body>
+<header><div class="header"><div><small>TECNIGRÁFICAS</small><h1>Empaques</h1><div style="font-size:10px;opacity:.75">Cálculo, cabida y costos de cajas</div></div><button class="back" id="back">← Volver al sistema</button></div></header>
+<div class="app">
+<div class="tabs"><button class="tab active" data-tab="boxes">Cajas</button><button class="tab" data-tab="bags">Bolsas</button></div>
+<section class="panel active" id="panel-boxes">
+<div class="grid">
+<div>
+<div class="card">
+<h2>Calculadora · Caja con tapa</h2>
+<div class="compact">
+<label>Ancho<input id="boxW" type="number" step="any" value="30"></label>
+<label>Profundidad<input id="boxD" type="number" step="any" value="10"></label>
+<label>Alto<input id="boxH" type="number" step="any" value="7.5"></label>
+<label>Pestaña<input id="boxTab" type="number" step="any" value="2"></label>
+<label>Cantidad<input id="boxQty" type="number" step="1" value="1000"></label>
+</div>
+<div class="compact four" style="margin-top:7px">
+<label>Pliego $<input id="paperPrice" type="number" step="any" value="1200"></label>
+<label>Sobrante<input id="wasteSheets" type="number" step="1" value="100"></label>
+<label>Factor venta<input id="saleFactor" type="number" step=".1" value="2"></label>
+<label>Formato tarifa<select id="rateOverride"><option value="">Automático</option></select></label>
+</div>
+<div class="calc-result">
+<div class="metric"><span>Troquel abierto</span><strong id="dieSize">—</strong></div>
+<div class="metric"><span>Formato mínimo</span><strong id="minFormat">—</strong></div>
+<div class="metric"><span>Cabida / pliego</span><strong id="fitCount">—</strong></div>
+<div class="metric"><span>Millares cobrados</span><strong id="thousands">—</strong></div>
+</div>
+<div id="formatChecks" class="status-row"></div>
+<table class="cost-table"><thead><tr><th>Concepto</th><th>Tarifa</th><th>Cantidad</th><th class="money">Costo</th></tr></thead><tbody>
+<tr><td>Papel</td><td><input id="costPaperRate" type="number" step="any"></td><td id="paperQtyText">—</td><td class="money" id="paperCost">—</td></tr>
+<tr><td>Plancha <span class="manual-badge" id="manualPlate"></span></td><td><input class="proc" id="costPlateRate" type="number"></td><td>1 vez</td><td class="money" id="plateCost">—</td></tr>
+<tr><td>Tiraje <span class="manual-badge" id="manualPrint"></span></td><td><input class="proc" id="costPrintRate" type="number"></td><td id="printQtyText">—</td><td class="money" id="printCost">—</td></tr>
+<tr><td>Troquel <span class="manual-badge" id="manualDie"></span></td><td><input class="proc" id="costDieRate" type="number"></td><td>1 vez</td><td class="money" id="dieCost">—</td></tr>
+<tr><td>Troquelada <span class="manual-badge" id="manualDieCut"></span></td><td><input class="proc" id="costDieCutRate" type="number"></td><td id="dieCutQtyText">—</td><td class="money" id="dieCutCost">—</td></tr>
+</tbody></table>
+<div class="actions"><button class="btn secondary" id="resetRates">↺ Usar tarifas automáticas</button><div data-quote-bridge></div><button class="btn primary" id="toQuote">Agregar a la cotización</button></div>
+<div class="calc-result">
+<div class="metric"><span>Costo total</span><strong id="totalCost">—</strong></div>
+<div class="metric"><span>Costo / caja</span><strong id="unitCost">—</strong></div>
+<div class="metric"><span>Venta sugerida</span><strong id="saleTotal">—</strong></div>
+<div class="metric"><span>Venta / caja</span><strong id="saleUnit">—</strong></div>
+</div>
+<div id="calcWarning" class="warning hidden"></div>
+</div>
+
+<div class="card tariffs">
+<div class="tariff-head"><div><h2 style="margin-bottom:2px">Tarifas y rangos</h2><div class="note">Editable. El área útil es la que realmente se usa para decidir si el troquel cabe.</div></div><button class="btn secondary" id="addRate">+ Rango</button></div>
+<div style="overflow:auto"><table class="tariff-table"><thead><tr><th>Nombre</th><th>Nominal A</th><th>Nominal H</th><th>Útil A</th><th>Útil H</th><th>Plancha</th><th>Tiraje/millar</th><th>Troquel</th><th>Troq./millar</th><th></th></tr></thead><tbody id="rateBody"></tbody></table></div>
+<div class="note" style="margin-top:7px">Valores iniciales provisionales: actualízalos cuando confirmes las tarifas. El pliego completo usa área útil 98 × 68 cm; 1/8 usa 23 × 33 cm.</div>
+</div>
+</div>
+
+<div>
+<div class="card">
+<h2>Visualización de cabida</h2>
+<div class="viz-grid">
+<div class="viz"><h3 id="sheetTitle">Pliego 100 × 70 cm</h3><div id="sheetViz"></div><div class="note" id="sheetLegend"></div></div>
+<div class="viz"><h3>Troquel aproximado</h3><div id="dieViz"></div><div class="note">Esquema dimensional para cotizar. No reemplaza el archivo técnico final de troquel.</div></div>
+</div>
+<div class="viz" style="margin-top:10px"><h3>Vista armada proporcional</h3><div id="box3d"></div></div>
+<div class="goodnote">La cabida siempre respeta el área útil, no el borde físico del papel. El margen de seguridad queda visible en la gráfica.</div>
+</div>
+</div>
+</div>
+</section>
+<section class="panel" id="panel-bags"><div class="card coming"><h2>Bolsas</h2><p>La sección ya queda reservada. La construiremos después de estabilizar Cajas.</p></div></section>
+</div>
+<script>
+(async()=>{
+"use strict";
+const db=window.supabase.createClient("https://kqrfcdfygskzhsdzzcze.supabase.co","sb_publishable_KfkIr6TlW6ivuT5cD0g9Kg_EuZwDKJ9"),$=id=>document.getElementById(id);
+const fmt=v=>new Intl.NumberFormat("es-CO",{style:"currency",currency:"COP",maximumFractionDigits:0}).format(Number(v)||0);
+let session=null,profile=null,rates=[],autoRate=null,lastResult=null;const manual={plate:false,print:false,die:false,diecut:false};
+function n(id){const v=Number($(id).value);return Number.isFinite(v)?v:0}
+function esc(s){return String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;")}
+function canManage(){return ["owner","admin"].includes(profile?.role)}
+function fits(d1,d2,r){return (d1<=Number(r.usable_w)&&d2<=Number(r.usable_h))||(d2<=Number(r.usable_w)&&d1<=Number(r.usable_h))}
+function gridFit(itemW,itemH,sheetW,sheetH){const a={rot:false,cols:Math.floor(sheetW/itemW),rows:Math.floor(sheetH/itemH)};a.count=a.cols*a.rows;a.w=itemW;a.h=itemH;const b={rot:true,cols:Math.floor(sheetW/itemH),rows:Math.floor(sheetH/itemW)};b.count=b.cols*b.rows;b.w=itemH;b.h=itemW;return b.count>a.count?b:a}
+function selectedRate(minRate){const id=$("rateOverride").value;return rates.find(r=>r.id===id)||minRate}
+function updateManualBadges(){$("manualPlate").textContent=manual.plate?"MANUAL":"";$("manualPrint").textContent=manual.print?"MANUAL":"";$("manualDie").textContent=manual.die?"MANUAL":"";$("manualDieCut").textContent=manual.diecut?"MANUAL":""}
+function setAutoCosts(rate,force=false){if(!rate)return;if(force||!manual.plate){$("costPlateRate").value=Number(rate.plate_cost||0);manual.plate=false}if(force||!manual.print){$("costPrintRate").value=Number(rate.print_per_thousand||0);manual.print=false}if(force||!manual.die){$("costDieRate").value=Number(rate.die_cost||0);manual.die=false}if(force||!manual.diecut){$("costDieCutRate").value=Number(rate.die_cut_per_thousand||0);manual.diecut=false}updateManualBadges()}
+function calculate(){
+ const W=n("boxW"),D=n("boxD"),H=n("boxH"),tab=n("boxTab"),qty=Math.max(1,Math.ceil(n("boxQty"))),d1=2*H+2*D+tab,d2=2*H+W;
+ const sorted=[...rates].filter(r=>r.active!==false).sort((a,b)=>(Number(a.nominal_w)*Number(a.nominal_h))-(Number(b.nominal_w)*Number(b.nominal_h))),minRate=sorted.find(r=>fits(d1,d2,r))||null,rate=selectedRate(minRate);
+ if(rate!==autoRate){autoRate=rate;setAutoCosts(rate,false)}
+ const full=rates.find(r=>r.is_full_sheet)||sorted[sorted.length-1],pack=full?gridFit(d2,d1,Number(full.usable_w),Number(full.usable_h)):{count:0,cols:0,rows:0,w:d2,h:d1,rot:false},fitCount=pack.count,netSheets=fitCount?Math.ceil(qty/fitCount):0,waste=Math.max(0,Math.ceil(n("wasteSheets"))),totalSheets=netSheets+waste,mill=Math.ceil(qty/1000);
+ $("costPaperRate").value=n("paperPrice");
+ const paper=totalSheets*n("costPaperRate"),plate=n("costPlateRate"),print=n("costPrintRate")*mill,die=n("costDieRate"),diecut=n("costDieCutRate")*mill,total=paper+plate+print+die+diecut,factor=n("saleFactor")||2,sale=total*factor;
+ lastResult={W,D,H,tab,qty,d1,d2,minRate,rate,full,pack,fitCount,netSheets,waste,totalSheets,mill,paper,plate,print,die,diecut,total,factor,sale,unitCost:total/qty,saleUnit:sale/qty};
+ $("dieSize").textContent=`${d1.toFixed(1)} × ${d2.toFixed(1)} cm`;$("minFormat").textContent=minRate?minRate.name:"No cabe";$("fitCount").textContent=fitCount||"—";$("thousands").textContent=mill;
+ $("paperQtyText").textContent=`${netSheets} + ${waste} = ${totalSheets}`;$("printQtyText").textContent=`${mill} millar${mill===1?"":"es"}`;$("dieCutQtyText").textContent=`${mill} millar${mill===1?"":"es"}`;
+ $("paperCost").textContent=fmt(paper);$("plateCost").textContent=fmt(plate);$("printCost").textContent=fmt(print);$("dieCost").textContent=fmt(die);$("dieCutCost").textContent=fmt(diecut);$("totalCost").textContent=fmt(total);$("unitCost").textContent=fmt(total/qty);$("saleTotal").textContent=fmt(sale);$("saleUnit").textContent=fmt(sale/qty);
+ $("formatChecks").innerHTML=sorted.map(r=>`<span class="pill ${fits(d1,d2,r)?"ok":"no"}">${esc(r.name)} · ${fits(d1,d2,r)?"cabe":"no cabe"} · útil ${Number(r.usable_w)}×${Number(r.usable_h)}</span>`).join("");
+ const warn=[];if(!minRate)warn.push("El troquel abierto supera el área útil del pliego completo.");if(rate&&[rate.plate_cost,rate.print_per_thousand,rate.die_cost,rate.die_cut_per_thousand].some(v=>Number(v||0)===0))warn.push("La tarifa seleccionada tiene procesos en $0. Revisa Tarifas y rangos.");$("calcWarning").classList.toggle("hidden",!warn.length);$("calcWarning").textContent=warn.join(" ");
+ renderSheet();renderDie();render3d()
+}
+function renderSheet(){const r=lastResult;if(!r?.full){$("sheetViz").innerHTML="Sin pliego configurado";return}const f=r.full,W=700,H=490,pad=12,scale=Math.min((W-2*pad)/Number(f.nominal_w),(H-2*pad)/Number(f.nominal_h)),pw=Number(f.nominal_w)*scale,ph=Number(f.nominal_h)*scale,ox=(W-pw)/2,oy=(H-ph)/2,uw=Number(f.usable_w)*scale,uh=Number(f.usable_h)*scale,ux=ox+(pw-uw)/2,uy=oy+(ph-uh)/2;let rects="";if(r.fitCount){for(let row=0;row<r.pack.rows;row++)for(let col=0;col<r.pack.cols;col++){const x=ux+col*r.pack.w*scale,y=uy+row*r.pack.h*scale,w=r.pack.w*scale,h=r.pack.h*scale;rects+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="#dff5fb" stroke="#008fb8" stroke-width="1.6"/><text x="${x+w/2}" y="${y+h/2}" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#08738e">${r.d1.toFixed(1)}×${r.d2.toFixed(1)}</text>`}}$("sheetViz").innerHTML=`<svg viewBox="0 0 ${W} ${H}"><rect x="${ox}" y="${oy}" width="${pw}" height="${ph}" fill="#fff" stroke="#8f9bad" stroke-width="2"/><rect x="${ux}" y="${uy}" width="${uw}" height="${uh}" fill="#f8fbff" stroke="#e6007e" stroke-width="2" stroke-dasharray="7 5"/>${rects}<text x="${ox+6}" y="${oy+14}" font-size="10" fill="#68758a">Papel ${f.nominal_w}×${f.nominal_h}</text><text x="${ux+6}" y="${uy+14}" font-size="10" fill="#c00068">Área útil ${f.usable_w}×${f.usable_h}</text></svg>`;const mx=(Number(f.nominal_w)-Number(f.usable_w))/2,my=(Number(f.nominal_h)-Number(f.usable_h))/2;$("sheetTitle").textContent=`Pliego ${f.nominal_w} × ${f.nominal_h} cm`;$("sheetLegend").textContent=`Cabida estimada: ${r.fitCount} caja(s) por pliego · ${r.pack.rot?"troquel girado 90°":"orientación normal"} · margen aprox. ${mx} cm lateral y ${my} cm superior/inferior.`}
+function renderDie(){const r=lastResult;if(!r)return;const W=520,H=360,m=24,s=Math.min((W-2*m)/r.d2,(H-2*m)/r.d1),x=(W-r.d2*s)/2,y=(H-r.d1*s)/2,vx=[r.H,r.H+r.W].map(v=>x+v*s),hy=[r.H,r.H+r.D,r.H+r.D+r.H,r.H+r.D+r.H+r.D].map(v=>y+v*s);$("dieViz").innerHTML=`<svg viewBox="0 0 ${W} ${H}"><rect x="${x}" y="${y}" width="${r.d2*s}" height="${r.d1*s}" fill="#fff" stroke="#172033" stroke-width="2"/>${vx.map(v=>`<line x1="${v}" y1="${y}" x2="${v}" y2="${y+r.d1*s}" stroke="#00a6d6" stroke-dasharray="5 4"/>`).join("")}${hy.map(v=>`<line x1="${x}" y1="${v}" x2="${x+r.d2*s}" y2="${v}" stroke="#e6007e" stroke-dasharray="5 4"/>`).join("")}<text x="${W/2}" y="${H-6}" text-anchor="middle" font-size="11">${r.d2.toFixed(1)} cm</text><text x="10" y="${H/2}" transform="rotate(-90 10 ${H/2})" text-anchor="middle" font-size="11">${r.d1.toFixed(1)} cm</text></svg>`}
+function render3d(){const r=lastResult;if(!r)return;const W=520,H=260,fw=Math.max(100,Math.min(280,r.W/(r.W+r.D)*330+80)),depth=Math.max(35,Math.min(120,r.D/(r.W+r.D)*150+25)),height=Math.max(55,Math.min(150,r.H/Math.max(r.H,r.W*.55)*125)),x=90,y=210-height,dx=depth*.75,dy=-depth*.42;$("box3d").innerHTML=`<svg viewBox="0 0 ${W} ${H}"><polygon points="${x},${y} ${x+fw},${y} ${x+fw+dx},${y+dy} ${x+dx},${y+dy}" fill="#f7dba8" stroke="#8f6b3e"/><polygon points="${x},${y} ${x+fw},${y} ${x+fw},${y+height} ${x},${y+height}" fill="#edc882" stroke="#8f6b3e"/><polygon points="${x+fw},${y} ${x+fw+dx},${y+dy} ${x+fw+dx},${y+height+dy} ${x+fw},${y+height}" fill="#d9ae62" stroke="#8f6b3e"/><text x="${x+fw/2}" y="${y+height+20}" text-anchor="middle" font-size="11">${r.W} cm ancho</text><text x="${x+fw+dx+8}" y="${y+height/2}" font-size="11">${r.H} cm alto</text><text x="${x+fw+dx/2}" y="${y+dy-8}" text-anchor="middle" font-size="11">${r.D} cm prof.</text></svg>`}
+function renderRates(){$("rateOverride").innerHTML='<option value="">Automático</option>'+rates.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join("");$("rateBody").innerHTML=rates.map(r=>`<tr data-rate="${r.id}"><td><input data-k="name" value="${esc(r.name)}"></td><td><input data-k="nominal_w" type="number" step="any" value="${r.nominal_w}"></td><td><input data-k="nominal_h" type="number" step="any" value="${r.nominal_h}"></td><td><input data-k="usable_w" type="number" step="any" value="${r.usable_w}"></td><td><input data-k="usable_h" type="number" step="any" value="${r.usable_h}"></td><td><input data-k="plate_cost" type="number" value="${r.plate_cost||0}"></td><td><input data-k="print_per_thousand" type="number" value="${r.print_per_thousand||0}"></td><td><input data-k="die_cost" type="number" value="${r.die_cost||0}"></td><td><input data-k="die_cut_per_thousand" type="number" value="${r.die_cut_per_thousand||0}"></td><td>${canManage()?`<button data-save="${r.id}">Guardar</button>`:""}</td></tr>`).join("");document.querySelectorAll("[data-save]").forEach(b=>b.onclick=()=>saveRate(b.dataset.save))}
+async function saveRate(id){const tr=document.querySelector(`[data-rate="${id}"]`),payload={};tr.querySelectorAll("[data-k]").forEach(i=>payload[i.dataset.k]=i.type==="number"?Number(i.value||0):i.value.trim());const {error}=await db.from("packaging_box_rates").update(payload).eq("id",id);if(error)return alert(error.message);await loadRates();alert("Tarifa actualizada.")}
+async function addRate(){if(!canManage())return alert("Solo Propietaria/Administración puede crear tarifas.");const {error}=await db.from("packaging_box_rates").insert({name:"Nuevo rango",nominal_w:50,nominal_h:35,usable_w:48,usable_h:33,plate_cost:0,print_per_thousand:0,die_cost:0,die_cut_per_thousand:0,sort_order:rates.length+10,active:true,is_full_sheet:false,created_by:session.user.id});if(error)return alert(error.message);await loadRates()}
+async function loadRates(){const {data,error}=await db.from("packaging_box_rates").select("*").eq("active",true).order("sort_order");if(error)throw error;rates=data||[];renderRates();calculate()}
+function toQuote(){if(!lastResult?.minRate)return alert("Primero calcula una caja que quepa en el pliego.");const r=lastResult,description=`Caja con tapa · ${r.W} × ${r.D} × ${r.H} cm · troquel aprox. ${r.d1.toFixed(1)} × ${r.d2.toFixed(1)} cm · formato ${r.minRate.name} · cabida ${r.fitCount}/pliego.`;TecniQuote.send({source:"packaging_calculator",quantity:r.qty,unit:"Unidad",detail:"Caja personalizada",description,unitPrice:Math.round(r.saleUnit),suggestedUnitPrice:Math.round(r.saleUnit),unitCost:Math.round(r.unitCost)},"append","empaques")}
+const {data:{session:s}}=await db.auth.getSession();if(!s){location.replace("index.html");return}session=s;const {data:p}=await db.from("profiles").select("*").eq("id",s.user.id).maybeSingle();profile=p;
+$("back").onclick=()=>location.href="index.html#dashboard";document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));$("panel-"+b.dataset.tab).classList.add("active")});
+["boxW","boxD","boxH","boxTab","boxQty","paperPrice","wasteSheets","saleFactor","rateOverride"].forEach(id=>$(id).addEventListener("input",calculate));$("costPaperRate").addEventListener("input",()=>{$("paperPrice").value=$("costPaperRate").value;calculate()});
+[["costPlateRate","plate"],["costPrintRate","print"],["costDieRate","die"],["costDieCutRate","diecut"]].forEach(([id,key])=>$(id).addEventListener("input",()=>{manual[key]=true;updateManualBadges();calculate()}));
+$("resetRates").onclick=()=>{manual.plate=manual.print=manual.die=manual.diecut=false;setAutoCosts(selectedRate(lastResult?.minRate),true);calculate()};$("addRate").onclick=addRate;$("toQuote").onclick=toQuote;
+try{await loadRates()}catch(e){alert("No fue posible cargar Empaques. Ejecuta primero el SQL V7.85.\n\n"+e.message)}
+})();
+</script>
+</body></html>

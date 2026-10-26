@@ -1,0 +1,12 @@
+Tecnigráficas · Sistema V9.23  (incluye todo lo de la 9.21 y la 9.22)
+=============================
+SQL que deben estar corridos en Supabase (una sola vez cada uno):
+  cartera-clientes.sql → cartera-importar.sql → comprobante-opcional.sql
+Novedades 9.23 — Inventario:
+- Tarjetas con foto, cantidad en grande y barrita de color (verde: hay suficiente, amarillo: queda poco, rojo: se acabó).
+- Botones directos en cada tarjeta: "＋ Entró" y "－ Salió".
+- Filtros con un toque: Todos · Queda poco o se acabó · Se acabó · Inactivos, y por categoría.
+- Registrar movimiento: Entró / Salió → motivo con un toque → cuántos (con − y +) → muestra en cuánto queda → Guardar.
+  Quién, para qué pedido y notas quedan en "Más detalles (opcional)".
+- Editar insumo ordenado por secciones: Lo básico · Foto · Colores/tallas · Cantidades · Proveedor · Avanzado.
+Subir: Netlify > sistema-tecnigraficas > Deploys > arrastrar el ZIP.

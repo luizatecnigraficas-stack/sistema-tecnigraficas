@@ -1299,6 +1299,11 @@
     .tq-lt{display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;padding-bottom:6px}.tq-lt small{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase}.tq-lt b{font-size:16px;font-weight:950;color:#20222a}
     .item-options .check-field{font-size:12px}.item-options small{color:var(--muted);font-weight:600}
     @media(max-width:560px){.tq-seg{grid-template-columns:1fr 1fr!important}}
+    /* V9.26 tipo de cliente en una línea */
+    .tq-seg{display:flex!important;flex-wrap:wrap;gap:4px!important;background:#eef1f6;padding:4px;border-radius:999px;width:max-content;max-width:100%}
+    .tq-seg button{border:0!important;background:transparent!important;border-radius:999px!important;padding:6px 12px!important;font-size:12.5px!important;font-weight:800;color:#5c6372!important;white-space:nowrap}
+    .tq-seg button.on{background:#fff!important;color:#087a9a!important;box-shadow:0 1px 6px rgba(25,30,45,.12)}
+    @media(max-width:560px){.tq-seg{border-radius:14px;width:100%}.tq-seg button{flex:1 1 auto;padding:7px 8px!important;font-size:12px!important}}
 </style>
 </head>
 <body>
@@ -1323,7 +1328,7 @@
           <div class="grid-2">
             <div class="field">
               <label for="quoteBaseKind">¿A quién se le hará la cotización?</label>
-              <div class="tq-seg" id="tqSeg"><button type="button" data-v="person">👤 Persona</button><button type="button" data-v="company">🏢 Empresa</button><button type="button" data-v="company_contact">🏢👤 Empresa + contacto</button><button type="button" data-v="generic">📄 Sin nombre</button></div>
+              <div class="tq-seg" id="tqSeg" role="group" aria-label="Tipo de cliente"><button type="button" data-v="person">👤 Persona</button><button type="button" data-v="company">🏢 Empresa</button><button type="button" data-v="company_contact">🏢 Empresa + contacto</button><button type="button" data-v="generic">Sin nombre</button></div>
               <select id="quoteBaseKind" class="tq-hidden-select">
                 <option value="person">Persona natural</option>
                 <option value="company">Empresa directamente</option>

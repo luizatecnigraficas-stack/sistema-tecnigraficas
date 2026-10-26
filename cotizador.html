@@ -1304,6 +1304,26 @@
     .tq-seg button{border:0!important;background:transparent!important;border-radius:999px!important;padding:6px 12px!important;font-size:12.5px!important;font-weight:800;color:#5c6372!important;white-space:nowrap}
     .tq-seg button.on{background:#fff!important;color:#087a9a!important;box-shadow:0 1px 6px rgba(25,30,45,.12)}
     @media(max-width:560px){.tq-seg{border-radius:14px;width:100%}.tq-seg button{flex:1 1 auto;padding:7px 8px!important;font-size:12px!important}}
+
+    /* V9.26 fácil para todos */
+    .editor label,.editor .field label{font-size:13px!important}
+    .editor input,.editor select,.editor textarea{font-size:16px!important}
+    .editor .hint,.editor .switch-copy span{font-size:12px!important}
+    .editor .section-title{font-size:18px!important}
+    html.tq-big .editor{zoom:1.15}
+    html.tq-big .editor label{font-size:14px!important}
+    .tq-big-btn{border:1.5px solid rgba(255,255,255,.35);background:transparent;color:#fff;border-radius:999px;padding:7px 12px;font:inherit;font-weight:800;font-size:12px;cursor:pointer;margin-right:6px}.tq-big-btn.on{background:#fff;color:#20222a}
+    .tq-money{display:flex;align-items:center;border:1px solid var(--line);border-radius:12px;background:#fff;padding-left:12px}.tq-money span{font-weight:900;color:#6b7280}.tq-money input{border:0!important;box-shadow:none!important;font-weight:800;padding-left:6px!important}
+    .remove-item{width:auto!important;height:auto!important;padding:6px 10px!important;font-size:12px!important;font-weight:800;border-radius:10px!important;align-self:start}
+    .tq-err{border-color:#e5484d!important;box-shadow:0 0 0 3px rgba(229,72,77,.18)!important;background:#fff6f6!important}
+    .tq-done-back{position:fixed;inset:0;z-index:100000;background:rgba(20,22,30,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+    .tq-done{background:#fff;border-radius:22px;padding:26px 22px 20px;width:min(440px,100%);text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+    .tq-done-ic{width:64px;height:64px;border-radius:50%;background:#2fb37a;color:#fff;font-size:34px;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+    .tq-done h3{margin:0 0 6px;font-size:22px}.tq-done p{margin:0 0 16px;color:#4a5160;font-size:15px}
+    .tq-done-btns{display:grid;gap:8px}.tq-done-btns button,.tq-done-btns a{border:0;border-radius:14px;padding:14px;font:inherit;font-weight:900;font-size:15px;cursor:pointer;text-decoration:none}
+    .tq-done-btns [data-a="wa"]{background:#25d366;color:#fff}.tq-done-btns [data-a="new"]{background:linear-gradient(125deg,#00a6d6,#e6007e);color:#fff}.tq-done-btns [data-a="home"]{background:#eef1f6;color:#20222a}
+    .tq-resume{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#fff8d6;border:1px solid #f3dc7a;border-radius:14px;padding:10px 12px;margin-bottom:12px;font-size:13.5px}
+    .tq-resume button{border:0;background:#fff;border-radius:10px;padding:8px 12px;font:inherit;font-weight:800;font-size:12.5px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -1890,8 +1910,34 @@
         $("quoteNumber").value = quoteCode(data);
       }
 
+      // V9.26: pensado para que cualquiera la use fácil
+      function tqFmt(v){const n=Math.round(Number(String(v).replace(/[^\d.-]/g,""))||0);return n?n.toLocaleString("es-CO"):"0"}
+      function tqParse(v){const d=String(v||"").replace(/\D/g,"");return d===""?"":d}
+      function tqLiveFormat(el){const pos=el.value.length-el.selectionStart,d=tqParse(el.value);el.value=d===""?"":Number(d).toLocaleString("es-CO");const np=Math.max(0,el.value.length-pos);try{el.setSelectionRange(np,np)}catch(e){}}
+      function tqMarkMissing(generic,validItems){
+        document.querySelectorAll(".tq-err").forEach(x=>x.classList.remove("tq-err"));let first=null;
+        if(!generic&&!$("clientName").value.trim()){$("clientName").classList.add("tq-err");first=first||$("clientName")}
+        if(!validItems.length){const pi=document.querySelector("#itemsEditor .product-search-input");const q=document.querySelector('#itemsEditor [data-key="quantity"]');if(pi&&!pi.value.trim())pi.classList.add("tq-err");if(q&&!(Number(q.value)>0))q.classList.add("tq-err");first=first||pi}
+        if(first){first.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>first.focus(),400)}
+      }
+      document.addEventListener("input",e=>{if(e.target.classList?.contains("tq-err")&&e.target.value.trim())e.target.classList.remove("tq-err")});
+      function tqDone(number){
+        const back=document.createElement("div");back.className="tq-done-back";
+        back.innerHTML=`<div class="tq-done"><div class="tq-done-ic">✓</div><h3>¡Cotización guardada!</h3><p><b>${escapeHTML(number||"")}</b> quedó en el historial y el PDF ya está listo.</p><div class="tq-done-btns"><button type="button" data-a="wa">📲 Enviar por WhatsApp</button><button type="button" data-a="new">＋ Hacer otra cotización</button><a href="index.html" data-a="home">← Volver al sistema</a></div></div>`;
+        document.body.appendChild(back);
+        back.addEventListener("click",async e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a;if(a==="home")return;e.preventDefault();back.remove();if(a==="wa"){try{await prepareWhatsapp()}catch(err){}}newQuote({message:"Nueva cotización lista"})});
+      }
+      function tqResumeNotice(){
+        const hasClient=$("clientName").value.trim(),hasItems=(state.items||[]).some(i=>String(i.productName||"").trim());if(!hasClient&&!hasItems)return;
+        const n=document.createElement("div");n.className="tq-resume";n.innerHTML=`<span>📝 Seguimos con la cotización que dejaste a medias${hasClient?` para <b>${escapeHTML(hasClient)}</b>`:""}.</span><button type="button">Empezar una nueva</button>`;
+        n.querySelector("button").onclick=()=>{n.remove();newQuote({message:"Nueva cotización lista"})};
+        const host=document.querySelector(".editor-body");host.insertBefore(n,host.firstChild);
+      }
+      function tqBigText(on){document.documentElement.classList.toggle("tq-big",on);try{localStorage.setItem("tg-letra-grande",on?"1":"0")}catch(e){}const b=document.getElementById("tqBigBtn");if(b)b.classList.toggle("on",on)}
+      (function(){const bar=document.querySelector(".system-bar-actions");if(bar){bar.insertAdjacentHTML("afterbegin",'<button type="button" class="tq-big-btn" id="tqBigBtn" title="Agrandar la letra">🔍 Letra grande</button>');document.getElementById("tqBigBtn").onclick=()=>tqBigText(!document.documentElement.classList.contains("tq-big"))}let on=false;try{on=localStorage.getItem("tg-letra-grande")==="1"}catch(e){}tqBigText(on)})();
+      setInterval(()=>{const em=document.querySelector(".tq-emite");if(em)em.style.display=(state.canApproveBelowMinimum||$("issuerMode").value!=="tecni")?"":"none"},800);
       function blankItem() {
-        return { id:null, productId:"", productSearch:"", productName:"", variantId:"", variantLabel:"", priceTierId:null, quantity:"", unit:"Unidad", detail:"", unitPrice:"", suggestedUnitPrice:null, minimumUnitPrice:null, unitCost:null, pricingSource:"manual", approvalStatus:"not_required", lineRole:"included", isSelectedOption:false };
+        return { id:null, productId:"", productSearch:"", productName:"", variantId:"", variantLabel:"", priceTierId:null, quantity:1, unit:"Unidad", detail:"", unitPrice:"", suggestedUnitPrice:null, minimumUnitPrice:null, unitCost:null, pricingSource:"manual", approvalStatus:"not_required", lineRole:"included", isSelectedOption:false };
       }
 
       function normalizeItems(items) {
@@ -2032,7 +2078,7 @@
         const oldSuggested=item.suggestedUnitPrice==null?null:numberValue(item.suggestedUnitPrice),current=String(item.unitPrice??"");item.priceTierId=tierId;item.suggestedUnitPrice=suggested;item.minimumUnitPrice=minimum;item.unitCost=cost;item.pricingSource=source;
         if(forcePrice||current===""||(oldSuggested!==null&&Math.abs(numberValue(current)-oldSuggested)<.005)){item.unitPrice=suggested==null?"":suggested}
         if(render){renderItemEditors()}else{
-          const priceInput=document.querySelector(`[data-index="${index}"][data-key="unitPrice"]`);if(priceInput&&String(priceInput.value)!==String(item.unitPrice??""))priceInput.value=item.unitPrice??"";
+          const priceInput=document.querySelector(`[data-index="${index}"][data-key="unitPrice"]`);if(priceInput&&tqParse(priceInput.value)!==String(item.unitPrice??""))priceInput.value=item.unitPrice===""||item.unitPrice==null?"":tqFmt(item.unitPrice);
           refreshItemPricingUI(index);
         }
         updatePreview();
@@ -2048,15 +2094,15 @@
             <div class="field detail-field"><label>Detalle <span style="font-weight:500;color:#8a93a2">(opcional)</span></label><textarea rows="1" data-index="${index}" data-key="detail" placeholder="Material, medidas, acabado…">${escapeHTML(item.detail)}</textarea></div>
             <div class="field quantity-field"><label>Cantidad</label><input type="number" min="0" data-index="${index}" data-key="quantity" value="${escapeHTML(item.quantity)}" placeholder="0"  step="any" inputmode="decimal" /></div>
             <div class="field unit-field"><label>Unidad</label><select data-index="${index}" data-key="unit">${["Unidad","Docena","Pliego","Metro","M²","Paquete","Caja","Servicio","Otro"].map(option=>`<option value="${option}" ${item.unit===option?"selected":""}>${option}</option>`).join("")}</select></div>
-            <div class="field unit-price-field"><label>Valor unitario</label><input type="number" min="0" data-index="${index}" data-key="unitPrice" value="${escapeHTML(item.unitPrice)}" placeholder="$ 0"  step="any" inputmode="decimal" /></div><div class="tq-lt" data-lt="${index}"><small>Total</small><b>${formatCOP((Number(item.quantity)||0)*(Number(item.unitPrice)||0))}</b></div>
-            <button class="remove-item" type="button" title="Eliminar ítem" data-remove="${index}">×</button>
+            <div class="field unit-price-field"><label>Valor unitario</label><div class="tq-money"><span>$</span><input type="text" data-money="1" data-index="${index}" data-key="unitPrice" value="${item.unitPrice===""||item.unitPrice==null?"":tqFmt(item.unitPrice)}" placeholder="0" inputmode="numeric" autocomplete="off" /></div></div><div class="tq-lt" data-lt="${index}"><small>Total</small><b>${formatCOP((Number(item.quantity)||0)*(Number(item.unitPrice)||0))}</b></div>
+            <button class="remove-item" type="button" title="Quitar este producto" data-remove="${index}">🗑 Quitar</button>
             <div class="price-info ${hint.kind}" data-price-info="${index}" ${selectedProduct?"":"hidden"}>${hint.text}</div>
             <div class="item-options"><label class="check-field"><input type="checkbox" data-index="${index}" data-key="lineRoleToggle" ${item.lineRole==="alternative"?"checked":""} /> Es una opción para que el cliente escoja <small>(no suma al total)</small></label></div>
             <div class="approval-note ${approval.approved?"approved":""}" data-approval-note="${index}" ${status.below?"":"hidden"}>${escapeHTML(approval.text)}</div>`;
           editor.appendChild(card);
         });
         editor.querySelectorAll("[data-index]").forEach(control=>{control.addEventListener("input",handleItemChange);control.addEventListener("change",handleItemChange)});
-        editor.querySelectorAll("[data-remove]").forEach(button=>button.addEventListener("click",()=>{state.items.splice(Number(button.dataset.remove),1);if(!state.items.length)state.items.push(blankItem());renderItemEditors();updatePreview()}));
+        editor.querySelectorAll("[data-remove]").forEach(button=>button.addEventListener("click",()=>{const it=state.items[Number(button.dataset.remove)];if(it&&(String(it.productName||"").trim()||String(it.detail||"").trim())&&!confirm(`¿Quitar “${String(it.productName||"este producto").trim()}” de la cotización?`))return;state.items.splice(Number(button.dataset.remove),1);if(!state.items.length)state.items.push(blankItem());renderItemEditors();updatePreview()}));
         editor.querySelectorAll("[data-product-search]").forEach(input=>{
           input.addEventListener("focus",()=>openProductResults(input));
           input.addEventListener("input",()=>handleProductSearchInput(input));
@@ -2078,7 +2124,7 @@
         const index=Number(input.dataset.productSearch),results=input.closest(".product-combobox")?.querySelector(".product-results");
         if(!results||!state.items[index])return;
         const query=input.value.trim();
-        if(query.length<2){results.innerHTML='<div class="product-empty">Escribe al menos 2 letras para buscar productos guardados.</div>';return}
+        if(query.length<1){results.innerHTML='<div class="product-empty">Escribe el nombre del producto.</div>';return}
         const matches=searchProducts(query);
         results.innerHTML=(matches.length?matches.map(product=>`<button type="button" class="product-result" data-product-pick="${product.id}" data-product-index="${index}" role="option"><strong>${escapeHTML(productLabel(product))}</strong><span>${escapeHTML(productResultMeta(product))}${product.description?` · ${escapeHTML(product.description.slice(0,90))}${product.description.length>90?"…":""}`:""}</span></button>`).join(""):`<div class="product-empty">No está guardado. Puedes continuar escribiendo normalmente.</div>`);
         results.querySelectorAll("[data-product-pick]").forEach(button=>button.addEventListener("mousedown",event=>{event.preventDefault();selectProductFromSearch(Number(button.dataset.productIndex),button.dataset.productPick)}));
@@ -2142,7 +2188,7 @@
 
       function handleItemChange(event) {
         const index=Number(event.target.dataset.index),key=event.target.dataset.key;if(!state.items[index]||!key)return;const item=state.items[index];
-        const oldSuggested=item.suggestedUnitPrice==null?null:numberValue(item.suggestedUnitPrice);item[key]=event.target.type==="checkbox"?event.target.checked:event.target.value;
+        const oldSuggested=item.suggestedUnitPrice==null?null:numberValue(item.suggestedUnitPrice);item[key]=event.target.type==="checkbox"?event.target.checked:(event.target.dataset.money?tqParse(event.target.value):event.target.value);if(event.target.dataset.money&&event.type==="input")tqLiveFormat(event.target);
         if(key==="lineRoleToggle"){item.lineRole=event.target.checked?"alternative":"included";if(item.lineRole!=="alternative")item.isSelectedOption=false;renderItemEditors();updatePreview();return}
         if(key==="lineRole"){if(item.lineRole!=="alternative")item.isSelectedOption=false;renderItemEditors();updatePreview();return}
         if(key==="variantId"){item.variantId=event.target.value;applyVariantToItem(index,{render:true});return}
@@ -3127,7 +3173,7 @@
         // La nota/motivo del precio especial es SIEMPRE opcional.
         // Nunca se agrega a la lista de campos faltantes y nunca bloquea guardar/imprimir.
         const belowMinimum=validItems.filter(item=>priceStatus(item).below&&item.approvalStatus!=="approved");if(belowMinimum.length&&!state.canApproveBelowMinimum&&($("quoteStatus").value!=="draft"||forPrint))missing.push("autorización de Luiza o Mara para los precios bajo el mínimo (puedes guardar como borrador)");
-        if(missing.length){alert(`Antes de continuar, completa: ${missing.join(" y ")}.`);return false}return true;
+        if(missing.length){tqMarkMissing(generic,validItems);alert(`Falta: ${missing.join(" y ")}. Te lo marqué en rojo 👇`);return false}return true;
       }
 
       function cleanPhoneForWhatsapp(value) {
@@ -3371,9 +3417,7 @@
         // El PDF se genera desde una copia independiente de la previsualización.
         // Solo después de confirmar que la cotización se guardó correctamente,
         // limpiamos el formulario para dejar lista la siguiente cotización.
-        newQuote({
-          message: `Cotización ${savedQuoteNumber} guardada. Nueva cotización lista.`
-        });
+        tqDone(savedQuoteNumber);
       }
 
       let previewResizeFrame = 0;
@@ -3451,10 +3495,11 @@
         $("quoteBaseKind").addEventListener("change",()=>changeQuoteBaseKind());$("clientName").addEventListener("focus",()=>{if($("clientName").value.trim().length>=1)openClientResults()});
 
 
+
       // V9.25: cliente y fechas más sencillos
       document.getElementById("tqNewClient")?.addEventListener("click",()=>{if(!window.TecniClientes)return;const q=$("clientName").value.trim();closeClientResults();TecniClientes.open({kind:clientSearchKind(),name:$("selectedClient").value?"":q,onSaved:c=>{if(!state.clients.some(x=>x.id===c.id))state.clients.push(c);const want=c.kind==="company"?"company":"person";if(clientSearchKind()!==want){$("quoteBaseKind").value=want;changeQuoteBaseKind();tqSeg()}selectClientFromSearch(c.id)}})});
       function tqDates(){const f=v=>{if(!v)return"—";const [y,m,d]=v.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("es-CO",{day:"numeric",month:"short"})};const t=document.getElementById("tqDatesTxt");if(t)t.textContent=`Emitida ${f($("issueDate").value)} · válida hasta ${f($("expiryDate").value)}`}
-      function tqLineTotals(){document.querySelectorAll("[data-lt]").forEach(el=>{const i=el.dataset.lt,q=Number(document.querySelector(`[data-index="${i}"][data-key="quantity"]`)?.value)||0,u=Number(document.querySelector(`[data-index="${i}"][data-key="unitPrice"]`)?.value)||0;el.querySelector("b").textContent=formatCOP(q*u)})}
+      function tqLineTotals(){document.querySelectorAll("[data-lt]").forEach(el=>{const i=el.dataset.lt,q=Number(document.querySelector(`[data-index="${i}"][data-key="quantity"]`)?.value)||0,u=Number(tqParse(document.querySelector(`[data-index="${i}"][data-key="unitPrice"]`)?.value))||0;el.querySelector("b").textContent=formatCOP(q*u)})}
       document.addEventListener("input",()=>{tqDates();tqLineTotals()});setInterval(()=>{tqDates();tqLineTotals()},1000);tqDates();
       // V9.24: cotización por pasos
       function tqSeg(){const v=$("quoteBaseKind").value;document.querySelectorAll("#tqSeg [data-v]").forEach(b=>b.classList.toggle("on",b.dataset.v===v))}
@@ -3569,7 +3614,7 @@
             sessionStorage.removeItem("tecni_force_new_quote");
           }
           if(forceNew){newQuote({message:"Nueva cotización lista con la fecha de hoy"});}
-          else loadDraft();
+          else{loadDraft();setTimeout(tqResumeNotice,300)}
           if (!$("quoteNumber").value || $("quoteNumber").value.startsWith("COT-")) $("quoteNumber").value = "Se asignará al guardar";
           $("issueDate").value = localISODate();
           $("expiryDate").value = addDays($("issueDate").value, 15);

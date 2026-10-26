@@ -1,0 +1,10 @@
+Tecnigráficas · Sistema V9.26 — cotización fácil para todos
+- 🔍 "Letra grande" arriba (se queda prendido en ese computador).
+- Letras más grandes en todo el formulario.
+- Precio con puntos mientras se escribe ($ 180.000) y total de cada línea.
+- Cantidad empieza en 1. Productos se buscan desde la primera letra.
+- "🗑 Quitar" pregunta antes de borrar un producto.
+- Si falta algo, se marca en rojo y la pantalla baja hasta ahí.
+- Al guardar sale "¡Cotización guardada!" con: Enviar por WhatsApp · Hacer otra · Volver al sistema.
+- Si quedó una cotización a medias, avisa y deja seguirla o empezar una nueva.
+- "Emite" solo lo ven Lu, Mara y Mavy (quienes aprueban precios).

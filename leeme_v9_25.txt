@@ -1,0 +1,9 @@
+Tecnigráficas · Sistema V9.25 — cotización más limpia
+- Arriba, "Emite: Tecnigráficas" en una línea chiquita.
+- ① ¿Para quién?: botones de tipo pequeños y solo el buscador del nombre + botón "＋ Nueva".
+  Celular, correo y "guardar en clientes" ya no se ven (los datos salen solos en la cotización).
+  "Sin nombre" no muestra ningún campo.
+- Fechas en una franja chiquita (hoy · válida 15 días) con "Cambiar".
+- ② ¿Qué se cotiza?: un solo botón para agregar, detalle más corto y total de cada línea.
+- IVA y notas: "Ocultar total final" pasó a "Más opciones".
+- Estado de cuenta: sin NIT; llave Bre-B @tecnigraficas y www.sastecnigraficas.com.

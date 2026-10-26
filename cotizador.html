@@ -1276,6 +1276,29 @@
     .tq-more{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:6px}.tq-more[hidden]{display:none}
     .tq-more .button{font-size:12.5px}
     @media(max-width:560px){.tq-progress span{display:none}.tq-more{grid-template-columns:1fr}}
+
+    /* V9.25 limpieza */
+    .tq-emite{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;font-size:12.5px;font-weight:800;color:#4a5160}
+    .tq-emite select{width:auto!important;padding:6px 30px 6px 10px!important;font-size:13px!important;font-weight:800;border-radius:999px!important;min-height:0!important}
+    .tq-emite small{font-weight:600;color:var(--muted);font-size:11px}
+    .tq-seg{grid-template-columns:repeat(4,1fr)!important;gap:5px!important}.tq-seg button{padding:8px 4px!important;font-size:12px!important;border-radius:10px!important}
+    #tqStep1 label[for="quoteBaseKind"]{display:none}
+    #clientPhoneWrap,#clientEmailWrap,#saveClientRow,#clientLookupHelp{display:none!important}
+    #tqStep1 [hidden]{display:none!important}
+    #tqStep1 .grid-2{grid-template-columns:1fr!important}
+    .tq-cbx{display:flex;gap:6px;align-items:stretch;position:relative}.tq-cbx input{flex:1;min-width:0}
+    .tq-newbtn{border:1.5px solid #8edcf0;background:#e9f7fc;color:#087a9a;border-radius:12px;padding:0 14px;font:inherit;font-weight:900;font-size:13px;cursor:pointer;white-space:nowrap}.tq-newbtn:hover{background:#d4f0fa}
+    .tq-cbx .client-results{right:0}
+    .tq-dates{border:1px solid var(--line);border-left:5px solid #ffd500;border-radius:var(--radius);margin:-4px 0 14px;background:#fffdf3}
+    .tq-dates summary{list-style:none;display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;font-weight:800;font-size:13.5px}.tq-dates summary::-webkit-details-marker{display:none}
+    .tq-dates summary b{margin-left:auto;font-size:12px;color:#087a9a}.tq-dates[open] summary b{visibility:hidden}
+    .tq-dates .grid-2{padding:0 14px 12px}
+    .tq-hide{display:none!important}
+    .product-search-help{display:none}
+    .detail-field textarea{min-height:42px!important;height:auto}
+    .tq-lt{display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-end;padding-bottom:6px}.tq-lt small{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase}.tq-lt b{font-size:16px;font-weight:950;color:#20222a}
+    .item-options .check-field{font-size:12px}.item-options small{color:var(--muted);font-weight:600}
+    @media(max-width:560px){.tq-seg{grid-template-columns:1fr 1fr!important}}
 </style>
 </head>
 <body>
@@ -1293,7 +1316,8 @@
       <div class="editor-body">
 
 
-        <nav class="tq-progress" id="tqProgress" aria-label="Pasos"><button type="button" data-go="tqStep1"><b>1</b><span>Cliente</span></button><i></i><button type="button" data-go="tqStep2"><b>2</b><span>Productos</span></button><i></i><button type="button" data-go="tqStep3"><b>3</b><span>Condiciones</span></button><i></i><button type="button" data-go="tqActions"><b>✓</b><span>Guardar</span></button></nav>
+        <div class="tq-emite"><span>Emite:</span><select id="issuerMode"><option value="tecni">Tecnigráficas</option><option value="personal">Luiza Fernanda Narváez Timaná</option></select><small id="tqEmiteHint">Cambia solo si la cotización va a tu nombre</small></div>
+        <nav class="tq-progress" id="tqProgress" aria-label="Pasos"><button type="button" data-go="tqStep1"><b>1</b><span>Cliente</span></button><i></i><button type="button" data-go="tqStep2"><b>2</b><span>Productos</span></button><i></i><button type="button" data-go="tqActions"><b>✓</b><span>Guardar</span></button></nav>
         <section class="section tq-step tq-s1" id="tqStep1">
           <h2 class="section-title"><span><b class="tq-n">1</b> ¿Para quién es la cotización?</span></h2>
           <div class="grid-2">
@@ -1315,9 +1339,10 @@
 
             <div class="field" id="clientNameWrap">
               <label for="clientName" id="clientNameLabel">Nombre de la persona *</label>
-              <div class="client-combobox">
+              <div class="client-combobox tq-cbx">
                 <input id="clientName" autocomplete="off" placeholder="🔎 Escribe el nombre…" aria-autocomplete="list" aria-expanded="false" />
                 <div class="client-results" id="clientResults" role="listbox"></div>
+                <button type="button" class="tq-newbtn" id="tqNewClient">＋ Nueva</button>
               </div>
               <div class="client-lookup-help" id="clientLookupHelp">Desde la primera letra te muestro los clientes guardados. Si no está, toca ＋ Crear.</div>
             </div>
@@ -1355,16 +1380,8 @@
           </div>
         </section>
 
-        <section class="section tq-step tq-s2" id="tqStep2">
-          <h2 class="section-title"><span><b class="tq-n">2</b> ¿Qué se cotiza?</span> <button class="small-button" type="button" id="addItem">+ Agregar ítem</button></h2>
-          <div class="items-editor" id="itemsEditor"></div>
-          <div class="items-bottom-action">
-            <button class="button secondary" type="button" id="addItemBottom">+ Agregar otro ítem</button>
-          </div>
-        </section>
-
-        <section class="section tq-step tq-s3" id="tqStep3">
-          <h2 class="section-title"><span><b class="tq-n">3</b> Fechas y condiciones</span></h2>
+        <details class="tq-dates" id="tqStep3">
+          <summary><span>📅</span><span id="tqDatesTxt">Fechas de hoy · vence en 15 días</span><b>Cambiar</b></summary>
           <div class="grid-2">
             <input id="quoteNumber" type="hidden" value="Se asignará al guardar" />
             <select id="quoteStatus" hidden aria-hidden="true"><option value="draft">Borrador</option><option value="sent">Enviada</option><option value="approved">Aprobada</option><option value="rejected">Rechazada</option><option value="expired">Vencida</option><option value="cancelled">Cancelada</option></select>
@@ -1383,7 +1400,18 @@
             </div>
             </details>
           </div>
+        
+        </details>
+
+        <section class="section tq-step tq-s2" id="tqStep2">
+          <h2 class="section-title"><span><b class="tq-n">2</b> ¿Qué se cotiza?</span> <button class="small-button tq-hide" type="button" id="addItem">+ Agregar ítem</button></h2>
+          <div class="items-editor" id="itemsEditor"></div>
+          <div class="items-bottom-action">
+            <button class="button secondary" type="button" id="addItemBottom">＋ Agregar otro producto</button>
+          </div>
         </section>
+
+
 
         <section class="section tq-step tq-s3b">
           <h2 class="section-title"><span>💬 IVA y notas</span></h2>
@@ -1463,7 +1491,7 @@
         <details class="collapsible-section tq-settings">
           <summary class="collapsible-summary"><div class="collapsible-summary-text"><strong>⚙ Ajustes de la cotización</strong><span>Quién la emite (Tecnigráficas o Luiza) y los datos de Tecni. Casi nunca hay que tocarlo.</span></div><span class="collapsible-icon">+</span></summary>
           <div class="collapsible-content">
-        <div id="issuerSection" class="tq-issuer"><h2 class="section-title">¿Quién emite la cotización?</h2><div class="field"><label for="issuerMode">Emisor</label><select id="issuerMode"><option value="tecni">Tecnigráficas</option><option value="personal">Luiza Fernanda Narváez Timaná</option></select></div><div id="personalIssuerFields" hidden><div class="grid-2"><div class="field full"><label for="personalIssuerName">Nombre del emisor</label><input id="personalIssuerName" value="Luiza Fernanda Narváez Timaná" maxlength="200"></div><div class="field"><label for="personalIssuerNit">NIT / identificación</label><input id="personalIssuerNit" value="1061795361" maxlength="60"></div><div class="field"><label>Condición indicada</label><input value="No responsable de IVA" readonly></div></div><div class="hint">Esta opción muestra los datos personales y no agrega IVA a la cotización. El logo de Tecnigráficas se conserva como imagen comercial.</div></div><div class="hint" id="tecniIssuerHint">Puedes mostrar u ocultar el NIT en «Datos de Tecnigráficas → Mostrar NIT».</div></div>
+        <div id="issuerSection" class="tq-issuer"><h2 class="section-title" style="font-size:14px">Datos cuando emite Luiza</h2><div id="personalIssuerFields" hidden><div class="grid-2"><div class="field full"><label for="personalIssuerName">Nombre del emisor</label><input id="personalIssuerName" value="Luiza Fernanda Narváez Timaná" maxlength="200"></div><div class="field"><label for="personalIssuerNit">NIT / identificación</label><input id="personalIssuerNit" value="1061795361" maxlength="60"></div><div class="field"><label>Condición indicada</label><input value="No responsable de IVA" readonly></div></div><div class="hint">Esta opción muestra los datos personales y no agrega IVA a la cotización. El logo de Tecnigráficas se conserva como imagen comercial.</div></div><div class="hint" id="tecniIssuerHint">Puedes mostrar u ocultar el NIT en «Datos de Tecnigráficas → Mostrar NIT».</div></div>
         <details class="collapsible-section tq-inner">
           <summary class="collapsible-summary">
             <div class="collapsible-summary-text">
@@ -2012,13 +2040,13 @@
           const selectedProduct=state.products.find(product=>product.id===item.productId);
           card.innerHTML=`<div class="field product-name-field"><label>Producto</label><div class="product-combobox"><input class="product-search-input ${selectedProduct?"has-product":""}" autocomplete="off" data-product-search="${index}" data-index="${index}" data-key="productName" value="${escapeHTML(item.productName)}" placeholder="Ej. Libreta personalizada" aria-label="Producto" aria-autocomplete="list" aria-expanded="false" /><button class="product-search-clear" type="button" data-product-clear="${index}" title="Desvincular producto guardado" ${selectedProduct?"":"hidden"}>×</button><div class="product-results" data-product-results="${index}" role="listbox"></div></div><div class="product-search-help">${selectedProduct?`Vinculado a ${escapeHTML(productLabel(selectedProduct))}. Puedes editar el nombre solo para esta cotización.`:"Escribe 2 letras para buscar un producto guardado o escribe un nombre nuevo."}</div></div>
             ${selectedProduct?.has_variants?`<div class="field variant-field"><label>Variación *</label><select data-index="${index}" data-key="variantId"><option value="">Seleccionar variación…</option>${productVariants(selectedProduct.id).map(v=>`<option value="${v.id}" ${item.variantId===v.id?"selected":""}>${escapeHTML(v.label)} · ${formatCOP(v.sale_price)}</option>`).join("")}</select><div class="product-search-help">Ej. medida, caras o acabado.</div></div>`:""}
-            <div class="field detail-field"><label>Descripción <span style="font-weight:500;color:#8a93a2">(opcional)</span></label><textarea data-index="${index}" data-key="detail" placeholder="Material, medidas, acabado, impresión, condiciones…">${escapeHTML(item.detail)}</textarea></div>
+            <div class="field detail-field"><label>Detalle <span style="font-weight:500;color:#8a93a2">(opcional)</span></label><textarea rows="1" data-index="${index}" data-key="detail" placeholder="Material, medidas, acabado…">${escapeHTML(item.detail)}</textarea></div>
             <div class="field quantity-field"><label>Cantidad</label><input type="number" min="0" data-index="${index}" data-key="quantity" value="${escapeHTML(item.quantity)}" placeholder="0"  step="any" inputmode="decimal" /></div>
             <div class="field unit-field"><label>Unidad</label><select data-index="${index}" data-key="unit">${["Unidad","Docena","Pliego","Metro","M²","Paquete","Caja","Servicio","Otro"].map(option=>`<option value="${option}" ${item.unit===option?"selected":""}>${option}</option>`).join("")}</select></div>
-            <div class="field unit-price-field"><label>Valor unitario</label><input type="number" min="0" data-index="${index}" data-key="unitPrice" value="${escapeHTML(item.unitPrice)}" placeholder="$ 0"  step="any" inputmode="decimal" /></div>
+            <div class="field unit-price-field"><label>Valor unitario</label><input type="number" min="0" data-index="${index}" data-key="unitPrice" value="${escapeHTML(item.unitPrice)}" placeholder="$ 0"  step="any" inputmode="decimal" /></div><div class="tq-lt" data-lt="${index}"><small>Total</small><b>${formatCOP((Number(item.quantity)||0)*(Number(item.unitPrice)||0))}</b></div>
             <button class="remove-item" type="button" title="Eliminar ítem" data-remove="${index}">×</button>
             <div class="price-info ${hint.kind}" data-price-info="${index}" ${selectedProduct?"":"hidden"}>${hint.text}</div>
-            <div class="item-options"><label class="check-field"><input type="checkbox" data-index="${index}" data-key="lineRoleToggle" ${item.lineRole==="alternative"?"checked":""} /> Es una opción para que el cliente elija</label></div>
+            <div class="item-options"><label class="check-field"><input type="checkbox" data-index="${index}" data-key="lineRoleToggle" ${item.lineRole==="alternative"?"checked":""} /> Es una opción para que el cliente escoja <small>(no suma al total)</small></label></div>
             <div class="approval-note ${approval.approved?"approved":""}" data-approval-note="${index}" ${status.below?"":"hidden"}>${escapeHTML(approval.text)}</div>`;
           editor.appendChild(card);
         });
@@ -3417,13 +3445,18 @@
 
         $("quoteBaseKind").addEventListener("change",()=>changeQuoteBaseKind());$("clientName").addEventListener("focus",()=>{if($("clientName").value.trim().length>=1)openClientResults()});
 
+
+      // V9.25: cliente y fechas más sencillos
+      document.getElementById("tqNewClient")?.addEventListener("click",()=>{if(!window.TecniClientes)return;const q=$("clientName").value.trim();closeClientResults();TecniClientes.open({kind:clientSearchKind(),name:$("selectedClient").value?"":q,onSaved:c=>{if(!state.clients.some(x=>x.id===c.id))state.clients.push(c);const want=c.kind==="company"?"company":"person";if(clientSearchKind()!==want){$("quoteBaseKind").value=want;changeQuoteBaseKind();tqSeg()}selectClientFromSearch(c.id)}})});
+      function tqDates(){const f=v=>{if(!v)return"—";const [y,m,d]=v.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("es-CO",{day:"numeric",month:"short"})};const t=document.getElementById("tqDatesTxt");if(t)t.textContent=`Emitida ${f($("issueDate").value)} · válida hasta ${f($("expiryDate").value)}`}
+      function tqLineTotals(){document.querySelectorAll("[data-lt]").forEach(el=>{const i=el.dataset.lt,q=Number(document.querySelector(`[data-index="${i}"][data-key="quantity"]`)?.value)||0,u=Number(document.querySelector(`[data-index="${i}"][data-key="unitPrice"]`)?.value)||0;el.querySelector("b").textContent=formatCOP(q*u)})}
+      document.addEventListener("input",()=>{tqDates();tqLineTotals()});setInterval(()=>{tqDates();tqLineTotals()},1000);tqDates();
       // V9.24: cotización por pasos
       function tqSeg(){const v=$("quoteBaseKind").value;document.querySelectorAll("#tqSeg [data-v]").forEach(b=>b.classList.toggle("on",b.dataset.v===v))}
       function tqProgress(){
         const generic=$("quoteBaseKind").value==="generic",c1=generic||$("clientName").value.trim().length>1;
         const c2=[...document.querySelectorAll("#itemsEditor .product-search-input")].some(i=>i.value.trim());
-        const c3=Boolean($("issueDate").value);
-        [c1,c2,c3].forEach((ok,i)=>document.querySelectorAll("#tqProgress button")[i]?.classList.toggle("ok",ok));
+        [c1,c2].forEach((ok,i)=>document.querySelectorAll("#tqProgress button")[i]?.classList.toggle("ok",ok));
         const sel=Boolean($("selectedClient").value);$("saveClientRow").hidden=generic||sel||!$("clientName").value.trim();
       }
       document.getElementById("tqSeg")?.addEventListener("click",e=>{const b=e.target.closest("[data-v]");if(!b)return;$("quoteBaseKind").value=b.dataset.v;$("quoteBaseKind").dispatchEvent(new Event("change",{bubbles:true}));tqSeg();tqProgress();setTimeout(()=>{if(b.dataset.v!=="generic")$("clientName").focus()},50)});

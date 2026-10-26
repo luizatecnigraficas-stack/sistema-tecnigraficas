@@ -2,7 +2,7 @@
 <!-- V7.44 · cotizaciones sin destinatario nominal -->
 
 <html lang="es">
-<head><script src="arrastrar.js" defer></script><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Tecni"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#191b22">
+<head><script src="arrastrar.js" defer></script><script src="clientes.js" defer></script><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Tecni"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#191b22">
 <script src="avisos.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1250,6 +1250,32 @@
   .item-card .item-options .check-field input{width:20px!important;height:20px!important;padding:0!important}
   .item-card .price-info,.item-card .approval-note{font-size:11px!important}
 }
+
+    /* V9.24 cotización por pasos */
+    .tq-progress{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);padding:10px 4px;margin:-6px 0 12px;border-bottom:1px solid var(--line)}
+    .tq-progress button{border:0;background:transparent;display:flex;align-items:center;gap:6px;cursor:pointer;font:inherit;font-weight:800;font-size:12.5px;color:#6b7280;padding:4px}
+    .tq-progress button b{width:24px;height:24px;border-radius:50%;background:#eef1f6;display:flex;align-items:center;justify-content:center;font-size:12px}
+    .tq-progress button.ok b{background:#2fb37a;color:#fff}.tq-progress button.ok{color:#11703d}
+    .tq-progress i{flex:1;height:2px;background:#e3e7ee;min-width:8px}
+    .tq-step{border-left:5px solid var(--line)!important}
+    .tq-s1{border-left-color:#00a6d6!important}.tq-s2{border-left-color:#e6007e!important}.tq-s3,.tq-s3b{border-left-color:#ffd500!important}.tq-s4{border-left-color:#c3c8d2!important}
+    .tq-n{display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:14px;margin-right:6px;vertical-align:middle}
+    .tq-s1 .tq-n{background:#00a6d6}.tq-s2 .tq-n{background:#e6007e}.tq-s3 .tq-n{background:#e0b800}
+    .tq-step .section-title{font-size:17px}
+    .tq-seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .tq-seg button{border:2px solid var(--line);background:#fff;border-radius:12px;padding:10px 6px;font:inherit;font-weight:800;font-size:13px;cursor:pointer;color:#3d4350}
+    .tq-seg button.on{border-color:#00a6d6;background:#e9f7fc;color:#087a9a}
+    .tq-hidden-select{display:none!important}
+    #tqStep1 .grid-2>.field:first-of-type{grid-column:1/-1}
+    .client-new{border-top:1px dashed var(--line)!important;margin-top:4px}.client-new strong{color:#087a9a}
+    .tq-intro summary{cursor:pointer;font-weight:800;font-size:13px;color:#4a5160;padding:6px 0}.tq-intro summary small{font-weight:600;color:var(--muted)}
+    .tq-settings{margin-top:6px}.tq-issuer{margin-top:14px}.tq-inner{margin-top:12px}
+    .tq-actions{grid-template-columns:1fr auto!important;gap:8px!important;align-items:stretch}
+    .tq-actions #printQuote{grid-column:auto!important;font-size:15px}
+    .tq-more-btn{white-space:nowrap;padding-left:16px!important;padding-right:16px!important}
+    .tq-more{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:6px}.tq-more[hidden]{display:none}
+    .tq-more .button{font-size:12.5px}
+    @media(max-width:560px){.tq-progress span{display:none}.tq-more{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -1265,8 +1291,180 @@
       </header>
 
       <div class="editor-body">
-        <section class="section" id="issuerSection"><h2 class="section-title">¿Quién emite la cotización?</h2><div class="field"><label for="issuerMode">Emisor</label><select id="issuerMode"><option value="tecni">Tecnigráficas</option><option value="personal">Luiza Fernanda Narváez Timaná</option></select></div><div id="personalIssuerFields" hidden><div class="grid-2"><div class="field full"><label for="personalIssuerName">Nombre del emisor</label><input id="personalIssuerName" value="Luiza Fernanda Narváez Timaná" maxlength="200"></div><div class="field"><label for="personalIssuerNit">NIT / identificación</label><input id="personalIssuerNit" value="1061795361" maxlength="60"></div><div class="field"><label>Condición indicada</label><input value="No responsable de IVA" readonly></div></div><div class="hint">Esta opción muestra los datos personales y no agrega IVA a la cotización. El logo de Tecnigráficas se conserva como imagen comercial.</div></div><div class="hint" id="tecniIssuerHint">Puedes mostrar u ocultar el NIT en «Datos de Tecnigráficas → Mostrar NIT».</div></section>
-        <details class="collapsible-section">
+
+
+        <nav class="tq-progress" id="tqProgress" aria-label="Pasos"><button type="button" data-go="tqStep1"><b>1</b><span>Cliente</span></button><i></i><button type="button" data-go="tqStep2"><b>2</b><span>Productos</span></button><i></i><button type="button" data-go="tqStep3"><b>3</b><span>Condiciones</span></button><i></i><button type="button" data-go="tqActions"><b>✓</b><span>Guardar</span></button></nav>
+        <section class="section tq-step tq-s1" id="tqStep1">
+          <h2 class="section-title"><span><b class="tq-n">1</b> ¿Para quién es la cotización?</span></h2>
+          <div class="grid-2">
+            <div class="field">
+              <label for="quoteBaseKind">¿A quién se le hará la cotización?</label>
+              <div class="tq-seg" id="tqSeg"><button type="button" data-v="person">👤 Persona</button><button type="button" data-v="company">🏢 Empresa</button><button type="button" data-v="company_contact">🏢👤 Empresa + contacto</button><button type="button" data-v="generic">📄 Sin nombre</button></div>
+              <select id="quoteBaseKind" class="tq-hidden-select">
+                <option value="person">Persona natural</option>
+                <option value="company">Empresa directamente</option>
+                <option value="company_contact">Empresa + persona de contacto</option>
+                <option value="generic">Sin nombre / A quien pueda interesar</option>
+              </select>
+            </div>
+            <input type="hidden" id="selectedClient" value="" />
+            <input type="hidden" id="quoteClientKind" value="person" />
+            <input type="hidden" id="quoteRecipientMode" value="person" />
+            <input type="hidden" id="selectedCompany" value="" />
+            <input type="hidden" id="selectedContact" value="" />
+
+            <div class="field" id="clientNameWrap">
+              <label for="clientName" id="clientNameLabel">Nombre de la persona *</label>
+              <div class="client-combobox">
+                <input id="clientName" autocomplete="off" placeholder="🔎 Escribe el nombre…" aria-autocomplete="list" aria-expanded="false" />
+                <div class="client-results" id="clientResults" role="listbox"></div>
+              </div>
+              <div class="client-lookup-help" id="clientLookupHelp">Desde la primera letra te muestro los clientes guardados. Si no está, toca ＋ Crear.</div>
+            </div>
+
+            <div class="field" id="clientPhoneWrap"><label for="clientPhone" id="clientPhoneLabel">Celular</label><input id="clientPhone" placeholder="Número de contacto" /></div>
+            <div class="field full" id="clientEmailWrap"><label for="clientEmail">Correo</label><input id="clientEmail" type="email" placeholder="correo@cliente.com" /></div>
+
+            <div class="generic-recipient" id="genericRecipientPanel" hidden><strong>A quien pueda interesar</strong><span>La cotización se guardará y generará sin asociar una persona ni una empresa. En el PDF aparecerá únicamente esta frase como destinatario.</span></div>
+
+            <div class="recipient-panel" id="companyRecipientPanel" hidden>
+              <strong>Persona de contacto</strong>
+              <div class="contact-picker">
+                <div class="field"><label for="companyContactSelect">Contacto asociado a esta empresa</label><select id="companyContactSelect"><option value="">Seleccionar contacto…</option></select></div>
+                <div class="recipient-help" id="companyContactHelp">Primero selecciona una empresa de la base de datos para cargar sus contactos asociados.</div>
+              </div>
+              <div class="recipient-contact-card" id="contactSnapshotFields">
+                <div class="field"><label for="contactName">Nombre del contacto</label><input id="contactName" readonly /></div>
+                <div class="field"><label for="contactPosition">Cargo / relación</label><input id="contactPosition" placeholder="Compras, administración…" /></div>
+                <div class="field"><label for="contactPhone">Celular para este contacto</label><input id="contactPhone" /></div>
+                <div class="field"><label for="contactEmail">Correo para este contacto</label><input id="contactEmail" type="email" /></div>
+              </div>
+            </div>
+
+            <div id="selectedClientWrap" hidden></div>
+            <div id="selectedCompanyWrap" hidden></div>
+            <div id="companySnapshotFields" hidden>
+              <input id="recipientCompanyName" />
+              <input id="recipientCompanyPhone" />
+              <input id="recipientCompanyEmail" />
+            </div>
+          </div>
+          <div class="switch-row" id="saveClientRow" style="margin-top:11px;">
+            <div class="switch-copy"><strong id="saveClientLabel">Guardar persona nueva</strong><span id="saveClientHelp">Úsalo cuando la persona aún no esté registrada.</span></div>
+            <label class="switch" aria-label="Guardar persona"><input type="checkbox" id="saveClientToCloud" checked /><span class="slider"></span></label>
+          </div>
+        </section>
+
+        <section class="section tq-step tq-s2" id="tqStep2">
+          <h2 class="section-title"><span><b class="tq-n">2</b> ¿Qué se cotiza?</span> <button class="small-button" type="button" id="addItem">+ Agregar ítem</button></h2>
+          <div class="items-editor" id="itemsEditor"></div>
+          <div class="items-bottom-action">
+            <button class="button secondary" type="button" id="addItemBottom">+ Agregar otro ítem</button>
+          </div>
+        </section>
+
+        <section class="section tq-step tq-s3" id="tqStep3">
+          <h2 class="section-title"><span><b class="tq-n">3</b> Fechas y condiciones</span></h2>
+          <div class="grid-2">
+            <input id="quoteNumber" type="hidden" value="Se asignará al guardar" />
+            <select id="quoteStatus" hidden aria-hidden="true"><option value="draft">Borrador</option><option value="sent">Enviada</option><option value="approved">Aprobada</option><option value="rejected">Rechazada</option><option value="expired">Vencida</option><option value="cancelled">Cancelada</option></select>
+            <div class="field">
+              <label for="issueDate">Fecha de emisión</label>
+              <input id="issueDate" type="date" />
+            </div>
+            <div class="field">
+              <label for="expiryDate">Fecha de vencimiento</label>
+              <input id="expiryDate" type="date" />
+            </div>
+            <details class="field full tq-intro"><summary>✏️ Cambiar el texto de introducción <small>(opcional)</small></summary>
+            <div class="field full">
+              <label for="introText">Texto introductorio</label>
+              <textarea id="introText">Nos permitimos presentar la siguiente cotización, preparada de acuerdo con los requerimientos indicados. Será un gusto acompañarle en la realización de su proyecto.</textarea>
+            </div>
+            </details>
+          </div>
+        </section>
+
+        <section class="section tq-step tq-s3b">
+          <h2 class="section-title"><span>💬 IVA y notas</span></h2>
+
+          <div class="switch-row">
+            <div class="switch-copy">
+              <strong>Aplicar IVA del 19%</strong>
+              <span>Los valores unitarios se interpretarán antes de IVA.</span>
+            </div>
+            <label class="switch" aria-label="Aplicar IVA">
+              <input type="checkbox" id="applyTax" />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="switch-row" style="margin-top:10px;">
+            <div class="switch-copy">
+              <strong>Ocultar total final</strong>
+              <span>Deja visibles los ítems y sus precios, pero oculta el cuadro de subtotal, IVA y total en la cotización/PDF.</span>
+            </div>
+            <label class="switch" aria-label="Ocultar total final">
+              <input type="checkbox" id="hideFinalTotal" />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="field" style="margin-top:11px;">
+            <label for="notes">Notas adicionales</label>
+            <textarea id="notes" placeholder="Tiempos de entrega, forma de pago, especificaciones, condiciones, etc."></textarea>
+          </div>
+
+          <div class="hint" style="margin-top:8px;">
+            Cuando el IVA esté desactivado, se incluirá automáticamente: “Si requiere factura electrónica, se incrementa el 19% del IVA”.
+          </div>
+        </section>
+
+        <section class="section tq-step tq-s4">
+          <h2 class="section-title"><span>🖼 Imágenes de referencia</span> <small>Opcional</small></h2>
+
+          <div class="switch-row">
+            <div class="switch-copy">
+              <strong>Agregar página de imágenes</strong>
+              <span>Se incluirá después de todos los ítems de la cotización.</span>
+            </div>
+            <label class="switch" aria-label="Agregar imágenes de referencia">
+              <input type="checkbox" id="includeReferences" />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="reference-controls" id="referenceControls">
+            <div class="grid-2">
+              <div class="field full">
+                <label for="referenceTitle">Título de la página</label>
+                <input id="referenceTitle" value="Imágenes de referencia" />
+              </div>
+              <div class="field full">
+                <label for="referenceIntro">Texto introductorio</label>
+                <textarea id="referenceIntro">A continuación presentamos imágenes de referencia relacionadas con el producto o servicio cotizado.</textarea>
+              </div>
+            </div>
+
+            <div class="reference-upload-box">
+              <label>Agregar imágenes de referencia (máximo 6)</label>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <label class="button secondary" style="margin:0;cursor:pointer">Desde computador<input id="referenceFiles" type="file" accept="image/*" multiple style="display:none" /></label>
+                <button class="button secondary" type="button" id="openReferenceBank">Desde banco de fotos</button>
+              </div>
+              <div class="hint" style="margin-top:7px;">Las imágenes quedarán guardadas permanentemente con esta cotización y volverán a aparecer cuando la abras o edites.</div>
+            </div>
+
+            <div class="reference-editor-list" id="referenceEditorList"></div>
+            <div class="cloud-note">Las imágenes de referencia se guardan en Supabase Storage privado junto con la cotización.</div>
+          </div>
+        </section>
+
+        <details class="collapsible-section tq-settings">
+          <summary class="collapsible-summary"><div class="collapsible-summary-text"><strong>⚙ Ajustes de la cotización</strong><span>Quién la emite (Tecnigráficas o Luiza) y los datos de Tecni. Casi nunca hay que tocarlo.</span></div><span class="collapsible-icon">+</span></summary>
+          <div class="collapsible-content">
+        <div id="issuerSection" class="tq-issuer"><h2 class="section-title">¿Quién emite la cotización?</h2><div class="field"><label for="issuerMode">Emisor</label><select id="issuerMode"><option value="tecni">Tecnigráficas</option><option value="personal">Luiza Fernanda Narváez Timaná</option></select></div><div id="personalIssuerFields" hidden><div class="grid-2"><div class="field full"><label for="personalIssuerName">Nombre del emisor</label><input id="personalIssuerName" value="Luiza Fernanda Narváez Timaná" maxlength="200"></div><div class="field"><label for="personalIssuerNit">NIT / identificación</label><input id="personalIssuerNit" value="1061795361" maxlength="60"></div><div class="field"><label>Condición indicada</label><input value="No responsable de IVA" readonly></div></div><div class="hint">Esta opción muestra los datos personales y no agrega IVA a la cotización. El logo de Tecnigráficas se conserva como imagen comercial.</div></div><div class="hint" id="tecniIssuerHint">Puedes mostrar u ocultar el NIT en «Datos de Tecnigráficas → Mostrar NIT».</div></div>
+        <details class="collapsible-section tq-inner">
           <summary class="collapsible-summary">
             <div class="collapsible-summary-text">
               <strong>Datos de Tecnigráficas</strong>
@@ -1316,7 +1514,7 @@
               </div>
             </div>
 
-            <div class="switch-row" id="saveClientRow" style="margin-top:11px;">
+            <div class="switch-row" id="showNitRow" style="margin-top:11px;">
               <div class="switch-copy">
                 <strong>Mostrar NIT de Tecnigráficas</strong>
                 <span>Es opcional y estará oculto por defecto.</span>
@@ -1333,177 +1531,20 @@
             </div>
           </div>
         </details>
-
-        <section class="section">
-          <h2 class="section-title">Cliente y destinatario</h2>
-          <div class="grid-2">
-            <div class="field">
-              <label for="quoteBaseKind">¿A quién se le hará la cotización?</label>
-              <select id="quoteBaseKind">
-                <option value="person">Persona natural</option>
-                <option value="company">Empresa directamente</option>
-                <option value="company_contact">Empresa + persona de contacto</option>
-                <option value="generic">Sin nombre / A quien pueda interesar</option>
-              </select>
-            </div>
-            <input type="hidden" id="selectedClient" value="" />
-            <input type="hidden" id="quoteClientKind" value="person" />
-            <input type="hidden" id="quoteRecipientMode" value="person" />
-            <input type="hidden" id="selectedCompany" value="" />
-            <input type="hidden" id="selectedContact" value="" />
-
-            <div class="field" id="clientNameWrap">
-              <label for="clientName" id="clientNameLabel">Nombre de la persona *</label>
-              <div class="client-combobox">
-                <input id="clientName" autocomplete="off" placeholder="Escribe al menos 3 letras…" aria-autocomplete="list" aria-expanded="false" />
-                <div class="client-results" id="clientResults" role="listbox"></div>
-              </div>
-              <div class="client-lookup-help" id="clientLookupHelp">Escribe 3 letras para buscar en tu base de datos o continúa escribiendo para crear una persona nueva.</div>
-            </div>
-
-            <div class="field" id="clientPhoneWrap"><label for="clientPhone" id="clientPhoneLabel">Celular</label><input id="clientPhone" placeholder="Número de contacto" /></div>
-            <div class="field full" id="clientEmailWrap"><label for="clientEmail">Correo</label><input id="clientEmail" type="email" placeholder="correo@cliente.com" /></div>
-
-            <div class="generic-recipient" id="genericRecipientPanel" hidden><strong>A quien pueda interesar</strong><span>La cotización se guardará y generará sin asociar una persona ni una empresa. En el PDF aparecerá únicamente esta frase como destinatario.</span></div>
-
-            <div class="recipient-panel" id="companyRecipientPanel" hidden>
-              <strong>Persona de contacto</strong>
-              <div class="contact-picker">
-                <div class="field"><label for="companyContactSelect">Contacto asociado a esta empresa</label><select id="companyContactSelect"><option value="">Seleccionar contacto…</option></select></div>
-                <div class="recipient-help" id="companyContactHelp">Primero selecciona una empresa de la base de datos para cargar sus contactos asociados.</div>
-              </div>
-              <div class="recipient-contact-card" id="contactSnapshotFields">
-                <div class="field"><label for="contactName">Nombre del contacto</label><input id="contactName" readonly /></div>
-                <div class="field"><label for="contactPosition">Cargo / relación</label><input id="contactPosition" placeholder="Compras, administración…" /></div>
-                <div class="field"><label for="contactPhone">Celular para este contacto</label><input id="contactPhone" /></div>
-                <div class="field"><label for="contactEmail">Correo para este contacto</label><input id="contactEmail" type="email" /></div>
-              </div>
-            </div>
-
-            <div id="selectedClientWrap" hidden></div>
-            <div id="selectedCompanyWrap" hidden></div>
-            <div id="companySnapshotFields" hidden>
-              <input id="recipientCompanyName" />
-              <input id="recipientCompanyPhone" />
-              <input id="recipientCompanyEmail" />
-            </div>
           </div>
-          <div class="switch-row" style="margin-top:11px;">
-            <div class="switch-copy"><strong id="saveClientLabel">Guardar persona nueva</strong><span id="saveClientHelp">Úsalo cuando la persona aún no esté registrada.</span></div>
-            <label class="switch" aria-label="Guardar persona"><input type="checkbox" id="saveClientToCloud" checked /><span class="slider"></span></label>
+        </details>
+
+
+        <div class="actions tq-actions" id="tqActions">
+          <button class="button primary wide" type="button" id="printQuote">✓ Guardar y generar PDF</button>
+          <button class="button secondary tq-more-btn" type="button" id="tqMoreBtn" aria-expanded="false">⋯ Más</button>
+          <div class="tq-more" id="tqMore" hidden>
+            <button class="button secondary" type="button" id="saveCloud">💾 Guardar en historial (sin PDF)</button>
+            <button class="button secondary" type="button" id="sendWhatsapp">💬 Preparar WhatsApp</button>
+            <button class="button secondary" type="button" id="sendEmail">✉️ Preparar correo</button>
+            <button class="button secondary" type="button" id="saveDraft">📝 Guardar borrador en este equipo</button>
+            <button class="button secondary" type="button" id="newQuote">＋ Empezar cotización nueva</button>
           </div>
-        </section>
-
-        <section class="section">
-          <h2 class="section-title">Información de la cotización</h2>
-          <div class="grid-2">
-            <input id="quoteNumber" type="hidden" value="Se asignará al guardar" />
-            <select id="quoteStatus" hidden aria-hidden="true"><option value="draft">Borrador</option><option value="sent">Enviada</option><option value="approved">Aprobada</option><option value="rejected">Rechazada</option><option value="expired">Vencida</option><option value="cancelled">Cancelada</option></select>
-            <div class="field">
-              <label for="issueDate">Fecha de emisión</label>
-              <input id="issueDate" type="date" />
-            </div>
-            <div class="field">
-              <label for="expiryDate">Fecha de vencimiento</label>
-              <input id="expiryDate" type="date" />
-            </div>
-            <div class="field full">
-              <label for="introText">Texto introductorio</label>
-              <textarea id="introText">Nos permitimos presentar la siguiente cotización, preparada de acuerdo con los requerimientos indicados. Será un gusto acompañarle en la realización de su proyecto.</textarea>
-            </div>
-          </div>
-        </section>
-
-        <section class="section">
-          <h2 class="section-title">Productos o servicios <button class="small-button" type="button" id="addItem">+ Agregar ítem</button></h2>
-          <div class="items-editor" id="itemsEditor"></div>
-          <div class="items-bottom-action">
-            <button class="button secondary" type="button" id="addItemBottom">+ Agregar otro ítem</button>
-          </div>
-        </section>
-
-        <section class="section">
-          <h2 class="section-title">IVA, notas y condiciones</h2>
-
-          <div class="switch-row">
-            <div class="switch-copy">
-              <strong>Aplicar IVA del 19%</strong>
-              <span>Los valores unitarios se interpretarán antes de IVA.</span>
-            </div>
-            <label class="switch" aria-label="Aplicar IVA">
-              <input type="checkbox" id="applyTax" />
-              <span class="slider"></span>
-            </label>
-          </div>
-
-          <div class="switch-row" style="margin-top:10px;">
-            <div class="switch-copy">
-              <strong>Ocultar total final</strong>
-              <span>Deja visibles los ítems y sus precios, pero oculta el cuadro de subtotal, IVA y total en la cotización/PDF.</span>
-            </div>
-            <label class="switch" aria-label="Ocultar total final">
-              <input type="checkbox" id="hideFinalTotal" />
-              <span class="slider"></span>
-            </label>
-          </div>
-
-          <div class="field" style="margin-top:11px;">
-            <label for="notes">Notas adicionales</label>
-            <textarea id="notes" placeholder="Tiempos de entrega, forma de pago, especificaciones, condiciones, etc."></textarea>
-          </div>
-
-          <div class="hint" style="margin-top:8px;">
-            Cuando el IVA esté desactivado, se incluirá automáticamente: “Si requiere factura electrónica, se incrementa el 19% del IVA”.
-          </div>
-        </section>
-
-        <section class="section">
-          <h2 class="section-title">Imágenes de referencia <small>Página opcional al final</small></h2>
-
-          <div class="switch-row">
-            <div class="switch-copy">
-              <strong>Agregar página de imágenes</strong>
-              <span>Se incluirá después de todos los ítems de la cotización.</span>
-            </div>
-            <label class="switch" aria-label="Agregar imágenes de referencia">
-              <input type="checkbox" id="includeReferences" />
-              <span class="slider"></span>
-            </label>
-          </div>
-
-          <div class="reference-controls" id="referenceControls">
-            <div class="grid-2">
-              <div class="field full">
-                <label for="referenceTitle">Título de la página</label>
-                <input id="referenceTitle" value="Imágenes de referencia" />
-              </div>
-              <div class="field full">
-                <label for="referenceIntro">Texto introductorio</label>
-                <textarea id="referenceIntro">A continuación presentamos imágenes de referencia relacionadas con el producto o servicio cotizado.</textarea>
-              </div>
-            </div>
-
-            <div class="reference-upload-box">
-              <label>Agregar imágenes de referencia (máximo 6)</label>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-                <label class="button secondary" style="margin:0;cursor:pointer">Desde computador<input id="referenceFiles" type="file" accept="image/*" multiple style="display:none" /></label>
-                <button class="button secondary" type="button" id="openReferenceBank">Desde banco de fotos</button>
-              </div>
-              <div class="hint" style="margin-top:7px;">Las imágenes quedarán guardadas permanentemente con esta cotización y volverán a aparecer cuando la abras o edites.</div>
-            </div>
-
-            <div class="reference-editor-list" id="referenceEditorList"></div>
-            <div class="cloud-note">Las imágenes de referencia se guardan en Supabase Storage privado junto con la cotización.</div>
-          </div>
-        </section>
-
-        <div class="actions">
-          <button class="button secondary" type="button" id="saveDraft">Guardar borrador local</button>
-          <button class="button secondary" type="button" id="newQuote">Nueva cotización</button>
-          <button class="button secondary wide" type="button" id="saveCloud">Guardar en historial</button>
-          <button class="button secondary" type="button" id="sendWhatsapp">Preparar WhatsApp</button>
-          <button class="button secondary" type="button" id="sendEmail">Preparar correo</button>
-          <button class="button primary wide" type="button" id="printQuote">Guardar y generar PDF</button>
         </div>
       </div>
     </aside>
@@ -1675,6 +1716,7 @@
       const SUPABASE_URL = "https://kqrfcdfygskzhsdzzcze.supabase.co";
       const SUPABASE_KEY = "sb_publishable_KfkIr6TlW6ivuT5cD0g9Kg_EuZwDKJ9";
       const cloud = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      (function w(){if(window.TecniClientes)TecniClientes.init(cloud);else setTimeout(w,200)})();
       let cloudSession = null;
 
       const $ = (id) => document.getElementById(id);
@@ -2250,7 +2292,7 @@
         $("clientNameLabel").textContent=isCompany?"Nombre de la empresa *":"Nombre de la persona *";
         $("clientPhoneLabel").textContent=isCompany?"Teléfono":"Celular";
         $("clientName").placeholder=isCompany?"Razón social o nombre comercial":"Nombre completo";
-        $("saveClientLabel").textContent=isCompany?"Guardar empresa nueva":"Guardar persona nueva";
+        $("saveClientLabel").textContent=isCompany?"Guardar esta empresa en Clientes":"Guardar esta persona en Clientes";
         $("saveClientHelp").textContent=isCompany?"Úsalo cuando la empresa aún no esté registrada.":"Úsalo cuando la persona aún no esté registrada.";
       }
       async function loadProductsAndPricing() {
@@ -2321,9 +2363,11 @@
       }
       function renderClientResults(){
         const input=$("clientName"),box=$("clientResults"),q=input.value.trim();
-        if(q.length<3){box.innerHTML='<div class="product-empty">Escribe al menos 3 letras para buscar.</div>';return}
+        if(q.length<1){box.innerHTML='<div class="product-empty">Escribe el nombre para buscar.</div>';return}
         const rows=matchingClients(q);
-        box.innerHTML=rows.length?rows.map(c=>`<button type="button" class="client-result" data-client-pick="${c.id}" role="option"><strong>${escapeHTML(c.name)}</strong><span>${escapeHTML([c.phone,c.email].filter(Boolean).join(" · ")||"Sin datos adicionales")}</span></button>`).join(""):'<div class="product-empty">No está registrado. Puedes continuar escribiendo para crear uno nuevo.</div>';
+        const exact=rows.some(c=>normalizeClientSearch(c.name)===normalizeClientSearch(q));
+        box.innerHTML=(rows.length?rows.map(c=>`<button type="button" class="client-result" data-client-pick="${c.id}" role="option"><strong>${escapeHTML(c.name)}</strong><span>${escapeHTML([c.phone,c.email].filter(Boolean).join(" · ")||"Sin datos adicionales")}</span></button>`).join(""):'<div class="product-empty">No está registrado todavía.</div>')+(exact||!window.TecniClientes?"":`<button type="button" class="client-result client-new" data-client-new="1"><strong>＋ Crear “${escapeHTML(q)}” como cliente nuevo</strong><span>Con documento, teléfono, correo y dirección</span></button>`);
+        box.querySelectorAll("[data-client-new]").forEach(b=>b.addEventListener("mousedown",e=>{e.preventDefault();closeClientResults();TecniClientes.open({kind:clientSearchKind(),name:q,onSaved:c=>{if(!state.clients.some(x=>x.id===c.id))state.clients.push(c);const want=c.kind==="company"?"company":"person";if(clientSearchKind()!==want){$("quoteBaseKind").value=want==="company"?"company":"person";changeQuoteBaseKind();tqSeg()}selectClientFromSearch(c.id)}})}));
         box.querySelectorAll("[data-client-pick]").forEach(b=>b.addEventListener("mousedown",e=>{e.preventDefault();selectClientFromSearch(b.dataset.clientPick)}))
       }
       function openClientResults(){renderClientResults();$("clientResults").classList.add("open");$("clientName").setAttribute("aria-expanded","true")}
@@ -2383,10 +2427,10 @@
         const isCompany=company||companyContact;
         $("clientNameLabel").textContent=isCompany?"Nombre de la empresa *":"Nombre de la persona *";
         $("clientPhoneLabel").textContent=isCompany?"Teléfono":"Celular";
-        $("clientName").placeholder=isCompany?"Escribe 3 letras para buscar la empresa…":"Escribe 3 letras para buscar la persona…";
-        $("clientLookupHelp").textContent=isCompany?"Escribe 3 letras para buscar una empresa registrada o continúa escribiendo para crear una nueva.":"Escribe 3 letras para buscar una persona registrada o continúa escribiendo para crear una nueva.";
-        $("saveClientLabel").textContent=isCompany?"Guardar empresa nueva":"Guardar persona nueva";
-        $("saveClientHelp").textContent=isCompany?"Úsalo si la empresa aún no está registrada.":"Úsalo si la persona aún no está registrada.";
+        $("clientName").placeholder=isCompany?"🔎 Escribe el nombre de la empresa…":"🔎 Escribe el nombre de la persona…";
+        $("clientLookupHelp").textContent=isCompany?"Desde la primera letra te muestro las empresas guardadas. Si no está, toca ＋ Crear.":"Desde la primera letra te muestro las personas guardadas. Si no está, toca ＋ Crear.";
+        $("saveClientLabel").textContent=isCompany?"Guardar esta empresa en Clientes":"Guardar esta persona en Clientes";
+        $("saveClientHelp").textContent=isCompany?"Al guardar la cotización queda registrada para la próxima vez.":"Al guardar la cotización queda registrada para la próxima vez.";
         const selected=clientById($("selectedClient").value);
         $("saveClientToCloud").disabled=Boolean(selected);if(selected)$("saveClientToCloud").checked=false;
         if(companyContact){
@@ -3371,9 +3415,24 @@
           });
         });
 
-        $("quoteBaseKind").addEventListener("change",()=>changeQuoteBaseKind());$("clientName").addEventListener("focus",()=>{if($("clientName").value.trim().length>=3)openClientResults()});
-      $("clientName").addEventListener("input",()=>{clearSelectedClientIfTyping();if($("clientName").value.trim().length>=3)openClientResults();else closeClientResults();updatePreview()});
-      $("clientName").addEventListener("keydown",e=>{const box=$("clientResults");if(e.key==="Escape"){closeClientResults();return}if(!box.classList.contains("open")&&$("clientName").value.trim().length>=3)openClientResults();const choices=[...box.querySelectorAll(".client-result")];if(e.key==="Enter"){const active=box.querySelector(".client-result.active")||choices[0];if(active){e.preventDefault();active.dispatchEvent(new MouseEvent("mousedown",{bubbles:true,cancelable:true}))}return}if(!["ArrowDown","ArrowUp"].includes(e.key))return;e.preventDefault();const current=choices.findIndex(x=>x.classList.contains("active")),next=e.key==="ArrowDown"?Math.min(current+1,choices.length-1):Math.max(current<=0?choices.length-1:current-1,0);choices.forEach(x=>x.classList.remove("active"));choices[next]?.classList.add("active");choices[next]?.scrollIntoView({block:"nearest"})});
+        $("quoteBaseKind").addEventListener("change",()=>changeQuoteBaseKind());$("clientName").addEventListener("focus",()=>{if($("clientName").value.trim().length>=1)openClientResults()});
+
+      // V9.24: cotización por pasos
+      function tqSeg(){const v=$("quoteBaseKind").value;document.querySelectorAll("#tqSeg [data-v]").forEach(b=>b.classList.toggle("on",b.dataset.v===v))}
+      function tqProgress(){
+        const generic=$("quoteBaseKind").value==="generic",c1=generic||$("clientName").value.trim().length>1;
+        const c2=[...document.querySelectorAll("#itemsEditor .product-search-input")].some(i=>i.value.trim());
+        const c3=Boolean($("issueDate").value);
+        [c1,c2,c3].forEach((ok,i)=>document.querySelectorAll("#tqProgress button")[i]?.classList.toggle("ok",ok));
+        const sel=Boolean($("selectedClient").value);$("saveClientRow").hidden=generic||sel||!$("clientName").value.trim();
+      }
+      document.getElementById("tqSeg")?.addEventListener("click",e=>{const b=e.target.closest("[data-v]");if(!b)return;$("quoteBaseKind").value=b.dataset.v;$("quoteBaseKind").dispatchEvent(new Event("change",{bubbles:true}));tqSeg();tqProgress();setTimeout(()=>{if(b.dataset.v!=="generic")$("clientName").focus()},50)});
+      document.getElementById("tqProgress")?.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)document.getElementById(b.dataset.go)?.scrollIntoView({behavior:"smooth",block:"start"})});
+      document.getElementById("tqMoreBtn")?.addEventListener("click",()=>{const m=$("tqMore"),open=m.hidden;m.hidden=!open;$("tqMoreBtn").setAttribute("aria-expanded",open)});
+      document.getElementById("tqMore")?.addEventListener("click",e=>{if(e.target.closest("button"))setTimeout(()=>{$("tqMore").hidden=true;$("tqMoreBtn").setAttribute("aria-expanded","false")},0)});
+      document.addEventListener("input",tqProgress);document.addEventListener("change",()=>{tqSeg();tqProgress()});setInterval(()=>{tqSeg();tqProgress()},800);
+      $("clientName").addEventListener("input",()=>{clearSelectedClientIfTyping();if($("clientName").value.trim().length>=1)openClientResults();else closeClientResults();updatePreview()});
+      $("clientName").addEventListener("keydown",e=>{const box=$("clientResults");if(e.key==="Escape"){closeClientResults();return}if(!box.classList.contains("open")&&$("clientName").value.trim().length>=1)openClientResults();const choices=[...box.querySelectorAll(".client-result")];if(e.key==="Enter"){const active=box.querySelector(".client-result.active")||choices[0];if(active){e.preventDefault();active.dispatchEvent(new MouseEvent("mousedown",{bubbles:true,cancelable:true}))}return}if(!["ArrowDown","ArrowUp"].includes(e.key))return;e.preventDefault();const current=choices.findIndex(x=>x.classList.contains("active")),next=e.key==="ArrowDown"?Math.min(current+1,choices.length-1):Math.max(current<=0?choices.length-1:current-1,0);choices.forEach(x=>x.classList.remove("active"));choices[next]?.classList.add("active");choices[next]?.scrollIntoView({block:"nearest"})});
       $("companyContactSelect").addEventListener("change",()=>applyCompanyContact($("companyContactSelect").value));
       document.addEventListener("click",e=>{if(!e.target.closest(".client-combobox"))closeClientResults()});
         

@@ -1,0 +1,8 @@
+Tecnigráficas · Sistema V9.24
+- Cotización por pasos: ① ¿Para quién? ② ¿Qué se cotiza? ③ Fechas y condiciones, con rayita de avance arriba.
+  Persona / Empresa / Empresa + contacto / Sin nombre en botones. Busca clientes desde la primera letra.
+  "＋ Crear … como cliente nuevo" abre una ventanita completa (persona o empresa) y lo deja escogido.
+  Abajo un solo botón grande "Guardar y generar PDF" y "⋯ Más" con lo demás.
+  "Quién emite" y "Datos de Tecnigráficas" pasaron a "⚙ Ajustes de la cotización" al final.
+- Crear cliente desde: cotizaciones, cuentas de cobro, remisiones, venta rápida y cartera.
+- Todas las listas largas del sistema (clientes, insumos, órdenes, proveedores…) ahora se buscan escribiendo.

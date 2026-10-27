@@ -2702,7 +2702,7 @@
 
     // V9.29: Proveedores · cuentas por pagar (lo opuesto a la cartera)
     const sp={rows:[],suppliers:[],categories:[],accounts:null,balances:[],current:null,items:[],pays:[],history:new Map(),payAcc:null,missing:false};
-    const spKindText={payment:"Pago",discount:"Descuento"};
+    const spKindText={payment:"Pago",discount:"Descuento",prior:"Pagado antes del sistema"};
     async function loadSuppliersPay(){
       if(!canViewFinance())return;const monthStart=todayISO().slice(0,8)+"01";
       const [bal,pays,money]=await Promise.all([db.from("supplier_account_balances").select("*"),db.from("supplier_account_payments").select("amount,kind,payment_date").gte("payment_date",monthStart),db.rpc("finance_account_balances")]);

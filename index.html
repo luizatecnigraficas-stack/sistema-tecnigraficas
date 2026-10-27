@@ -1780,8 +1780,6 @@
       document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("active",x.dataset.view===view||(view==="costing"&&x.dataset.view==="calculators")));
       const [t,s]=titles[view]||["Sistema",""];
       $("pageTitle").textContent=t;$("pageSubtitle").textContent=s;$("sidebar").classList.remove("open");
-      // V9.29: si abriste este módulo hace menos de 20 s, no lo vuelvas a descargar (los cambios propios sí recargan)
-      const navNow=Date.now(),navPrev=(navigate.last||(navigate.last={}))[view];navigate.last[view]=navNow;if(navPrev&&navNow-navPrev<20000)return;
       if(view==="clients")loadClients();if(view==="quotes")loadQuotes();if(view==="remissions")loadRemissions();if(view==="products")loadProducts();if(view==="inventory")loadInventory();if(view==="production")loadProduction();if(view==="payments"){loadPayments();loadCartera()}if(view==="finance")loadFinance();if(view==="suppliers")loadSuppliersPay();if(view==="costing")loadCostings();if(view==="resources")loadResources();if(view==="users")loadUsers();if(view==="reports")loadReports();
     }
 
@@ -2007,10 +2005,10 @@
       const quoteRequest=db.from("quotes").select("*").order("created_at",{ascending:false});
       const quoteItemsRequest=db.from("quote_items").select("quote_id,product_id,description,unit,quantity,line_role,is_selected,line_total,sort_order").order("sort_order");
       const canReadOrders=hasPermission("work_orders.view")||hasPermission("work_orders.create");
-      const orderRequest=canReadOrders?db.from("work_orders").select("id,quote_id,order_number,status"):Promise.resolve({data:[],error:null});
+      const orderRequest=canReadOrders?db.from("work_orders").select("*"):Promise.resolve({data:[],error:null});
       const [quoteRes,quoteItemsRes,orderRes]=await Promise.all([quoteRequest,quoteItemsRequest,orderRequest]);
       if(quoteRes.error){showToast("Error cargando cotizaciones");return}
-      state.quotes=quoteRes.data||[];state.quoteItems=quoteItemsRes.error?[]:(quoteItemsRes.data||[]);state.workOrders=orderRes.error?[]:(orderRes.data||[]);renderQuotes()
+      state.quotes=quoteRes.data||[];state.quoteItems=quoteItemsRes.error?[]:(quoteItemsRes.data||[]);if(!orderRes.error)state.workOrders=mergeById(state.workOrders,orderRes.data||[]);renderQuotes()
     }
     function quoteStatusOptions(selected){return Object.entries(statusText).map(([value,label])=>`<option value="${value}" ${value===selected?"selected":""}>${escapeHTML(label)}</option>`).join("")}
     function renderQuotes(){
@@ -3812,7 +3810,7 @@
       }).join(""):'<tr><td colspan="8" class="empty">No hay órdenes que coincidan con el filtro.</td></tr>'
     }
     async function ensurePaymentOrder(orderId){
-      let order=state.workOrders.find(o=>o.id===orderId);if(!order){const {data,error}=await db.from("work_orders").select("*").eq("id",orderId).single();if(error)throw error;order=data;state.workOrders.push(order)}
+      const {data:fresh,error:oe}=await db.from("work_orders").select("*").eq("id",orderId).single();if(oe)throw oe;let order=fresh;state.workOrders=mergeById(state.workOrders,[fresh]);
       const {data,error}=await db.from("work_order_payments").select("*").eq("work_order_id",orderId).order("payment_date",{ascending:false}).order("created_at",{ascending:false});if(error)throw error;state.payments=state.payments.filter(p=>p.work_order_id!==orderId).concat(data||[]);return order
     }
 

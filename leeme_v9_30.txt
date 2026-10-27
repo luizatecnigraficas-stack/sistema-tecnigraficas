@@ -1,0 +1,7 @@
+V9.30 · Don Fer, asistente con IA
+- Botón "Pregúntale a Don Fer" abajo a la derecha (solo con sesión iniciada).
+- Consulta: stickers por pliego (misma fórmula de la calculadora), historial de precios de
+  proveedores, deudas con proveedores, cartera, productos, costos, cotizaciones y saldos.
+- Usa los permisos de quien pregunta: si no ve Finanzas, Don Fer tampoco.
+- Solo consulta, no registra ni cambia nada.
+- Función en Supabase: tecni-asistente (usa el secreto ANTHROPIC_API_KEY).

@@ -402,6 +402,25 @@
     .today-row{display:flex;gap:12px;align-items:center;width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;padding:10px 2px;text-align:left;cursor:pointer;font-family:inherit;color:var(--ink)}.today-row:last-child{border-bottom:0}.today-row:hover{background:#f7f9fc}
     .today-row span:last-child{display:flex;flex-direction:column}.today-row small{color:var(--muted);font-size:11px}
     .today-row .when{flex:0 0 86px;text-align:center;border-radius:999px;padding:5px 8px;font-size:11px;font-weight:850;background:#f0f1f4;color:#5c6372}.today-row .when.soon{background:#fff3c4;color:#7a5a00}.today-row .when.late{background:#fde4e4;color:#b42318}
+    /* V9.30 Asistente Don Fer */
+    .df-fab{position:fixed;right:18px;bottom:18px;z-index:60;display:flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:8px 16px 8px 8px;background:linear-gradient(110deg,#00a6d6,#e6007e);color:#fff;font:800 14px Inter,system-ui,sans-serif;cursor:pointer;box-shadow:0 10px 28px rgba(230,0,126,.35)}
+    .df-fab img{width:38px;height:38px;border-radius:50%;background:#fff;object-fit:cover}
+    .df-panel{position:fixed;right:18px;bottom:18px;z-index:61;width:min(400px,calc(100vw - 24px));height:min(600px,calc(100vh - 36px));background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(20,30,50,.3);display:flex;flex-direction:column;overflow:hidden}
+    .df-head{display:flex;align-items:center;gap:10px;padding:12px 14px;background:linear-gradient(110deg,#00a6d6,#e6007e);color:#fff}
+    .df-head img{width:40px;height:40px;border-radius:50%;background:#fff;object-fit:cover}.df-head strong{display:block;font-size:16px}.df-head small{opacity:.9;font-size:12px}
+    .df-head button{margin-left:auto;border:0;background:rgba(255,255,255,.2);color:#fff;border-radius:10px;width:34px;height:34px;font-size:18px;cursor:pointer}
+    .df-msgs{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#f4f6fa}
+    .df-msg{max-width:88%;padding:10px 13px;border-radius:16px;font-size:15px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}
+    .df-msg.me{align-self:flex-end;background:#0b6f93;color:#fff;border-bottom-right-radius:4px}
+    .df-msg.bot{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px}
+    .df-msg.err{align-self:flex-start;background:#fff0f1;color:#952635;border:1px solid #e8bdc3}
+    .df-typing{align-self:flex-start;color:var(--muted);font-size:13px}
+    .df-sugs{display:flex;gap:6px;flex-wrap:wrap}.df-sugs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;font-size:13px;cursor:pointer;color:var(--ink)}
+    .df-form{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);background:#fff}
+    .df-form textarea{flex:1;resize:none;border:1px solid #d9dde6;border-radius:12px;padding:10px;font:inherit;font-size:15px;max-height:110px}
+    .df-form button{border:0;border-radius:12px;padding:0 16px;background:linear-gradient(110deg,#00a6d6,#e6007e);color:#fff;font-weight:800;cursor:pointer}
+    .df-form button:disabled{opacity:.5}
+    @media(max-width:650px){.df-fab span{display:none}.df-fab{padding:6px}.df-panel{right:6px;bottom:6px;width:calc(100vw - 12px);height:calc(100vh - 12px)}}
     /* V9.29 Proveedores: lo que debemos */
     .ca-card.sp{border-left-color:var(--cyan)}.ca-card.sp .ca-due{color:#0b6f93}
     .sp-supplies{font-size:12px;color:var(--muted);font-weight:700}
@@ -1760,8 +1779,8 @@
       document.querySelectorAll('[data-action="new-product"]').forEach(x=>x.classList.toggle("hidden",!hasPermission("products.manage")));
     }
 
-    async function enterApp(session){state.session=session;loading(true,"Preparando el sistema…");try{await loadProfile();await loadMyPermissions();applyPermissionUI();$("loginScreen").classList.add("hidden");$("appShell").classList.remove("hidden");const requested=location.hash.replace(/^#/,"");navigate(titles[requested]&&(requested==="finance"?canViewFinance():(!viewPermissions[requested]||hasPermission(viewPermissions[requested])))?requested:firstAvailableView());const loaders=[loadBusinessSettings()];if(hasPermission("dashboard.view"))loaders.push(loadDashboard());if(hasPermission("products.view"))loaders.push(loadCategories());await Promise.all(loaders);loadLogoDataURL().catch(()=>null)}catch(err){console.error(err);$("loginError").textContent=err.message||"No fue posible cargar el perfil";$("loginError").classList.remove("hidden");showToast("No fue posible cargar el perfil")}finally{loading(false)}}
-    function leaveApp(){navigate.last={};state.session=null;state.profile=null;state.permissions=new Map();$("appShell").classList.add("hidden");$("loginScreen").classList.remove("hidden")}
+    async function enterApp(session){state.session=session;loading(true,"Preparando el sistema…");try{await loadProfile();await loadMyPermissions();applyPermissionUI();$("loginScreen").classList.add("hidden");$("appShell").classList.remove("hidden");$("dfFab")?.classList.remove("hidden");const requested=location.hash.replace(/^#/,"");navigate(titles[requested]&&(requested==="finance"?canViewFinance():(!viewPermissions[requested]||hasPermission(viewPermissions[requested])))?requested:firstAvailableView());const loaders=[loadBusinessSettings()];if(hasPermission("dashboard.view"))loaders.push(loadDashboard());if(hasPermission("products.view"))loaders.push(loadCategories());await Promise.all(loaders);loadLogoDataURL().catch(()=>null)}catch(err){console.error(err);$("loginError").textContent=err.message||"No fue posible cargar el perfil";$("loginError").classList.remove("hidden");showToast("No fue posible cargar el perfil")}finally{loading(false)}}
+    function leaveApp(){navigate.last={};$("dfFab")?.classList.add("hidden");$("dfPanel")?.classList.add("hidden");df.msgs=[];state.session=null;state.profile=null;state.permissions=new Map();$("appShell").classList.add("hidden");$("loginScreen").classList.remove("hidden")}
 
     function localISO(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
     async function loadDashboard(){
@@ -2833,6 +2852,36 @@
       $("spCloseAccount").addEventListener("click",spToggleClose);$("spDeleteAccount").addEventListener("click",spDeleteAccount);
     }
     try{wireSuppliersPay()}catch(e){console.error("Proveedores",e)}
+
+    // V9.30: Asistente Don Fer (consulta datos con los permisos de quien pregunta)
+    const df={msgs:[],busy:false};
+    const dfSugs=["¿Cuántos stickers de 5x5 salen en un pliego Lite?","¿Cuánto nos cobró el herrero por el último rompetráfico?","¿Cuánto le debemos a proveedores?","¿Cuánto nos debe Friends Kuki?"];
+    function dfFormat(t){return escapeHTML(t).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/^#{1,3} (.+)$/gm,"<strong>$1</strong>").replace(/^[-*] /gm,"• ")}
+    function dfRender(){
+      const box=$("dfMsgs");
+      box.innerHTML=(df.msgs.length?"":`<div class="df-msg bot">¡Hola${state.profile?.full_name?" "+escapeHTML(String(state.profile.full_name).split(" ")[0]):""}! 👋 Soy Don Fer. Pregúntame lo que necesites del sistema.</div><div class="df-sugs">${dfSugs.map(q=>`<button type="button" data-df-q="${escapeHTML(q)}">${escapeHTML(q)}</button>`).join("")}</div>`)
+        +df.msgs.map(m=>`<div class="df-msg ${m.role==="user"?"me":m.error?"err":"bot"}">${m.role==="user"?escapeHTML(m.content):dfFormat(m.content)}</div>`).join("")
+        +(df.busy?'<div class="df-typing">Don Fer está buscando… 🔎</div>':"");
+      box.scrollTop=box.scrollHeight;$("dfSend").disabled=df.busy;
+    }
+    async function dfAsk(q){
+      q=String(q||"").trim();if(!q||df.busy)return;df.msgs.push({role:"user",content:q});df.busy=true;$("dfInput").value="";dfRender();
+      try{
+        const {data,error}=await db.functions.invoke("tecni-asistente",{body:{messages:df.msgs.filter(m=>!m.error).map(m=>({role:m.role,content:m.content}))}});
+        if(error){let msg="No pude conectarme con Don Fer. Revisa tu internet.";try{const b=await error.context?.json?.();if(b?.error)msg=b.error}catch(e){}throw new Error(msg)}
+        df.msgs.push({role:"assistant",content:data?.reply||data?.error||"Sin respuesta."});
+      }catch(err){df.msgs.push({role:"assistant",content:err.message,error:true})}
+      finally{df.busy=false;dfRender();$("dfInput").focus()}
+    }
+    function wireDonFer(){
+      $("dfFab").addEventListener("click",()=>{$("dfPanel").classList.remove("hidden");$("dfFab").classList.add("hidden");dfRender();setTimeout(()=>$("dfInput").focus(),50)});
+      $("dfClose").addEventListener("click",()=>{$("dfPanel").classList.add("hidden");$("dfFab").classList.remove("hidden")});
+      $("dfClear").addEventListener("click",()=>{df.msgs=[];dfRender()});
+      $("dfForm").addEventListener("submit",e=>{e.preventDefault();dfAsk($("dfInput").value)});
+      $("dfInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();dfAsk($("dfInput").value)}});
+      $("dfMsgs").addEventListener("click",e=>{const b=e.target.closest("[data-df-q]");if(b)dfAsk(b.dataset.dfQ)});
+    }
+    try{wireDonFer()}catch(e){console.error("Don Fer",e)}
 
     // V9.21: Reportes
     const rep={period:"month",data:null};
@@ -4795,5 +4844,11 @@
     init();
   })();
   </script>
+  <button type="button" class="df-fab hidden" id="dfFab" title="Pregúntale a Don Fer"><img src="donfer-asoma.webp" alt="" /><span>Pregúntale a Don Fer</span></button>
+  <div class="df-panel hidden" id="dfPanel" role="dialog" aria-label="Asistente Don Fer">
+    <div class="df-head"><img src="donfer-asoma.webp" alt="" /><div><strong>Don Fer</strong><small>Pregúntame precios, proveedores, stickers…</small></div><button type="button" id="dfClear" title="Nueva conversación">↺</button><button type="button" id="dfClose" title="Cerrar">×</button></div>
+    <div class="df-msgs" id="dfMsgs"></div>
+    <form class="df-form" id="dfForm"><textarea id="dfInput" rows="1" placeholder="Escribe tu pregunta…"></textarea><button type="submit" id="dfSend">Enviar</button></form>
+  </div>
 </body>
 </html>

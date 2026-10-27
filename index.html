@@ -2708,7 +2708,7 @@
       const [bal,pays,money]=await Promise.all([db.from("supplier_account_balances").select("*"),db.from("supplier_account_payments").select("amount,kind,payment_date").gte("payment_date",monthStart),db.rpc("finance_account_balances")]);
       if(bal.error){sp.missing=true;$("spGrid").innerHTML='<div class="pgrid-empty">No pude cargar las cuentas de proveedores: '+escapeHTML(bal.error.message)+'</div>';return}
       sp.missing=false;sp.rows=bal.data||[];sp.balances=money.error?[]:(money.data||[]);
-      const open=sp.rows.filter(r=>r.status==="open"),due=open.filter(r=>numberValue(r.balance)>.01),owed=due.reduce((a,r)=>a+numberValue(r.balance),0),have=sp.balances.reduce((a,b)=>a+numberValue(b.balance),0);
+      const due=sp.rows.filter(r=>numberValue(r.balance)>.01),owed=due.reduce((a,r)=>a+numberValue(r.balance),0),have=sp.balances.reduce((a,b)=>a+numberValue(b.balance),0);
       $("spStatDue").textContent=formatCOP(owed);$("spStatDueNote").textContent=due.length?`${due.length} cuenta${due.length===1?"":"s"} por pagar`:"No le debemos a nadie 🎉";
       $("spStatHave").textContent=money.error?"—":formatCOP(have);$("spStatAfter").textContent=money.error?"—":formatCOP(have-owed);$("spStatAfter").style.color=have-owed<0?"#b12f42":"";
       $("spStatMonth").textContent=formatCOP((pays.data||[]).filter(p=>p.kind==="payment").reduce((a,p)=>a+numberValue(p.amount),0));
@@ -2717,11 +2717,11 @@
     }
     function renderSuppliersPay(){
       if(sp.missing)return;const term=caKey($("spSearch").value),f=$("spFilter").value;
-      const rows=sp.rows.filter(r=>(!term||caKey(r.supplier_name+" "+r.label+" "+(r.supplies||"")).includes(term))&&(f==="all"||(f==="closed"?r.status==="closed":r.status==="open"&&(f==="open"||numberValue(r.balance)>.01))))
-        .sort((a,b)=>(a.status===b.status?0:a.status==="open"?-1:1)||numberValue(b.balance)-numberValue(a.balance)||String(a.supplier_name).localeCompare(String(b.supplier_name),"es"));
+      const rows=sp.rows.filter(r=>(!term||caKey(r.supplier_name+" "+r.label+" "+(r.supplies||"")).includes(term))&&(f==="all"||(f==="due"?numberValue(r.balance)>.01:f==="closed"?r.status==="closed":r.status==="open")))
+        .sort((a,b)=>numberValue(b.balance)-numberValue(a.balance)||(a.status===b.status?0:a.status==="open"?-1:1)||String(a.supplier_name).localeCompare(String(b.supplier_name),"es"));
       $("spGrid").innerHTML=rows.length?rows.map(r=>{
         const bal=numberValue(r.balance),closed=r.status==="closed",zero=!closed&&bal<=.01,last=[r.last_item_date,r.last_payment_date].filter(Boolean).sort().pop();
-        return `<button type="button" class="ca-card sp${closed?" closed":zero?" zero":""}" data-sp="${r.supplier_account_id}"><div class="ca-top"><span class="ca-name">${escapeHTML(r.supplier_name)}</span><span class="ca-label">${escapeHTML(r.label)}${closed?" · pagada":""}</span></div>${r.supplies?`<span class="sp-supplies">${escapeHTML(r.supplies)}</span>`:""}<span class="ca-due">${closed?"Pagada "+caDate(r.closed_on):zero?"Al día ✓":formatCOP(bal)}</span><small>Nos ha hecho ${formatCOP(r.total)} · Pagado ${formatCOP(r.paid)}</small><small>${last?"Último movimiento: "+caDate(last):"Sin movimientos todavía"}</small></button>`
+        return `<button type="button" class="ca-card sp${closed?" closed":zero?" zero":""}" data-sp="${r.supplier_account_id}"><div class="ca-top"><span class="ca-name">${escapeHTML(r.supplier_name)}</span><span class="ca-label">${escapeHTML(r.label)}${closed?" · pagada":""}</span></div>${r.supplies?`<span class="sp-supplies">${escapeHTML(r.supplies)}</span>`:""}<span class="ca-due">${bal>.01?formatCOP(bal):closed?"Pagada "+caDate(r.closed_on):"Al día ✓"}</span>${closed&&bal>.01?`<div class="ca-flags"><span class="ca-flag">⚠ Cerrada pero con saldo</span></div>`:""}<small>Nos ha hecho ${formatCOP(r.total)} · Pagado ${formatCOP(r.paid)}</small><small>${last?"Último movimiento: "+caDate(last):"Sin movimientos todavía"}</small></button>`
       }).join(""):`<div class="pgrid-empty">${f==="due"?"No le debemos nada a ningún proveedor 🎉 Toca <strong>+ Nueva cuenta</strong> para anotar una.":"No hay cuentas con ese filtro."}</div>`;
     }
     async function spLoadRefs(force){
@@ -2811,7 +2811,8 @@
     async function spToggleClose(){
       const a=sp.current,t=spTotals();
       if(a.status==="closed"){if(!confirm("¿Reabrir esta cuenta para seguir anotando?"))return}
-      else if(!confirm(t.balance>.01?`Todavía le debemos ${formatCOP(t.balance)}. ¿Marcarla como pagada de todas formas?`:`¿Marcar la cuenta ${a.label} como pagada? Queda en el historial.`))return;
+      else if(t.balance>.01)return alert(`Todavía le debemos ${formatCOP(t.balance)}.\n\nPara dejarla en cero registra el pago en «Abonos y pagos» (o un descuento). La cuenta se cierra sola cuando queda pagada.`);
+      else if(!confirm(`¿Marcar la cuenta ${a.label} como pagada? Queda en el historial.`))return;
       const closing=a.status!=="closed";const {error}=await db.from("supplier_accounts").update({status:closing?"closed":"open",closed_on:closing?todayISO():null,updated_at:new Date().toISOString()}).eq("id",a.id);if(error)return alert(error.message);
       showToast(closing?"✓ Cuenta marcada como pagada":"Cuenta reabierta");await loadSuppliersPay();if(closing)closeModal("spModal");else await spOpen(a.id);
     }

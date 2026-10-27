@@ -485,6 +485,7 @@
     .ca-doc tr:nth-child(even) td{background:#fafbfd}
     .ca-doc .sums{display:flex;justify-content:flex-end;margin:14px 44px 0}.ca-doc .sums table{width:340px;margin:0}.ca-doc .sums td{border:0;padding:5px 10px;background:none!important}.ca-doc .sums tr.big td{font-size:18px;font-weight:900;color:#e6007e;border-top:2px solid #20222a;padding-top:9px}
     .ca-doc h3{margin:22px 44px 8px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#697180}
+    .ca-doc .ctr{margin:0 44px 18px;border:2px solid #20222a;border-radius:14px;overflow:hidden}.ca-doc .ctr .ch{background:#20222a;color:#fff;padding:9px 14px;font-size:11px;font-weight:800;letter-spacing:.08em}.ca-doc .ctr .ch span{display:block;font-size:13px;letter-spacing:0;font-weight:900;color:#ffd500;margin-top:2px}.ca-doc .ctr table{width:100%;margin:0}.ca-doc .ctr td{padding:8px 14px}.ca-doc .ctr tr.tot td{font-weight:900;background:#fff7d6!important}.ca-doc .ctr .pct{color:#697180;width:90px;white-space:nowrap}.ca-doc .ctr .bar2{height:10px;background:#eef1f6;margin:10px 14px;border-radius:99px;overflow:hidden;display:flex}.ca-doc .ctr .bar2 i{display:block;height:100%}.ca-doc .cnote{margin:16px 44px 0;font-size:11.5px;line-height:1.5;color:#3d4250;background:#f6f8fb;border-radius:12px;padding:12px 16px;white-space:pre-line}
     .ca-doc .pay{margin:18px 44px 0;border:2px dashed #00a6d6;border-radius:14px;padding:12px 16px;font-size:12.5px;white-space:pre-line}.ca-doc .pay b{display:block;font-size:11px;letter-spacing:.08em;color:#00a6d6;margin-bottom:6px}.ca-doc .llave{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.ca-doc .llave span{font-size:12px;font-weight:800;color:#697180}.ca-doc .llave strong{font-size:24px;font-weight:900;color:#20222a;letter-spacing:.01em}.ca-doc .pay-extra{margin-top:6px;color:#4a5160}
     .ca-doc .foot{margin:22px 44px 0;text-align:center;color:#697180;font-size:11px;line-height:1.6}
     .mob-only{display:none!important}
@@ -1308,8 +1309,18 @@
         <div class="ca-pays" id="caPays"></div>
       </section>
     </div>
-    <div class="modal-actions ca-actions"><label class="ca-check ca-write"><input type="checkbox" id="caTax" /> Lleva IVA (19%)</label><button type="button" class="btn secondary hidden" id="caDeleteAccount">🗑 Eliminar cuenta</button><span style="flex:1"></span><button type="button" class="btn secondary ca-write" id="caCloseAccount">✅ Cerrar cuenta</button><button type="button" class="btn primary" id="caStatementButton">📲 Estado de cuenta</button></div>
+    <div class="modal-actions ca-actions"><label class="ca-check ca-write"><input type="checkbox" id="caTax" /> Lleva IVA (19%)</label><button type="button" class="btn secondary hidden" id="caDeleteAccount">🗑 Eliminar cuenta</button><span style="flex:1"></span><button type="button" class="btn secondary ca-write" id="caContractButton">📄 Contrato</button><button type="button" class="btn secondary ca-write" id="caCloseAccount">✅ Cerrar cuenta</button><button type="button" class="btn primary" id="caStatementButton">📲 Estado de cuenta</button></div>
   </div></div>
+
+  <div class="modal-backdrop hidden" id="caContractModal"><form class="modal" id="caContractForm" style="width:min(600px,100%)">
+    <div class="modal-head"><div><h3>📄 Datos del contrato</h3><div class="subtle">Si llenas el valor, el estado de cuenta muestra el resumen del contrato con porcentajes.</div></div><button type="button" class="modal-close" data-close="caContractModal">×</button></div>
+    <div class="form-grid">
+      <div class="field full"><label>Número o nombre del contrato</label><input id="caCtrNumber" placeholder="Ej. Contrato de suministro No. 6.1-17.7/009 de 2026" /></div>
+      <div class="field full"><label>Valor total del contrato (IVA incluido)</label><input id="caCtrValue" type="number" min="0" step="any" inputmode="numeric" placeholder="0" /></div>
+      <div class="field full"><label>Texto aclaratorio para el estado de cuenta</label><textarea id="caCtrNote" rows="5" placeholder="Opcional: aparece al final del estado de cuenta"></textarea></div>
+    </div>
+    <div class="modal-actions"><button type="button" class="btn secondary" data-close="caContractModal">Cancelar</button><button class="btn primary" type="submit">Guardar</button></div>
+  </form></div>
 
   <div class="modal-backdrop hidden" id="caStatementModal"><div class="modal" style="width:min(900px,100%)">
     <div class="modal-head"><div><h3>Estado de cuenta</h3><div class="subtle">Así lo verá el cliente. Mándalo por WhatsApp o descárgalo.</div></div><button type="button" class="modal-close" data-close="caStatementModal">×</button></div>
@@ -2667,12 +2678,28 @@
       const bal=t.balance;
       return `<div class="bar"><i></i><i></i><i></i></div><div class="top"><img src="logo.png" alt="Tecnigráficas" /><div class="t"><h1>ESTADO DE CUENTA</h1><div class="lbl">${escapeHTML(a.label)}</div><div class="dt">Corte: ${caDate(todayISO())}</div></div></div>
       <div class="who"><div><small>CLIENTE</small><strong>${escapeHTML(a.client_name)}</strong></div><div class="bal"><small>${bal>.01?"SALDO POR PAGAR":"ESTADO"}</small><strong>${bal>.01?formatCOP(bal):bal<-.01?"A favor "+formatCOP(-bal):"Al día ✓"}</strong></div></div>
+      ${caContractHTML(t)}
       <table><thead><tr><th>Fecha</th><th class="r">Cant.</th><th>Detalle</th><th class="r">V. unitario</th><th class="r">Total</th></tr></thead><tbody>${rows||'<tr><td colspan="5">Sin productos.</td></tr>'}</tbody></table>
       <div class="sums"><table>${t.tax?`<tr><td>Subtotal</td><td class="r">${formatCOP(t.sub)}</td></tr><tr><td>IVA ${numberValue(a.tax_rate)}%</td><td class="r">${formatCOP(t.tax)}</td></tr>`:""}<tr><td><b>Total entregado</b></td><td class="r"><b>${formatCOP(t.total)}</b></td></tr><tr><td>Abonos</td><td class="r">− ${formatCOP(t.paid)}</td></tr><tr class="big"><td>${bal<-.01?"A favor":"Saldo"}</td><td class="r">${formatCOP(Math.abs(bal))}</td></tr></table></div>
       ${pays?`<h3>Abonos recibidos</h3><table><thead><tr><th>Fecha</th><th>Concepto</th><th class="r">Valor</th></tr></thead><tbody>${pays}</tbody></table>`:""}
+      ${a.statement_note?`<div class="cnote">${escapeHTML(a.statement_note)}</div>`:""}
       ${bal>.01?`<div class="pay"><b>CÓMO PAGAR</b><div class="llave"><span>Llave Bre-B</span><strong>@tecnigraficas</strong></div>${payInfo?`<div class="pay-extra">${escapeHTML(payInfo)}</div>`:""}</div>`:""}
       <div class="foot"><strong>${escapeHTML(b.company_name||"Tecnigráficas")}</strong> · www.sastecnigraficas.com<br>${escapeHTML(b.address||"")}<br>WhatsApp ${escapeHTML(b.whatsapp||"")} · ${escapeHTML(b.email||"")} · ${escapeHTML(b.instagram||"")}<br>¡Gracias por confiar en nosotros! 💙</div>`;
     }
+    function caContractHTML(t){
+      const a=ca.current,cv=numberValue(a.contract_value);if(!(cv>0))return "";
+      const pendFac=ca.items.filter(i=>!i.invoiced).reduce((s,i)=>s+numberValue(i.quantity)*numberValue(i.unit_price),0)*(1+numberValue(a.tax_rate)/100),fact=t.total-pendFac,disp=cv-t.total,pct=v=>(v/cv*100).toLocaleString("es-CO",{minimumFractionDigits:2,maximumFractionDigits:2})+" %",row=(l,v,c="")=>`<tr class="${c}"><td>${l}</td><td class="r">${formatCOP(v)}</td><td class="r pct">${pct(v)}</td></tr>`;
+      const same=Math.abs(fact-t.paid)<1;
+      return `<div class="ctr"><div class="ch">RESUMEN DEL CONTRATO<span>${escapeHTML(a.contract_number||a.label)}</span></div><table>
+        ${row("Valor total del contrato",cv)}
+        ${same?row("Facturado y pagado",fact):row("Facturado",fact)+row("Pagado",t.paid)}
+        ${pendFac>.5?row("Consumo pendiente de factura",pendFac):""}
+        ${row("Total ejecutado por consumo acumulado",t.total,"tot")}
+        ${row("Saldo disponible por ejecutar",Math.max(disp,0))}
+      </table><div class="bar2"><i style="width:${Math.min(100,fact/cv*100)}%;background:#00a6d6"></i><i style="width:${Math.min(100,pendFac/cv*100)}%;background:#e6007e"></i></div></div>`;
+    }
+    async function caEditContract(){const a=ca.current;$("caCtrNumber").value=a.contract_number||"";$("caCtrValue").value=a.contract_value?numberValue(a.contract_value):"";$("caCtrNote").value=a.statement_note||"";openModal("caContractModal")}
+    async function caSaveContract(e){e.preventDefault();const v=numberValue($("caCtrValue").value);const payload={contract_number:$("caCtrNumber").value.trim()||null,contract_value:v>0?v:null,statement_note:$("caCtrNote").value.trim()||null};const {error}=await db.from("client_accounts").update(payload).eq("id",ca.current.id);if(error)return alert(error.message);Object.assign(ca.current,payload);closeModal("caContractModal");showToast("✓ Datos del contrato guardados")}
     function caFitStatement(){const wrap=$("caStScale").parentElement,sc=Math.min(1,(wrap.clientWidth-28)/816);$("caStScale").style.transform=`scale(${sc})`;$("caStScale").style.height=($("caDoc").offsetHeight*sc)+"px"}
     async function caOpenStatement(){loading(true,"Preparando estado de cuenta…");let info="";try{info=await caLoadPayInfo()}catch(e){}loading(false);$("caDoc").innerHTML=caStatementHTML(info);openModal("caStatementModal");requestAnimationFrame(caFitStatement);$("caDoc").querySelector("img")?.addEventListener("load",caFitStatement)}
     function caFileBase(){return `Estado de cuenta ${ca.current.client_name} ${ca.current.label}`.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9 _-]+/g,"").trim()}
@@ -2712,7 +2739,7 @@
       $("caPayAccounts").addEventListener("click",e=>{const b=e.target.closest("[data-ca-acc]");if(b){ca.payAcc=b.dataset.caAcc;caPayKindSync()}});
       $("caPays").addEventListener("click",e=>{const d=e.target.closest("[data-ca-paydel]"),s=e.target.closest("[data-ca-support]");if(d)caDeletePay(d.dataset.caPaydel);if(s)openSupport(s.dataset.caSupport)});
       $("caTax").addEventListener("change",caSetTax);$("caCloseAccount").addEventListener("click",()=>caToggleClose(false));$("caDeleteAccount").addEventListener("click",caDeleteAccount);
-      $("caPricesButton").addEventListener("click",caShowPrices);$("caStatementButton").addEventListener("click",caOpenStatement);
+      $("caPricesButton").addEventListener("click",caShowPrices);$("caContractButton").addEventListener("click",caEditContract);$("caContractForm").addEventListener("submit",caSaveContract);$("caStatementButton").addEventListener("click",caOpenStatement);
       $("caStShare").addEventListener("click",caShareImage);$("caStImage").addEventListener("click",caDownloadImage);$("caStPdf").addEventListener("click",caDownloadPdf);
       $("caStCopy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(caShareText());showToast("✓ Mensaje copiado")}catch(e){prompt("Copia el mensaje:",caShareText())}});
       $("caPayInfoButton").addEventListener("click",caEditPayInfo);$("caPayInfoForm").addEventListener("submit",caSavePayInfo);

@@ -1,0 +1,5 @@
+V9.31 · Don Fer registra (con confirmación)
+- Don Fer puede preparar: egresos/ingresos en Finanzas, trabajos de proveedores, pagos a
+  proveedores y abonos de clientes en Cartera.
+- Nada se guarda hasta tocar ✅ Confirmar en la tarjeta amarilla. Respeta permisos.
+- Los movimientos quedan con la nota "Registrado con Don Fer".

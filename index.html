@@ -570,6 +570,22 @@
     /* V9.28 la X de cerrar siempre a la vista */
     .modal>.modal-head{position:sticky;top:-20px;z-index:20;background:#fff;margin:-20px -20px 14px;padding:14px 20px 12px;border-bottom:1px solid #eef0f4;border-radius:20px 20px 0 0}
     .modal>.modal-head .modal-close{width:42px;height:42px;font-size:22px;font-weight:700;flex:0 0 auto}
+    /* V9.32 Encuesta */
+    .survey-badge{border:0;background:#fff5cc;color:#7a5b00;font:inherit;font-size:.78rem;font-weight:700;border-radius:99px;padding:2px 8px;cursor:pointer;margin-left:4px}
+    .sv-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:0 0 14px}
+    .sv-kpi{background:var(--surface-2,#f6f6f8);border-radius:14px;padding:12px}
+    .sv-kpi b{display:block;font-size:1.6rem;line-height:1.1}
+    .sv-kpi small{color:var(--muted,#666)}
+    .sv-bars{display:grid;gap:8px;margin:0 0 14px}
+    .sv-bar{display:grid;grid-template-columns:130px 1fr 38px;gap:8px;align-items:center;font-size:.9rem}
+    .sv-bar i{display:block;height:12px;border-radius:9px;background:linear-gradient(90deg,#E6007E,#ff5fae)}
+    .sv-bar span{background:var(--surface-2,#f1f1f4);border-radius:9px;overflow:hidden}
+    .sv-share{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+    .sv-share input{flex:1 1 220px;min-width:0}
+    .sv-item{border:1px solid var(--line,#e6e6ea);border-radius:14px;padding:10px 12px;margin:0 0 8px}
+    .sv-item .h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+    .sv-item p{margin:6px 0 0}
+    .sv-tags{color:var(--muted,#666);font-size:.82rem;margin-top:4px}
     /* V9.19 Productos unificados */
     .pchips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
     .pchip{border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;font-weight:800;font-size:14px;cursor:pointer;min-height:44px}
@@ -681,7 +697,7 @@
 
         <section class="view" id="view-clients">
           <div class="view-head"><div><h2>Clientes</h2><p>Empresas y personas naturales disponibles para todo el equipo.</p></div><button class="btn primary" id="addClientButton">+ Nuevo cliente</button></div>
-          <div class="toolbar"><input class="search" id="clientSearch" placeholder="Buscar por nombre, documento, teléfono o correo…" /><select id="clientKindFilter" class="search" style="flex:0 0 180px"><option value="">Todos</option><option value="company">Empresas</option><option value="person">Personas</option></select></div>
+          <div class="toolbar"><input class="search" id="clientSearch" placeholder="Buscar por nombre, documento, teléfono o correo…" /><select id="clientKindFilter" class="search" style="flex:0 0 180px"><option value="">Todos</option><option value="company">Empresas</option><option value="person">Personas</option></select><button type="button" class="btn secondary" id="surveyButton" style="flex:0 0 auto">📋 Encuesta</button></div>
           <div class="table-wrap"><table class="table"><thead><tr><th>Cliente</th><th>Tipo</th><th>Documento</th><th>Contacto</th><th>Fecha especial</th><th>Ciudad</th><th>Acciones</th></tr></thead><tbody id="clientsBody"></tbody></table></div>
         </section>
 
@@ -1880,6 +1896,7 @@
       ]);
       if(clientError||linkError){console.error(clientError||linkError);showToast("Error cargando clientes");return}
       state.clientLinks=(links||[]).filter(link=>link.active!==false);
+      try{const {data:sv}=await db.from("client_surveys").select("id,client_id,company_id,created_at,rating,quality,attention,communication,delivery,nps,products,improve,how_found,marketing_consent,source,matched").order("created_at",{ascending:false}).limit(1000);state.surveys=sv||[]}catch(_){state.surveys=[]}
       const byId=new Map((clients||[]).map(client=>[client.id,client]));
       state.clients=(clients||[]).map(client=>{
         const company_links=state.clientLinks.filter(link=>link.person_id===client.id).map(link=>({...link,company:byId.get(link.client_id)||null})).sort((a,b)=>Number(b.is_primary_for_person)-Number(a.is_primary_for_person)||String(a.company?.name||"").localeCompare(String(b.company?.name||"")));
@@ -1905,9 +1922,10 @@
         return (!kind||c.kind===kind)&&(!term||[c.name,c.document_number,c.phone,c.email,c.city,...relations].some(x=>String(x||"").toLowerCase().includes(term)))
       });
       $("clientsBody").innerHTML=rows.length?rows.map(c=>{
-        const actions=[];if(hasPermission("clients.edit"))actions.push(`<button class="mini" onclick="window.editClient('${c.id}')">Editar</button>`);if(hasPermission("clients.delete"))actions.push(`<button class="mini danger" onclick="window.deleteClient('${c.id}')">Eliminar</button>`);
+        const actions=[];actions.push(`<button class="mini" title="Enviar encuesta por WhatsApp" onclick="window.sendSurvey('${c.id}')">📋 Encuesta</button>`);if(hasPermission("clients.edit"))actions.push(`<button class="mini" onclick="window.editClient('${c.id}')">Editar</button>`);
+        const sv=(state.surveys||[]).find(x=>x.client_id===c.id||x.company_id===c.id);const svBadge=sv?` <button type="button" class="survey-badge" title="Ver opinión" onclick="window.clientSurveys('${c.id}')">⭐ ${sv.rating}</button>`:"";if(hasPermission("clients.delete"))actions.push(`<button class="mini danger" onclick="window.deleteClient('${c.id}')">Eliminar</button>`);
         const specialDate=c.kind==="company"?c.anniversary:c.birthday;const specialLabel=c.kind==="company"?"Aniversario":"Cumpleaños";
-        return `<tr><td><strong>${escapeHTML(c.name)}</strong><br><small>${escapeHTML(c.email||"")}</small></td><td>${c.kind==="company"?"Empresa":"Persona"}</td><td>${escapeHTML([c.document_type,c.document_number].filter(Boolean).join(" ")||"—")}</td><td>${escapeHTML(primaryRelationText(c))}</td><td>${specialDate?`${escapeHTML(specialLabel)}<br><small>${escapeHTML(formatDate(specialDate))}</small>`:"—"}</td><td>${escapeHTML(c.city||"—")}</td><td><div class="table-actions">${actions.join("")||"—"}</div></td></tr>`
+        return `<tr><td><strong>${escapeHTML(c.name)}</strong>${svBadge}<br><small>${escapeHTML(c.email||"")}</small></td><td>${c.kind==="company"?"Empresa":"Persona"}</td><td>${escapeHTML([c.document_type,c.document_number].filter(Boolean).join(" ")||"—")}</td><td>${escapeHTML(primaryRelationText(c))}</td><td>${specialDate?`${escapeHTML(specialLabel)}<br><small>${escapeHTML(formatDate(specialDate))}</small>`:"—"}</td><td>${escapeHTML(c.city||"—")}</td><td><div class="table-actions">${actions.join("")||"—"}</div></td></tr>`
       }).join(""):'<tr><td colspan="7" class="empty">No hay clientes para mostrar.</td></tr>'
     }
     function blankClientAssociation(){return {id:null,company_id:"",person_id:"",position:"",phone:"",email:"",is_primary_for_company:false,is_primary_for_person:false,new_name:"",new_document:"",new_phone:"",new_email:"",new_special_date:""}}
@@ -3040,6 +3058,65 @@
       document.addEventListener("click",e=>{const b=e.target;if(!b.classList||!b.classList.contains("modal-backdrop")||b.classList.contains("hidden")||downOn!==b||!b.id)return;
         if(b.dataset.dirty==="1"&&!confirm("¿Cerrar sin guardar lo que escribiste?"))return;closeModal(b.id)});
     })();
+    // V9.32: encuesta de clientes
+    const SURVEY_URL="https://sistema.sastecnigraficas.com/encuesta";
+    function surveyMessage(first,link){return `¡Hola${first?" "+first:""}! 👋 Somos Tecnigráficas 💛\nQueremos tener tus datos al día y saber cómo te fue con nosotros. ¿Nos ayudas con esta encuesta de 2 minutos? 🙏\n👉 ${link}\n¡Gracias por elegirnos! ✨`}
+    async function copySurveyText(t,label){try{await navigator.clipboard.writeText(t);showToast("✓ "+label+" copiado")}catch(_){prompt("Copia esto:",t)}}
+    function sendSurvey(id){
+      const c=(state.clients||[]).find(x=>x.id===id);if(!c)return;
+      const link=c.survey_token?`${SURVEY_URL}?c=${c.survey_token}`:SURVEY_URL;
+      let person=c,phone=c.phone;
+      if(c.kind==="company"){const l=(c.person_links||[]).find(x=>x.is_primary_for_company)||(c.person_links||[])[0];if(l){person=l.person||{name:l.name};phone=l.person?.phone||l.phone||phone}}
+      const first=c.kind==="company"&&person===c?"":String(person?.name||"").trim().split(/\s+/)[0];
+      const msg=surveyMessage(first,link);let d=String(phone||"").replace(/\D/g,"");if(d.length===10)d="57"+d;
+      if(d.length>=11)window.open(`https://wa.me/${d}?text=${encodeURIComponent(msg)}`,"_blank");
+      else copySurveyText(msg,"Mensaje con el link (este cliente no tiene celular)");
+    }
+    function svName(id){const c=(state.clients||[]).find(x=>x.id===id);return c?c.name:"Cliente borrado"}
+    function svItems(list){
+      const asp=v=>v?["","Mala","Regular","Buena","Excelente"][v]:"—";
+      return list.length?list.map(s=>`<div class="sv-item"><div class="h"><strong>${s.client_id?`<a href="#" onclick="event.preventDefault();window.editClient('${s.client_id}')">${escapeHTML(svName(s.client_id))}</a>`:"—"}${s.company_id?` <small>· ${escapeHTML(svName(s.company_id))}</small>`:""}</strong><span>${"★".repeat(s.rating)}${"☆".repeat(5-s.rating)} · Recomienda: <b>${s.nps}</b>/10</span></div>
+        <div class="sv-tags">${escapeHTML(formatDate(s.created_at.slice(0,10)))} · Calidad: ${asp(s.quality)} · Atención: ${asp(s.attention)} · Comunicación: ${asp(s.communication)} · Entrega: ${asp(s.delivery)}${s.how_found?` · Nos conoció: ${escapeHTML(s.how_found)}`:""}${s.marketing_consent?" · ✅ Acepta promociones":" · 🚫 Sin promociones"}${s.matched==="nuevo"?" · 🆕 Cliente nuevo":""}</div>
+        ${(s.products||[]).length?`<div class="sv-tags">Compra: ${escapeHTML(s.products.join(", "))}</div>`:""}
+        ${s.improve?`<p>💬 ${escapeHTML(s.improve)}</p>`:""}</div>`).join(""):'<div class="empty">Todavía no hay respuestas.</div>'
+    }
+    function ensureSurveyModal(){
+      if($("surveyModal"))return;
+      const el=document.createElement("div");el.className="modal-backdrop hidden";el.id="surveyModal";
+      el.innerHTML='<div class="modal" style="width:min(880px,100%)"><div class="modal-head"><h3 id="surveyModalTitle">Encuesta de clientes</h3><button type="button" class="modal-close" id="surveyClose">×</button></div><div id="surveyBody"></div></div>';
+      document.body.appendChild(el);
+      $("surveyClose").addEventListener("click",()=>closeModal("surveyModal"));
+      el.addEventListener("click",e=>{if(e.target===el)closeModal("surveyModal")});
+    }
+    function openSurveySummary(){
+      ensureSurveyModal();const list=state.surveys||[],n=list.length;
+      const avg=k=>{const v=list.map(s=>s[k]).filter(x=>x);return v.length?v.reduce((a,b)=>a+b,0)/v.length:0};
+      const prom=list.filter(s=>s.nps>=9).length,det=list.filter(s=>s.nps<=6).length,nps=n?Math.round((prom-det)/n*100):0;
+      const count=arr=>{const m={};arr.forEach(x=>{if(x)m[x]=(m[x]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1])};
+      const bars=[["quality","Calidad"],["attention","Atención"],["communication","Comunicación"],["delivery","Tiempo de entrega"]].map(([k,t])=>{const a=avg(k);return `<div class="sv-bar"><div>${t}</div><span><i style="width:${a/4*100}%"></i></span><b>${a?a.toFixed(1):"—"}</b></div>`}).join("");
+      const prods=count(list.flatMap(s=>s.products||[])).slice(0,6).map(([k,v])=>`${escapeHTML(k)} (${v})`).join(" · ")||"—";
+      const found=count(list.map(s=>s.how_found)).map(([k,v])=>`${escapeHTML(k)} (${v})`).join(" · ")||"—";
+      const mkt=list.filter(s=>s.marketing_consent).length;
+      $("surveyModalTitle").textContent="📋 Encuesta de clientes";
+      $("surveyBody").innerHTML=`
+        <p style="margin:0 0 8px"><b>Link para la difusión de WhatsApp</b> (sirve para todos; el sistema reconoce al cliente por su número):</p>
+        <div class="sv-share"><input class="search" readonly value="${SURVEY_URL}"><button type="button" class="btn primary" id="svCopyMsg">Copiar mensaje</button><button type="button" class="btn secondary" id="svCopyLink">Copiar link</button><a class="btn secondary" href="${SURVEY_URL}" target="_blank" rel="noopener">Ver encuesta</a></div>
+        <p style="margin:0 0 14px;color:var(--muted,#666);font-size:.9rem">Para mandarla a un cliente en particular, usa el botón <b>📋 Encuesta</b> de su fila: le llega su link personal con sus datos ya llenos.</p>
+        <div class="sv-kpis"><div class="sv-kpi"><b>${n}</b><small>respuestas</small></div><div class="sv-kpi"><b>${n?avg("rating").toFixed(1):"—"} ⭐</b><small>calificación promedio</small></div><div class="sv-kpi"><b>${n?nps:"—"}</b><small>índice de recomendación (de −100 a 100)</small></div><div class="sv-kpi"><b>${mkt}</b><small>aceptan promociones</small></div></div>
+        <div class="sv-bars">${bars}</div>
+        <p style="margin:0 0 4px"><b>Lo que más compran:</b> ${prods}</p>
+        <p style="margin:0 0 14px"><b>Cómo nos conocieron:</b> ${found}</p>
+        <h4 style="margin:0 0 8px">Opiniones</h4>${svItems(list.slice(0,60))}`;
+      $("svCopyMsg").addEventListener("click",()=>copySurveyText(surveyMessage("",SURVEY_URL),"Mensaje"));
+      $("svCopyLink").addEventListener("click",()=>copySurveyText(SURVEY_URL,"Link"));
+      openModal("surveyModal");
+    }
+    function clientSurveys(id){
+      ensureSurveyModal();const list=(state.surveys||[]).filter(s=>s.client_id===id||s.company_id===id);
+      $("surveyModalTitle").textContent="Opiniones de "+svName(id);$("surveyBody").innerHTML=svItems(list);openModal("surveyModal");
+    }
+    document.addEventListener("click",e=>{if(e.target.closest("#surveyButton"))openSurveySummary()});
+    window.sendSurvey=sendSurvey;window.clientSurveys=clientSurveys;
     // V9.09: venta rápida, comprobantes y niveles de acceso
     function financePermsInstalled(){return state.permissions instanceof Map&&state.permissions.has("finance.view")}
     function supportsEnabled(){return financePermsInstalled()}

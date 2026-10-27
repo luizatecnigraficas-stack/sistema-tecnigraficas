@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Encuesta Tecnigráficas</title>
+<meta name="description" content="Actualiza tus datos y cuéntanos cómo te fue con Tecnigráficas. Toma 2 minutos.">
+<meta property="og:title" content="¿Cómo te fue con Tecnigráficas? 💛">
+<meta property="og:description" content="Actualiza tus datos y cuéntanos tu experiencia. Toma 2 minutos.">
+<meta property="og:image" content="https://sistema.sastecnigraficas.com/donfer-salta.webp">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#E6007E">
+<link rel="icon" href="favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--m:#E6007E;--m2:#c4006b;--c:#00A0E3;--y:#FFD400;--k:#1d1d1f;--bg:#fff7fb;--line:#f1d4e4;--soft:#fde9f3;--mut:#6b6170}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Montserrat,system-ui,sans-serif;background:var(--bg);color:var(--k);font-size:17px;line-height:1.45;min-height:100vh}
+.top{height:8px;background:linear-gradient(90deg,var(--c) 0 33%,var(--m) 33% 66%,var(--y) 66%)}
+.wrap{max-width:560px;margin:0 auto;padding:18px 16px 110px}
+.brand{display:flex;justify-content:center;margin:6px 0 10px}
+.brand img{height:44px}
+.bar{height:8px;background:var(--soft);border-radius:9px;overflow:hidden;margin:6px 0 18px}
+.bar i{display:block;height:100%;width:0;background:var(--m);border-radius:9px;transition:width .35s}
+.step{display:none;animation:in .3s ease}
+.step.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-size:1.7rem;line-height:1.15;margin:.2em 0 .4em;font-weight:800}
+h2{font-size:1.35rem;margin:0 0 .2em;font-weight:800;color:var(--m)}
+.sub{color:var(--mut);margin:0 0 18px}
+.hero{text-align:center}
+.hero img{width:190px;max-width:60%;margin:4px auto 0;display:block;filter:drop-shadow(0 8px 14px rgba(230,0,126,.18))}
+.pill{display:inline-block;background:#fff;border:1px solid var(--line);padding:6px 14px;border-radius:99px;font-weight:600;font-size:.9rem;margin:4px 3px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin:0 0 14px}
+label.q{display:block;font-weight:700;margin:0 0 8px}
+label.q small{font-weight:500;color:var(--mut)}
+.field{margin:0 0 14px}
+input[type=text],input[type=tel],input[type=email],select,textarea{width:100%;font:inherit;font-size:17px;padding:13px 14px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--k);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--m)}
+textarea{min-height:96px;resize:vertical}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+.choice{display:flex;flex-wrap:wrap;gap:8px}
+.choice button,.chip{font:inherit;font-weight:600;border:2px solid var(--line);background:#fff;color:var(--k);border-radius:12px;padding:12px 14px;cursor:pointer;flex:1 1 auto;min-height:50px}
+.choice button.sel,.chip.sel{border-color:var(--m);background:var(--m);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{flex:0 1 auto;border-radius:99px;padding:10px 16px;min-height:44px}
+.stars{display:flex;gap:6px;justify-content:center}
+.stars button{background:none;border:0;padding:4px;cursor:pointer;font-size:46px;line-height:1;color:#e4d6de;transition:transform .1s}
+.stars button.on{color:var(--y);text-shadow:0 2px 0 #e0b800}
+.stars button:active{transform:scale(.9)}
+.starlbl{text-align:center;font-weight:700;color:var(--m);min-height:1.4em;margin-top:4px}
+.asp{display:grid;gap:12px}
+.asp .name{font-weight:700;margin-bottom:6px}
+.asp .choice button{padding:10px 6px;font-size:.88rem;min-height:46px}
+.nps{display:grid;grid-template-columns:repeat(11,1fr);gap:4px}
+.nps button{font:inherit;font-weight:700;padding:12px 0;border:2px solid var(--line);background:#fff;border-radius:10px;cursor:pointer;font-size:.95rem}
+.nps button.sel{background:var(--m);border-color:var(--m);color:#fff}
+.npsl{display:flex;justify-content:space-between;color:var(--mut);font-size:.8rem;margin-top:6px}
+.check{display:flex;gap:12px;align-items:flex-start;padding:12px;border:2px solid var(--line);border-radius:12px;background:#fff;margin-bottom:10px;cursor:pointer}
+.check input{width:24px;height:24px;flex:0 0 24px;accent-color:var(--m);margin:1px 0 0}
+.check span{font-size:.92rem}
+.check small{display:block;color:var(--mut);font-size:.8rem;margin-top:4px}
+.nav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,247,251,.95);backdrop-filter:blur(6px);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.nav .in{max-width:560px;margin:0 auto;display:flex;gap:10px}
+.btn{font:inherit;font-weight:800;font-size:1.05rem;border:0;border-radius:14px;padding:16px 18px;cursor:pointer;background:var(--m);color:#fff;flex:1}
+.btn:active{background:var(--m2)}
+.btn.ghost{background:#fff;color:var(--k);border:2px solid var(--line);flex:0 0 auto}
+.btn[disabled]{opacity:.6}
+.err{background:#fff0f0;color:#b00020;border:1px solid #ffc9cf;border-radius:12px;padding:10px 12px;font-weight:600;font-size:.92rem;margin:0 0 12px;display:none}
+.err.on{display:block}
+.hide{display:none!important}
+.done{text-align:center;padding-top:10px}
+.done img{width:200px;max-width:62%}
+.hello{background:var(--soft);border-radius:14px;padding:10px 14px;font-weight:600;margin:0 0 14px}
+.foot{text-align:center;color:var(--mut);font-size:.8rem;margin-top:20px}
+.foot a{color:var(--m)}
+</style>
+</head>
+<body>
+<div class="top"></div>
+<div class="wrap">
+  <div class="brand"><img src="logo-web.webp" alt="Tecnigráficas"></div>
+  <div class="bar" id="barBox"><i id="bar"></i></div>
+
+  <!-- 0 Bienvenida -->
+  <section class="step on" data-step="0">
+    <div class="hero">
+      <img src="donfer-salta.webp" alt="Don Fer">
+      <h1>¡Hola! ¿Cómo te fue con nosotros? 💛</h1>
+      <p class="sub">Queremos tener tus datos al día y saber qué hacemos bien y qué podemos mejorar.</p>
+      <div><span class="pill">⏱️ 2 minutos</span><span class="pill">🔒 Tus datos están seguros</span></div>
+    </div>
+  </section>
+
+  <!-- 1 Datos -->
+  <section class="step" data-step="1">
+    <h2>Tus datos</h2>
+    <p class="sub">Para atenderte mejor y saludarte en tu día especial 🎂</p>
+    <div class="hello hide" id="hello"></div>
+    <div class="field"><label class="q" for="name">Nombre completo *</label><input type="text" id="name" autocomplete="name" maxlength="120"></div>
+    <div class="field"><label class="q" for="phone">WhatsApp *</label><input type="tel" id="phone" autocomplete="tel" inputmode="tel" placeholder="300 123 4567" maxlength="20"></div>
+    <div class="field"><label class="q" for="email">Correo <small>(opcional)</small></label><input type="email" id="email" autocomplete="email" inputmode="email" maxlength="120"></div>
+    <div class="field"><label class="q" for="city">Ciudad</label><input type="text" id="city" value="Popayán" maxlength="60"></div>
+    <div class="field"><label class="q">Tu cumpleaños <small>(opcional)</small></label>
+      <div class="row"><select id="bDay"></select><select id="bMonth"></select></div></div>
+    <div class="field"><label class="q">¿Nos compras para ti o para una empresa?</label>
+      <div class="choice" id="kind"><button type="button" data-v="person">Para mí</button><button type="button" data-v="company">Para una empresa</button></div></div>
+    <div class="card hide" id="companyBox">
+      <div class="field"><label class="q" for="cName">Nombre de la empresa *</label><input type="text" id="cName" maxlength="120" autocomplete="organization"></div>
+      <div class="field"><label class="q" for="cNit">NIT <small>(para tus facturas)</small></label><input type="text" id="cNit" inputmode="numeric" maxlength="20" placeholder="900123456-1"></div>
+      <div class="field" style="margin:0"><label class="q">Aniversario de la empresa <small>(opcional)</small></label>
+        <div class="row"><select id="aDay"></select><select id="aMonth"></select><select id="aYear"></select></div></div>
+    </div>
+  </section>
+
+  <!-- 2 Experiencia -->
+  <section class="step" data-step="2">
+    <h2>Tu experiencia</h2>
+    <p class="sub">Sé sincer@, nos ayuda muchísimo 🙏</p>
+    <div class="card">
+      <label class="q" style="text-align:center">¿Cómo calificarías tu experiencia con Tecnigráficas? *</label>
+      <div class="stars" id="stars"></div>
+      <div class="starlbl" id="starLbl"></div>
+    </div>
+    <div class="card">
+      <label class="q">¿Cómo nos fue en…?</label>
+      <div class="asp" id="aspects"></div>
+    </div>
+    <div class="card">
+      <label class="q">¿Qué nos has comprado? <small>(puedes marcar varios)</small></label>
+      <div class="chips" id="products"></div>
+    </div>
+  </section>
+
+  <!-- 3 Final -->
+  <section class="step" data-step="3">
+    <h2>¡Ya casi!</h2>
+    <p class="sub">Últimas preguntas y listo ✨</p>
+    <div class="card">
+      <label class="q">Del 0 al 10, ¿qué tanto nos recomendarías a un amigo? *</label>
+      <div class="nps" id="nps"></div>
+      <div class="npsl"><span>Nada</span><span>¡Totalmente!</span></div>
+    </div>
+    <div class="card">
+      <label class="q" for="improve">¿Qué podemos mejorar? <small>(opcional)</small></label>
+      <textarea id="improve" maxlength="2000" placeholder="Lo que quieras contarnos: algo que te gustó, algo que no…"></textarea>
+    </div>
+    <div class="card">
+      <label class="q">¿Cómo nos conociste?</label>
+      <div class="chips" id="found"></div>
+    </div>
+    <label class="check"><input type="checkbox" id="consent"><span><b>Autorizo a Tecnigráficas</b> a guardar mis datos para atender mis pedidos y contactarme. *<small>Según la Ley 1581 de 2012. Puedes pedir que actualicemos o borremos tus datos cuando quieras escribiendo a contacto@sastecnigraficas.com.</small></span></label>
+    <label class="check"><input type="checkbox" id="marketing" checked><span>Quiero recibir promociones y novedades por WhatsApp 🎁</span></label>
+  </section>
+
+  <!-- 4 Gracias -->
+  <section class="step" data-step="4">
+    <div class="done">
+      <img src="donfer-pulgar.webp" alt="Don Fer">
+      <h1 id="thanks">¡Mil gracias! 💛</h1>
+      <p class="sub">Tus respuestas ya nos llegaron. Gracias por confiar en Tecnigráficas, ¡imprimimos la diferencia!</p>
+      <a class="btn" style="display:block;text-decoration:none;margin-top:10px" href="https://sastecnigraficas.com">Ver nuestros productos</a>
+    </div>
+  </section>
+
+  <div class="foot">Tecnigráficas · Popayán · <a href="https://sastecnigraficas.com">sastecnigraficas.com</a></div>
+</div>
+
+<nav class="nav" id="nav"><div class="in">
+  <button class="btn ghost hide" id="back" type="button">←</button>
+  <button class="btn" id="next" type="button">Empezar</button>
+</div></nav>
+
+<script>
+(()=>{
+const API="https://kqrfcdfygskzhsdzzcze.supabase.co/rest/v1/rpc/",KEY="sb_publishable_KfkIr6TlW6ivuT5cD0g9Kg_EuZwDKJ9";
+const $=id=>document.getElementById(id);
+const token=(()=>{const c=new URLSearchParams(location.search).get("c")||"";return /^[0-9a-f-]{36}$/i.test(c)?c:null})();
+const S={step:0,kind:null,rating:0,nps:null,aspects:{},products:new Set(),found:null};
+const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+async function rpc(fn,body){
+  const r=await fetch(API+fn,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>null);
+  if(!r.ok)throw new Error((j&&j.message)||"No se pudo enviar, revisa tu internet");
+  return j;
+}
+function fillSelect(el,ph,items){el.innerHTML=`<option value="">${ph}</option>`+items.map(([v,t])=>`<option value="${v}">${t}</option>`).join("")}
+const days=[...Array(31)].map((_,i)=>[String(i+1).padStart(2,"0"),i+1]),months=MONTHS.map((m,i)=>[String(i+1).padStart(2,"0"),m]);
+const y=new Date().getFullYear(),years=[...Array(y-1949)].map((_,i)=>[y-i,y-i]);
+fillSelect($("bDay"),"Día",days);fillSelect($("bMonth"),"Mes",months);
+fillSelect($("aDay"),"Día",days);fillSelect($("aMonth"),"Mes",months);fillSelect($("aYear"),"Año",years);
+
+// selección única
+function single(box,onPick){box.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;box.querySelectorAll("button").forEach(x=>x.classList.toggle("sel",x===b));onPick(b.dataset.v)})}
+single($("kind"),v=>{S.kind=v;$("companyBox").classList.toggle("hide",v!=="company")});
+// estrellas
+const SL=["","Mala 😕","Regular 😐","Buena 🙂","Muy buena 😀","¡Excelente! 🤩"];
+$("stars").innerHTML=[1,2,3,4,5].map(n=>`<button type="button" aria-label="${n} estrellas" data-v="${n}">★</button>`).join("");
+$("stars").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S.rating=+b.dataset.v;[...$("stars").children].forEach((x,i)=>x.classList.toggle("on",i<S.rating));$("starLbl").textContent=SL[S.rating]});
+// aspectos
+const ASP=[["quality","Calidad del producto"],["attention","Atención"],["communication","Comunicación"],["delivery","Tiempo de entrega"]];
+$("aspects").innerHTML=ASP.map(([k,t])=>`<div><div class="name">${t}</div><div class="choice" data-k="${k}"><button type="button" data-v="4">Excelente</button><button type="button" data-v="3">Buena</button><button type="button" data-v="2">Regular</button><button type="button" data-v="1">Mala</button></div></div>`).join("");
+$("aspects").querySelectorAll(".choice").forEach(box=>single(box,v=>S.aspects[box.dataset.k]=+v));
+// chips
+function chips(box,list,multi){box.innerHTML=list.map(t=>`<button type="button" class="chip" data-v="${t}">${t}</button>`).join("");
+  box.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+    if(multi){b.classList.toggle("sel");b.classList.contains("sel")?S.products.add(b.dataset.v):S.products.delete(b.dataset.v)}
+    else{const was=b.classList.contains("sel");box.querySelectorAll("button").forEach(x=>x.classList.remove("sel"));if(!was)b.classList.add("sel");S.found=was?null:b.dataset.v}})}
+chips($("products"),["Stickers y etiquetas","Pendones y gran formato","Tarjetas y papelería","Volantes","Empaques y cajas","Talonarios y formatos","Acrílicos y llaveros","Diseño y logos","Otro"],true);
+chips($("found"),["Me lo recomendaron","Instagram","Facebook","Google","Pasé por el local","Soy cliente hace años","Otro"],false);
+// nps
+$("nps").innerHTML=[...Array(11)].map((_,i)=>`<button type="button" data-v="${i}">${i}</button>`).join("");
+single($("nps"),v=>S.nps=+v);
+
+// pasos
+const LAST=3;
+function err(msg){let e=document.querySelector(".step.on .err");if(!e){e=document.createElement("div");e.className="err";document.querySelector(".step.on").prepend(e)}e.textContent=msg;e.classList.toggle("on",!!msg);if(msg)window.scrollTo({top:0,behavior:"smooth"})}
+function show(n){
+  S.step=n;document.querySelectorAll(".step").forEach(s=>s.classList.toggle("on",+s.dataset.step===n));
+  $("bar").style.width=(n>LAST?100:n/LAST*100)+"%";$("barBox").classList.toggle("hide",n===0||n>LAST);
+  $("back").classList.toggle("hide",n===0||n>LAST);$("nav").classList.toggle("hide",n>LAST);
+  $("next").textContent=n===0?"Empezar →":n===LAST?"Enviar ✨":"Siguiente →";
+  window.scrollTo({top:0});
+}
+function digits(v){return String(v||"").replace(/\D/g,"")}
+function validate(n){
+  if(n===1){
+    if($("name").value.trim().length<3)return"Escribe tu nombre completo";
+    const d=digits($("phone").value);if(d.length<7||d.length>13)return"Revisa tu número de WhatsApp";
+    const em=$("email").value.trim();if(em&&!/^\S+@\S+\.\S+$/.test(em))return"Revisa tu correo";
+    if(!!$("bDay").value!==!!$("bMonth").value)return"Completa el día y el mes de tu cumpleaños";
+    if(S.kind==="company"&&$("cName").value.trim().length<2)return"Escribe el nombre de la empresa";
+    if(S.kind==="company"&&!!$("aDay").value!==!!$("aMonth").value)return"Completa el día y el mes del aniversario";
+  }
+  if(n===2&&!S.rating)return"Toca las estrellas para calificarnos ⭐";
+  if(n===3){if(S.nps===null)return"Elige un número del 0 al 10";if(!$("consent").checked)return"Necesitamos tu autorización para guardar tus datos"}
+  return"";
+}
+async function submit(){
+  const company=S.kind==="company";
+  const bd=$("bDay").value&&$("bMonth").value?`${$("bMonth").value}-${$("bDay").value}`:"";
+  const an=company&&$("aDay").value&&$("aMonth").value?`${$("aYear").value||2000}-${$("aMonth").value}-${$("aDay").value}`:"";
+  const p={name:$("name").value.trim(),phone:$("phone").value.trim(),email:$("email").value.trim(),city:$("city").value.trim(),birthday:bd,
+    buyer:S.kind||"",company_name:company?$("cName").value.trim():"",company_nit:company?$("cNit").value.trim():"",company_anniversary:an,
+    rating:S.rating,...S.aspects,nps:S.nps,products:[...S.products],improve:$("improve").value.trim(),how_found:S.found||"",
+    data_consent:$("consent").checked,marketing:$("marketing").checked};
+  const r=await rpc("survey_submit",{p_token:token,p});
+  $("thanks").textContent=`¡Mil gracias, ${r&&r.name?r.name:""}! 💛`.replace(", !","!");
+}
+$("next").addEventListener("click",async()=>{
+  const m=validate(S.step);err(m);if(m)return;
+  if(S.step<LAST){show(S.step+1);return}
+  $("next").disabled=true;$("next").textContent="Enviando…";
+  try{await submit();show(4)}catch(e){err(e.message);$("next").disabled=false;$("next").textContent="Enviar ✨"}
+});
+$("back").addEventListener("click",()=>{err("");show(S.step-1)});
+
+// datos guardados (link personal)
+if(token)rpc("survey_prefill",{p_token:token}).then(d=>{
+  if(!d)return;
+  if(d.name)$("name").value=d.name;if(d.phone)$("phone").value=d.phone;if(d.email)$("email").value=d.email;if(d.city)$("city").value=d.city;
+  if(d.birthday){const[mm,dd]=d.birthday.split("-");$("bMonth").value=mm;$("bDay").value=dd}
+  if(d.company||d.kind==="company"){$("kind").querySelector('[data-v="company"]').click();const c=d.company||{};
+    if(c.name)$("cName").value=c.name;if(c.nit)$("cNit").value=c.nit;
+    if(c.anniversary){const[yy,mm,dd]=c.anniversary.split("-");$("aYear").value=yy==="2000"?"":yy;$("aMonth").value=mm;$("aDay").value=dd}}
+  else $("kind").querySelector('[data-v="person"]').click();
+  const first=(d.name||"").split(" ")[0];
+  $("hello").textContent=`👋 ${first?first+", e":"E"}stos son los datos que tenemos. Corrige lo que haya cambiado.`;$("hello").classList.remove("hide");
+}).catch(()=>{});
+show(0);
+})();
+</script>
+</body>
+</html>

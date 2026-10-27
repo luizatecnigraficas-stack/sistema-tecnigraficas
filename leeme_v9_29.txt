@@ -1,0 +1,8 @@
+V9.29 · Proveedores (lo que debemos) + velocidad
+- Nueva sección Dinero → Proveedores: cuentas con cada proveedor (herrero, lonas, offset, papel…),
+  cargos con historial de precios, abonos y pago total. Cada pago sale como egreso en Finanzas
+  desde la cuenta elegida. Muestra cuánto debemos, cuánto tenemos hoy y cuánto quedaría.
+- Solo la ven quienes tienen acceso a Finanzas.
+- La base de datos ya quedó lista en Supabase (no hay que correr SQL).
+- Velocidad: reglas de seguridad e índices optimizados en Supabase; las fotos cargan a medida
+  que bajas; los módulos abiertos hace menos de 20 s no se vuelven a descargar.

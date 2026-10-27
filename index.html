@@ -402,6 +402,16 @@
     .today-row{display:flex;gap:12px;align-items:center;width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;padding:10px 2px;text-align:left;cursor:pointer;font-family:inherit;color:var(--ink)}.today-row:last-child{border-bottom:0}.today-row:hover{background:#f7f9fc}
     .today-row span:last-child{display:flex;flex-direction:column}.today-row small{color:var(--muted);font-size:11px}
     .today-row .when{flex:0 0 86px;text-align:center;border-radius:999px;padding:5px 8px;font-size:11px;font-weight:850;background:#f0f1f4;color:#5c6372}.today-row .when.soon{background:#fff3c4;color:#7a5a00}.today-row .when.late{background:#fde4e4;color:#b42318}
+    /* V9.29 Proveedores: lo que debemos */
+    .ca-card.sp{border-left-color:var(--cyan)}.ca-card.sp .ca-due{color:#0b6f93}
+    .sp-supplies{font-size:12px;color:var(--muted);font-weight:700}
+    .sp-money{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:0 0 16px}
+    .sp-money>div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+    .sp-money span{display:block;font-size:11px;font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+    .sp-money strong{display:block;font-size:18px;font-weight:950}.sp-money small{font-size:11px;color:var(--muted)}
+    .sp-money .after{background:linear-gradient(110deg,rgba(0,166,214,.10),rgba(230,0,126,.08))}
+    .sp-money .neg strong{color:#b12f42}
+    .sp-quickpay{display:flex;gap:6px;flex-wrap:wrap;margin-top:-2px}
     /* V9.21 Cartera: cuentas de clientes */
     .cart-tabs{max-width:720px}
     .ca-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
@@ -612,6 +622,7 @@
         <div class="nav-label" role="button" tabindex="0" data-group="Dinero"><span>Dinero</span><i>▾</i></div>
         <button data-group="Dinero" data-view="finance" id="financeNav"><span class="icon">◉</span>Finanzas</button>
         <button data-group="Dinero" data-view="payments"><span class="icon">$</span>Cartera</button>
+        <button data-group="Dinero" data-view="suppliers" id="suppliersNav"><span class="icon">⇄</span>Proveedores</button>
         <button data-group="Dinero" data-view="reports"><span class="icon">◒</span>Reportes</button>
         <div class="nav-label" role="button" tabindex="0" data-group="Equipo"><span>Equipo</span><i>▾</i></div>
         <button data-group="Equipo" data-view="users" id="usersNav"><span class="icon">⚿</span>Usuarios y permisos</button>
@@ -754,6 +765,19 @@
                   </div>
         </section>
 
+
+        <section class="view" id="view-suppliers">
+          <div class="view-head"><div><h2>Proveedores · lo que debemos</h2><p>Lo que nos hacen el herrero, las lonas, la offset, el papel… y lo que les vamos abonando.</p></div></div>
+          <div class="today-grid">
+            <div class="today-tile due"><span class="tt-label">🧾 Debemos a proveedores</span><strong id="spStatDue">$ 0</strong><small id="spStatDueNote">&nbsp;</small></div>
+            <div class="today-tile in"><span class="tt-label">💰 Tenemos hoy</span><strong id="spStatHave">$ 0</strong><small>Suma de todas las cuentas</small></div>
+            <div class="today-tile"><span class="tt-label">⚖ Si pagamos todo</span><strong id="spStatAfter">$ 0</strong><small>Lo que quedaría</small></div>
+            <div class="today-tile deliver"><span class="tt-label">💸 Abonado este mes</span><strong id="spStatMonth">$ 0</strong><small>Plata que salió a proveedores</small></div>
+          </div>
+          <div class="sp-money" id="spMoney"></div>
+          <div class="toolbar"><input class="search" id="spSearch" placeholder="Buscar proveedor o cuenta…" /><select id="spFilter" class="search" style="flex:0 0 210px"><option value="due">Con saldo pendiente</option><option value="open">Todas las abiertas</option><option value="closed">Pagadas (historial)</option><option value="all">Todas</option></select><button class="btn primary" type="button" id="spNewButton">+ Nueva cuenta</button></div>
+          <div class="ca-grid" id="spGrid"><div class="pgrid-empty">Cargando…</div></div>
+        </section>
 
         <section class="view" id="view-finance">
           <div class="view-head fin-head">
@@ -1170,6 +1194,55 @@
   <div class="modal-backdrop hidden" id="priceHistoryModal"><div class="modal" style="width:min(980px,100%)"><div class="modal-head"><div><h3>Historial de precios</h3><div class="subtle" id="priceHistoryProduct">—</div></div><button type="button" class="modal-close" data-close="priceHistoryModal">×</button></div>
     <div class="table-wrap"><table class="table"><thead><tr><th>Fecha</th><th>Costo</th><th>Precio venta</th><th>Precio mínimo</th><th>IVA</th><th>Modificado por</th></tr></thead><tbody id="priceHistoryBody"></tbody></table></div><div class="modal-actions"><button type="button" class="btn primary" data-close="priceHistoryModal">Listo</button></div></div></div>
 
+
+  <div class="modal-backdrop hidden" id="spNewModal"><form class="modal" id="spNewForm" style="width:min(560px,100%)">
+    <div class="modal-head"><div><h3>Nueva cuenta con proveedor</h3><div class="subtle">Para anotar lo que nos hace o vende y lo que le vamos pagando.</div></div><button type="button" class="modal-close" data-close="spNewModal">×</button></div>
+    <div class="form-grid">
+      <div class="field full"><label>Proveedor *</label><input id="spNewSupplier" list="spSupplierList" required autocomplete="off" placeholder="Ej. Herrero, José (lonas), Diego ID…" /><datalist id="spSupplierList"></datalist><small class="subtle">Si es nuevo, escribe el nombre y queda guardado en Proveedores.</small></div>
+      <div class="field full hidden" id="spNewSuppliesWrap"><label>¿Qué nos hace o vende?</label><input id="spNewSupplies" placeholder="Ej. Estructuras metálicas, lonas gran formato, tirajes offset…" /></div>
+      <div class="field full"><label>Nombre de la cuenta</label><input id="spNewLabel" placeholder="Ej. Cuenta 1, Octubre, Estructura Fresco…" /><small class="subtle">Si lo dejas vacío, el sistema la numera solo.</small></div>
+      <div class="field full"><label>Categoría en Finanzas</label><select id="spNewCategory"></select><small class="subtle">Así quedan clasificados los abonos en Finanzas.</small></div>
+      <div class="field full"><label>Saldo que ya le debemos (opcional)</label><input type="number" id="spNewOpening" min="0" step="any" inputmode="numeric" placeholder="0" /><small class="subtle">Si hoy ya le debes algo de antes, ponlo aquí y queda como «Saldo anterior».</small></div>
+      <div class="field full"><label>Notas</label><textarea id="spNewNotes" rows="2" placeholder="Opcional: condiciones, a quién se le paga…"></textarea></div>
+    </div>
+    <div class="modal-actions"><button type="button" class="btn secondary" data-close="spNewModal">Cancelar</button><button class="btn primary" type="submit">Crear cuenta</button></div>
+  </form></div>
+
+  <div class="modal-backdrop hidden" id="spModal"><div class="modal ca-modal">
+    <div class="modal-head"><div><h3 id="spTitle">Proveedor</h3><div class="subtle" id="spSubtitle"></div></div><button type="button" class="modal-close" data-close="spModal">×</button></div>
+    <div class="ca-summary"><div><span>Total que nos ha hecho</span><strong id="spTotal">$ 0</strong></div><div><span>Le hemos pagado</span><strong id="spPaid">$ 0</strong></div><div class="due"><span>Le debemos</span><strong id="spBalance">$ 0</strong></div></div>
+    <div class="ca-cols">
+      <section class="ca-box">
+        <div class="ca-box-head"><h4>🧾 Lo que nos ha hecho o vendido</h4></div>
+        <form class="ca-item-form" id="spItemForm" autocomplete="off">
+          <input type="hidden" id="spItemId" />
+          <label class="f-date">Fecha<input type="date" id="spItemDate" /></label>
+          <label class="f-qty">Cant.<input type="number" id="spItemQty" min="0" step="any" value="1" inputmode="decimal" /></label>
+          <label class="f-desc">Detalle *<input id="spItemDesc" list="spDescList" placeholder="Ej. Estructura 2x1 m, Lona 3x2…" /><datalist id="spDescList"></datalist></label>
+          <label class="f-price">Valor unitario<input type="number" id="spItemPrice" min="0" step="any" inputmode="numeric" placeholder="0" /></label>
+          <label class="f-place">Nota<input id="spItemNotes" placeholder="Opcional: para qué cliente, # factura…" /></label>
+          <div class="f-btns"><button class="btn primary" type="submit" id="spItemSave">+ Agregar</button><button class="btn secondary hidden" type="button" id="spItemCancel">Cancelar</button></div>
+          <div class="ca-hint hidden" id="spPriceHint"></div>
+        </form>
+        <div class="ca-items" id="spItems"></div>
+      </section>
+      <section class="ca-box">
+        <div class="ca-box-head"><h4>💸 Abonos y pagos</h4></div>
+        <form class="ca-pay-form" id="spPayForm" autocomplete="off">
+          <label>Fecha<input type="date" id="spPayDate" /></label>
+          <label>Valor *<input type="number" id="spPayAmount" min="0" step="any" inputmode="numeric" placeholder="0" /></label>
+          <div class="full sp-quickpay"><button type="button" class="mini" id="spPayAll">Pagar todo el saldo</button></div>
+          <label class="full">Tipo<select id="spPayKind"><option value="payment">💸 Pago (sale plata)</option><option value="discount">🎁 Descuento / rebaja</option></select></label>
+          <div class="full" id="spPayAccWrap"><span class="ca-mini-label">¿De qué cuenta sale?</span><div class="qs-chips" id="spPayAccounts"></div></div>
+          <label class="full">Referencia<input id="spPayRef" placeholder="Opcional: # transferencia, recibo…" /></label>
+          <label class="full">Comprobante<input type="file" id="spPaySupport" accept="image/*,application/pdf" /></label>
+          <button class="btn success full" type="submit">Registrar pago</button>
+        </form>
+        <div class="ca-pays" id="spPays"></div>
+      </section>
+    </div>
+    <div class="modal-actions ca-actions"><button type="button" class="btn secondary hidden" id="spDeleteAccount">🗑 Eliminar cuenta</button><span style="flex:1"></span><button type="button" class="btn secondary" id="spCloseAccount">✅ Marcar pagada</button></div>
+  </div></div>
 
   <div class="modal-backdrop hidden" id="caNewModal"><form class="modal" id="caNewForm" style="width:min(560px,100%)">
     <div class="modal-head"><div><h3>Abrir cuenta</h3><div class="subtle">Para clientes a los que les vamos entregando y pagan después.</div></div><button type="button" class="modal-close" data-close="caNewModal">×</button></div>
@@ -1623,7 +1696,7 @@
     document.addEventListener("tecni:cliente-creado",e=>{const c=e.detail;if(!c)return;[state.clients].forEach(list=>{if(Array.isArray(list)&&!list.some(x=>x.id===c.id))list.push(c)});try{if(typeof qs!=="undefined"&&Array.isArray(qs.clients)&&!qs.clients.some(x=>x.id===c.id))qs.clients.push(c)}catch(_){}try{if(typeof ca!=="undefined"&&Array.isArray(ca.clients)&&!ca.clients.some(x=>x.id===c.id))ca.clients.push(c)}catch(_){}});
     const $=id=>document.getElementById(id);
     const state={session:null,profile:null,permissions:new Map(),clients:[],clientLinks:[],clientAssociationDraft:[],quotes:[],quoteItems:[],remissions:[],remissionItems:[],remissionDraft:null,workOrders:[],workOrderItems:[],workOrderDraft:null,payments:[],paymentOrder:null,receiptBundle:null,financeMovements:[],financeAccounts:[],financeCategories:[],financeProviders:[],financeSupplierProducts:[],financeSupplierProductDraft:[],financePurchaseDraft:[],inventoryPurchaseHistory:[],quickSupplierTarget:null,financeClosings:[],financeLatestClosure:null,financeClosingDraft:null,financeMovementViewing:null,financeObligations:[],financeObligationPeriods:[],financeObligationPayments:[],financeVariableExpenses:[],payrollPeople:[],costings:[],costingLines:[],inventoryItems:[],inventoryVariants:[],inventoryMovements:[],inventoryUnits:[],inventoryPhotoData:null,inventoryUnitPhotoData:null,inventoryVariantParametersDraft:[],inventoryVariantDraft:[],inventoryOriginalStock:0,inventoryHistoryContext:null,inventoryUnitsContext:null,inventoryReportContext:null,business:{company_name:"Tecnigráficas",slogan:"Imprimimos la diferencia",phone:"312 252 62 44",whatsapp:"312 252 62 44",email:"contacto@sastecnigraficas.com",instagram:"@tecnigraficas.co",address:"Carrera 14 # 7A - 12, Barrio Valencia, Popayán, Cauca",nit:"901911453-0"},products:[],categories:[],productTiers:[],productTierDraft:[],productVariants:[],productVariantDraft:[],productHistory:[],profiles:new Map(),users:[],permissionRows:[],permissionTarget:null,productFamilyManual:false,categoryPrefixManual:false,productCodePreviewToken:0,catalogPhotoData:null,catalogGalleryDraft:[],resourcePhotos:[],resourcePhotoUrls:new Map(),resourcePhotoSelected:null,resourceLinks:[],resourceMacros:[],transferAccounts:[]};
-    const titles={dashboard:["Inicio","Resumen general de Tecnigráficas"],clients:["Clientes","Empresas y personas naturales"],quotes:["Cotizaciones","Historial central compartido"],remissions:["Remisiones","Registro de productos y entregas"],products:["Productos","Todo lo que vendemos: precios y página web"],costing:["Costeo rápido","Calculadora interna e histórico de costos"],catalog:["Catálogo público","Productos terminados para clientes"],calculators:["Herramientas","Calculadoras, costeo y programas de diseño"],inventory:["Inventario","Insumos y movimientos"],production:["Producción","En qué va cada pedido"],payments:["Cartera","Lo que nos deben los clientes y sus abonos"],finance:["Finanzas","Ingresos, egresos y saldos"],reports:["Reportes","Cómo va el negocio: ventas, clientes y productos"],users:["Usuarios y permisos","Accesos individuales del equipo"],resources:["Recursos internos","Fotos, enlaces, macros y cuentas útiles"],design:["Herramientas de diseño","Programas internos para preparación gráfica"]};
+    const titles={dashboard:["Inicio","Resumen general de Tecnigráficas"],clients:["Clientes","Empresas y personas naturales"],quotes:["Cotizaciones","Historial central compartido"],remissions:["Remisiones","Registro de productos y entregas"],products:["Productos","Todo lo que vendemos: precios y página web"],costing:["Costeo rápido","Calculadora interna e histórico de costos"],catalog:["Catálogo público","Productos terminados para clientes"],calculators:["Herramientas","Calculadoras, costeo y programas de diseño"],inventory:["Inventario","Insumos y movimientos"],production:["Producción","En qué va cada pedido"],payments:["Cartera","Lo que nos deben los clientes y sus abonos"],suppliers:["Proveedores","Lo que les debemos y lo que les vamos pagando"],finance:["Finanzas","Ingresos, egresos y saldos"],reports:["Reportes","Cómo va el negocio: ventas, clientes y productos"],users:["Usuarios y permisos","Accesos individuales del equipo"],resources:["Recursos internos","Fotos, enlaces, macros y cuentas útiles"],design:["Herramientas de diseño","Programas internos para preparación gráfica"]};
     const statusText={draft:"Borrador",sent:"Enviada",approved:"Aprobada",rejected:"Rechazada",expired:"Vencida",cancelled:"Cancelada"};
     const workOrderStatusText={pending_design:"🎨 Por diseñar",waiting_approval:"👀 Esperando al cliente",in_production:"🖨 Haciéndose",finishing:"✂ Haciéndose · en acabados",ready:"📦 Listo para entregar",delivered:"✅ Entregado",cancelled:"❌ Cancelado (el cliente desistió)"};
     const paymentStatusText={unpaid:"Sin pago",partial:"Abono parcial",paid:"Pagada"};
@@ -1651,7 +1724,7 @@
       if(view==="catalog")view="products";if(view==="design")view="calculators";
       if(view!=="resources"){resourcePhotoObserver?.disconnect();resourceTab="";}
       if(view==="cdc"){if(!hasPermission("quotes.view"))return showToast("No tienes permiso para abrir cuentas de cobro");window.location.href="cuentas-cobro.html";return;}
-      if(view==="finance"&&!canViewFinance()){showToast("No tienes permiso para abrir Finanzas");return}if(view==="costing"&&!hasPermission("quotes.create")){showToast("No tienes permiso para abrir Costeo rápido");return}
+      if((view==="finance"||view==="suppliers")&&!canViewFinance()){showToast("No tienes permiso para abrir Finanzas");return}if(view==="costing"&&!hasPermission("quotes.create")){showToast("No tienes permiso para abrir Costeo rápido");return}
       const required=viewPermissions[view];
       if(required&&!hasPermission(required)){showToast("No tienes permiso para abrir este módulo");return}
       document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
@@ -1659,7 +1732,9 @@
       document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("active",x.dataset.view===view||(view==="costing"&&x.dataset.view==="calculators")));
       const [t,s]=titles[view]||["Sistema",""];
       $("pageTitle").textContent=t;$("pageSubtitle").textContent=s;$("sidebar").classList.remove("open");
-      if(view==="clients")loadClients();if(view==="quotes")loadQuotes();if(view==="remissions")loadRemissions();if(view==="products")loadProducts();if(view==="inventory")loadInventory();if(view==="production")loadProduction();if(view==="payments"){loadPayments();loadCartera()}if(view==="finance")loadFinance();if(view==="costing")loadCostings();if(view==="resources")loadResources();if(view==="users")loadUsers();if(view==="reports")loadReports();
+      // V9.29: si abriste este módulo hace menos de 20 s, no lo vuelvas a descargar (los cambios propios sí recargan)
+      const navNow=Date.now(),navPrev=(navigate.last||(navigate.last={}))[view];navigate.last[view]=navNow;if(navPrev&&navNow-navPrev<20000)return;
+      if(view==="clients")loadClients();if(view==="quotes")loadQuotes();if(view==="remissions")loadRemissions();if(view==="products")loadProducts();if(view==="inventory")loadInventory();if(view==="production")loadProduction();if(view==="payments"){loadPayments();loadCartera()}if(view==="finance")loadFinance();if(view==="suppliers")loadSuppliersPay();if(view==="costing")loadCostings();if(view==="resources")loadResources();if(view==="users")loadUsers();if(view==="reports")loadReports();
     }
 
     async function login(e){e.preventDefault();$("loginError").classList.add("hidden");$("loginButton").disabled=true;const {error}=await db.auth.signInWithPassword({email:$("loginEmail").value.trim(),password:$("loginPassword").value});$("loginButton").disabled=false;if(error){$("loginError").textContent=error.message==="Invalid login credentials"?"Correo o contraseña incorrectos.":error.message;$("loginError").classList.remove("hidden")}}
@@ -1673,7 +1748,7 @@
     function applyPermissionUI(){
       document.querySelectorAll("#nav button[data-view]").forEach(btn=>{const required=viewPermissions[btn.dataset.view];btn.classList.toggle("hidden",Boolean(required&&!hasPermission(required)))});
       $("addRemissionButton").classList.toggle("hidden",!hasPermission("quotes.create"));
-      $("financeNav").classList.toggle("hidden",!canViewFinance());document.querySelector('#nav button[data-view="costing"]')?.classList.toggle("hidden",!hasPermission("quotes.create"));
+      $("financeNav").classList.toggle("hidden",!canViewFinance());$("suppliersNav")?.classList.toggle("hidden",!canViewFinance());document.querySelector('#nav button[data-view="costing"]')?.classList.toggle("hidden",!hasPermission("quotes.create"));
       $("topNewQuote").classList.toggle("hidden",!hasPermission("quotes.create"));
       $("addQuoteButton").classList.toggle("hidden",!hasPermission("quotes.create"));
       $("addClientButton").classList.toggle("hidden",!hasPermission("clients.create"));
@@ -1686,7 +1761,7 @@
     }
 
     async function enterApp(session){state.session=session;loading(true,"Preparando el sistema…");try{await loadProfile();await loadMyPermissions();applyPermissionUI();$("loginScreen").classList.add("hidden");$("appShell").classList.remove("hidden");const requested=location.hash.replace(/^#/,"");navigate(titles[requested]&&(requested==="finance"?canViewFinance():(!viewPermissions[requested]||hasPermission(viewPermissions[requested])))?requested:firstAvailableView());const loaders=[loadBusinessSettings()];if(hasPermission("dashboard.view"))loaders.push(loadDashboard());if(hasPermission("products.view"))loaders.push(loadCategories());await Promise.all(loaders);loadLogoDataURL().catch(()=>null)}catch(err){console.error(err);$("loginError").textContent=err.message||"No fue posible cargar el perfil";$("loginError").classList.remove("hidden");showToast("No fue posible cargar el perfil")}finally{loading(false)}}
-    function leaveApp(){state.session=null;state.profile=null;state.permissions=new Map();$("appShell").classList.add("hidden");$("loginScreen").classList.remove("hidden")}
+    function leaveApp(){navigate.last={};state.session=null;state.profile=null;state.permissions=new Map();$("appShell").classList.add("hidden");$("loginScreen").classList.remove("hidden")}
 
     function localISO(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
     async function loadDashboard(){
@@ -2066,7 +2141,7 @@
     function inventoryUnitSummary(units){const active=(units||[]).filter(u=>u.active),parts=[];const counts=new Map();active.forEach(u=>counts.set(u.status,(counts.get(u.status)||0)+1));for(const [status,count] of counts)parts.push(`${count} ${String(inventoryUnitStatusText[status]||status).toLowerCase()}`);const partial=active.filter(u=>u.remaining_percent!==null&&u.remaining_percent!==undefined&&Number(u.remaining_percent)<100&&Number(u.remaining_percent)>0);if(partial.length===1)parts.push(`${partial[0].unit_code} al ${formatInventoryQuantity(partial[0].remaining_percent)} %`);return parts.join(" · ")||"Sin detalle por unidad"}
     function inventoryStockState(item){if(!item.active)return "inactive";const stock=Number(item.current_stock)||0,min=Number(item.minimum_stock)||0;if(stock<=0)return "out";if(item.has_variants){const variants=inventoryVariantsForItem(item.id,true);if(variants.some(v=>Number(v.current_stock)<=0||(Number(v.minimum_stock)>0&&Number(v.current_stock)<=Number(v.minimum_stock))))return "low"}if(min>0&&stock<=min)return "low";return "ok"}
     function inventoryStockLabel(item){const status=inventoryStockState(item);return status==="out"?"Agotado":status==="low"?(item.has_variants?"Variantes en alerta":"En mínimo"):status==="inactive"?"Inactivo":"Disponible"}
-    function inventoryItemPhoto(item){const variantPhoto=inventoryVariantsForItem(item.id,true).find(v=>v.photo_data)?.photo_data;const photo=item.photo_data||variantPhoto;return photo?`<img class="inventory-thumb" src="${escapeHTML(photo)}" alt="${escapeHTML(item.name)}" />`:'<div class="inventory-thumb placeholder">▣</div>'}
+    function inventoryItemPhoto(item){const variantPhoto=inventoryVariantsForItem(item.id,true).find(v=>v.photo_data)?.photo_data;const photo=item.photo_data||variantPhoto;return photo?`<img loading="lazy" decoding="async" class="inventory-thumb" src="${escapeHTML(photo)}" alt="${escapeHTML(item.name)}" />`:'<div class="inventory-thumb placeholder">▣</div>'}
     function inventoryItemValue(item){const variants=inventoryVariantsForItem(item.id);return item.has_variants?variants.reduce((sum,v)=>sum+Number(v.current_stock||0)*Number(v.unit_cost||0),0):Number(item.current_stock||0)*Number(item.unit_cost||0)}
     function inventoryCategories(){return [...new Set(state.inventoryItems.map(i=>String(i.category||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"))}
     function updateInventoryCategoryOptions(){const categories=inventoryCategories();$("inventoryCategoryFilter").innerHTML='<option value="">Todas las categorías</option>'+categories.map(c=>`<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join("");$("inventoryCategoryOptions").innerHTML=categories.map(c=>`<option value="${escapeHTML(c)}"></option>`).join("")}
@@ -2074,7 +2149,7 @@
     function uniqueVariantOptions(text){const seen=new Set();return String(text||"").split(/[,;\n]+/).map(x=>x.trim()).filter(x=>{const key=x.toLowerCase();if(!x||seen.has(key))return false;seen.add(key);return true})}
     function variantLabel(attributes,parameters=state.inventoryVariantParametersDraft){return parameters.map(p=>attributes[p.name]).filter(Boolean).join(" · ")||Object.values(attributes||{}).join(" · ")}
     function variantAttributesText(attributes){return Object.entries(attributes||{}).map(([k,v])=>`${k}: ${v}`).join(" · ")}
-    function variantPhotoHTML(v,cls="variant-photo"){return v.photo_data?`<img class="${cls}" src="${escapeHTML(v.photo_data)}" alt="${escapeHTML(v.label)}" />`:`<div class="variant-photo-placeholder">▣</div>`}
+    function variantPhotoHTML(v,cls="variant-photo"){return v.photo_data?`<img loading="lazy" decoding="async" class="${cls}" src="${escapeHTML(v.photo_data)}" alt="${escapeHTML(v.label)}" />`:`<div class="variant-photo-placeholder">▣</div>`}
 
     async function ensurePurchaseSupportData(){
       const [sup,acc,cat]=await Promise.all([
@@ -2104,7 +2179,7 @@
     }
     async function renderInventoryPurchases(){
       const q=$("inventoryPurchaseSearch").value.trim().toLowerCase(),rows=state.inventoryPurchaseHistory.filter(x=>!q||[x.description,x.unit,x.finance_movements?.concept,x.finance_movements?.finance_suppliers?.name,x.finance_movements?.document_number].join(" ").toLowerCase().includes(q)),cards=[];
-      for(const r of rows){const photo=await signedPurchasePhoto(r);cards.push(`<div class="purchase-history-grid"><div>${photo?`<img src="${photo}" alt="">`:'<div style="width:54px;height:54px;border-radius:8px;background:#f2f4f7;display:grid;place-items:center">▣</div>'}</div><div><strong>${escapeHTML(r.description)}</strong><small>${formatDate(r.finance_movements?.movement_date)} · ${escapeHTML(r.finance_movements?.document_number||"Sin referencia")}</small></div><div><strong>${escapeHTML(r.finance_movements?.finance_suppliers?.name||"Sin proveedor")}</strong><small>${escapeHTML(r.finance_movements?.concept||"")}</small></div><div>${formatInventoryQuantity(r.quantity)} ${escapeHTML(r.unit||"")}</div><div class="money">${formatCOP(r.unit_price)}</div><div class="money"><strong>${formatCOP(r.line_total)}</strong></div><div><span class="purchase-history-stock ${r.affects_stock?"yes":""}">${r.affects_stock?"Sumó inventario":"Solo historial"}</span></div><div>${r.inventory_item_id?`<button class="mini" onclick="window.openInventoryHistory('${r.inventory_item_id}')">Inventario</button>`:""}</div></div>`)}
+      for(const r of rows){const photo=await signedPurchasePhoto(r);cards.push(`<div class="purchase-history-grid"><div>${photo?`<img loading="lazy" decoding="async" src="${photo}" alt="">`:'<div style="width:54px;height:54px;border-radius:8px;background:#f2f4f7;display:grid;place-items:center">▣</div>'}</div><div><strong>${escapeHTML(r.description)}</strong><small>${formatDate(r.finance_movements?.movement_date)} · ${escapeHTML(r.finance_movements?.document_number||"Sin referencia")}</small></div><div><strong>${escapeHTML(r.finance_movements?.finance_suppliers?.name||"Sin proveedor")}</strong><small>${escapeHTML(r.finance_movements?.concept||"")}</small></div><div>${formatInventoryQuantity(r.quantity)} ${escapeHTML(r.unit||"")}</div><div class="money">${formatCOP(r.unit_price)}</div><div class="money"><strong>${formatCOP(r.line_total)}</strong></div><div><span class="purchase-history-stock ${r.affects_stock?"yes":""}">${r.affects_stock?"Sumó inventario":"Solo historial"}</span></div><div>${r.inventory_item_id?`<button class="mini" onclick="window.openInventoryHistory('${r.inventory_item_id}')">Inventario</button>`:""}</div></div>`)}
       $("inventoryPurchaseHistory").innerHTML=cards.join("")||'<div class="empty">Todavía no hay compras de insumos registradas.</div>'
     }
     async function openInventoryPurchases(){openModal("inventoryPurchasesModal");$("inventoryPurchaseSearch").value="";await loadInventoryPurchases()}
@@ -2625,6 +2700,139 @@
     }
     try{wireCartera()}catch(e){console.error("Cartera",e)}
 
+    // V9.29: Proveedores · cuentas por pagar (lo opuesto a la cartera)
+    const sp={rows:[],suppliers:[],categories:[],accounts:null,balances:[],current:null,items:[],pays:[],history:new Map(),payAcc:null,missing:false};
+    const spKindText={payment:"Pago",discount:"Descuento"};
+    async function loadSuppliersPay(){
+      if(!canViewFinance())return;const monthStart=todayISO().slice(0,8)+"01";
+      const [bal,pays,money]=await Promise.all([db.from("supplier_account_balances").select("*"),db.from("supplier_account_payments").select("amount,kind,payment_date").gte("payment_date",monthStart),db.rpc("finance_account_balances")]);
+      if(bal.error){sp.missing=true;$("spGrid").innerHTML='<div class="pgrid-empty">No pude cargar las cuentas de proveedores: '+escapeHTML(bal.error.message)+'</div>';return}
+      sp.missing=false;sp.rows=bal.data||[];sp.balances=money.error?[]:(money.data||[]);
+      const open=sp.rows.filter(r=>r.status==="open"),due=open.filter(r=>numberValue(r.balance)>.01),owed=due.reduce((a,r)=>a+numberValue(r.balance),0),have=sp.balances.reduce((a,b)=>a+numberValue(b.balance),0);
+      $("spStatDue").textContent=formatCOP(owed);$("spStatDueNote").textContent=due.length?`${due.length} cuenta${due.length===1?"":"s"} por pagar`:"No le debemos a nadie 🎉";
+      $("spStatHave").textContent=money.error?"—":formatCOP(have);$("spStatAfter").textContent=money.error?"—":formatCOP(have-owed);$("spStatAfter").style.color=have-owed<0?"#b12f42":"";
+      $("spStatMonth").textContent=formatCOP((pays.data||[]).filter(p=>p.kind==="payment").reduce((a,p)=>a+numberValue(p.amount),0));
+      $("spMoney").innerHTML=sp.balances.map(b=>`<div class="${numberValue(b.balance)<0?"neg":""}"><span>${escapeHTML(b.account_name)}</span><strong>${formatCOP(b.balance)}</strong><small>${b.confirmed?"Desde el último cierre":"Saldo inicial + movimientos"}</small></div>`).join("");
+      renderSuppliersPay();
+    }
+    function renderSuppliersPay(){
+      if(sp.missing)return;const term=caKey($("spSearch").value),f=$("spFilter").value;
+      const rows=sp.rows.filter(r=>(!term||caKey(r.supplier_name+" "+r.label+" "+(r.supplies||"")).includes(term))&&(f==="all"||(f==="closed"?r.status==="closed":r.status==="open"&&(f==="open"||numberValue(r.balance)>.01))))
+        .sort((a,b)=>(a.status===b.status?0:a.status==="open"?-1:1)||numberValue(b.balance)-numberValue(a.balance)||String(a.supplier_name).localeCompare(String(b.supplier_name),"es"));
+      $("spGrid").innerHTML=rows.length?rows.map(r=>{
+        const bal=numberValue(r.balance),closed=r.status==="closed",zero=!closed&&bal<=.01,last=[r.last_item_date,r.last_payment_date].filter(Boolean).sort().pop();
+        return `<button type="button" class="ca-card sp${closed?" closed":zero?" zero":""}" data-sp="${r.supplier_account_id}"><div class="ca-top"><span class="ca-name">${escapeHTML(r.supplier_name)}</span><span class="ca-label">${escapeHTML(r.label)}${closed?" · pagada":""}</span></div>${r.supplies?`<span class="sp-supplies">${escapeHTML(r.supplies)}</span>`:""}<span class="ca-due">${closed?"Pagada "+caDate(r.closed_on):zero?"Al día ✓":formatCOP(bal)}</span><small>Nos ha hecho ${formatCOP(r.total)} · Pagado ${formatCOP(r.paid)}</small><small>${last?"Último movimiento: "+caDate(last):"Sin movimientos todavía"}</small></button>`
+      }).join(""):`<div class="pgrid-empty">${f==="due"?"No le debemos nada a ningún proveedor 🎉 Toca <strong>+ Nueva cuenta</strong> para anotar una.":"No hay cuentas con ese filtro."}</div>`;
+    }
+    async function spLoadRefs(force){
+      if(sp.suppliers.length&&sp.categories.length&&!force)return;
+      const [s,c]=await Promise.all([db.from("finance_suppliers").select("id,name,supplies,phone,active").order("name"),db.from("finance_categories").select("id,name,movement_type,active").eq("active",true).neq("movement_type","income").order("name")]);
+      sp.suppliers=s.data||[];sp.categories=(c.data||[]).filter(x=>x.movement_type!=="both");
+    }
+    function spFindSupplier(name){return sp.suppliers.find(x=>caKey(x.name)===caKey(name))}
+    function spNextLabel(supplierId,base){const mine=sp.rows.filter(r=>r.supplier_id===supplierId);if(base){const m=String(base).match(/^(.*?)(\d+)\s*$/);if(m)return m[1]+(Number(m[2])+1)}return `Cuenta ${mine.length+1}`}
+    function spSupplierChanged(){const s=spFindSupplier($("spNewSupplier").value);$("spNewSuppliesWrap").classList.toggle("hidden",!!s||!$("spNewSupplier").value.trim());if(s&&!$("spNewLabel").value.trim())$("spNewLabel").value=spNextLabel(s.id)}
+    async function spOpenNew(){
+      if(!canViewFinance())return;loading(true,"Cargando proveedores…");try{await spLoadRefs()}finally{loading(false)}
+      $("spSupplierList").innerHTML=sp.suppliers.filter(x=>x.active!==false).map(x=>`<option value="${escapeHTML(x.name)}">${escapeHTML(x.supplies||"")}</option>`).join("");
+      const def=sp.categories.find(c=>/tercerizada/i.test(c.name))||sp.categories[0];
+      $("spNewCategory").innerHTML=sp.categories.map(c=>`<option value="${c.id}"${def&&c.id===def.id?" selected":""}>${escapeHTML(c.name)}</option>`).join("");
+      $("spNewForm").reset();if(def)$("spNewCategory").value=def.id;$("spNewSuppliesWrap").classList.add("hidden");openModal("spNewModal");setTimeout(()=>$("spNewSupplier").focus(),60);
+    }
+    async function spSaveNew(e){
+      e.preventDefault();const name=$("spNewSupplier").value.trim();if(!name)return alert("Escribe el nombre del proveedor.");
+      const opening=numberValue($("spNewOpening").value);if(opening<0)return alert("El saldo no puede ser negativo.");
+      loading(true,"Creando cuenta…");
+      try{
+        let s=spFindSupplier(name);
+        if(!s){const r=await db.from("finance_suppliers").insert({name,supplies:$("spNewSupplies").value.trim()||null,active:true}).select("id,name,supplies,phone,active").single();if(r.error)throw r.error;s=r.data;sp.suppliers.push(s)}
+        const label=$("spNewLabel").value.trim()||spNextLabel(s.id);
+        const {data,error}=await db.from("supplier_accounts").insert({supplier_id:s.id,label,default_category_id:$("spNewCategory").value||null,notes:$("spNewNotes").value.trim()||null}).select("id").single();if(error)throw error;
+        if(opening>0){const r=await db.from("supplier_account_items").insert({account_id:data.id,description:"Saldo anterior",quantity:1,unit_price:opening,item_date:todayISO()});if(r.error)throw r.error}
+        closeModal("spNewModal");showToast(`✓ Cuenta con ${s.name} creada`);await loadSuppliersPay();await spOpen(data.id)
+      }catch(err){alert(err.message)}finally{loading(false)}
+    }
+    async function spOpen(id){
+      loading(true,"Abriendo cuenta…");
+      try{
+        const [acc,items,pays]=await Promise.all([db.from("supplier_accounts").select("*,finance_suppliers(name,supplies,phone)").eq("id",id).single(),db.from("supplier_account_items").select("*").eq("account_id",id),db.from("supplier_account_payments").select("*,finance_accounts(name)").eq("account_id",id).order("payment_date").order("created_at")]);
+        if(acc.error)throw acc.error;sp.current=acc.data;sp.items=(items.data||[]).sort((a,b)=>String(a.item_date||"").localeCompare(String(b.item_date||""))||numberValue(a.sort_order)-numberValue(b.sort_order)||String(a.created_at).localeCompare(String(b.created_at)));sp.pays=pays.data||[];
+        if(!sp.accounts){const r=await db.rpc("finance_payment_accounts");sp.accounts=r.error?[]:(r.data||[])}
+        await spLoadHistory();
+      }catch(err){loading(false);return alert(err.message)}
+      loading(false);spResetItemForm();spResetPayForm();spRender();if($("spModal").classList.contains("hidden"))openModal("spModal");
+    }
+    async function spLoadHistory(){
+      const accs=sp.rows.filter(r=>r.supplier_id===sp.current.supplier_id),ids=accs.map(x=>x.supplier_account_id),labels=new Map(accs.map(x=>[x.supplier_account_id,x.label]));
+      sp.history=new Map();if(!ids.length){$("spDescList").innerHTML="";return}
+      const r=await db.from("supplier_account_items").select("description,unit_price,item_date,created_at,account_id").in("account_id",ids);
+      (r.data||[]).filter(i=>i.description!=="Saldo anterior").forEach(i=>{const k=caKey(i.description),d=i.item_date||String(i.created_at).slice(0,10),prev=sp.history.get(k);if(!prev||d>=prev.date)sp.history.set(k,{description:i.description,price:numberValue(i.unit_price),date:d,label:labels.get(i.account_id)});});
+      $("spDescList").innerHTML=[...sp.history.values()].map(h=>`<option value="${escapeHTML(h.description)}">Última vez: ${formatCOP(h.price)}</option>`).join("");
+    }
+    function spTotals(){const total=sp.items.reduce((s,i)=>s+numberValue(i.quantity)*numberValue(i.unit_price),0),paid=sp.pays.reduce((s,p)=>s+numberValue(p.amount),0);return {total,paid,balance:total-paid}}
+    function spRender(){
+      const a=sp.current,t=spTotals(),closed=a.status==="closed",sup=a.finance_suppliers||{};
+      $("spTitle").textContent=`${sup.name||"Proveedor"} · ${a.label}`;
+      $("spSubtitle").textContent=[closed?"Pagada el "+caDate(a.closed_on):"Abierta desde "+caDate(a.opened_on),sup.supplies,sup.phone?"📞 "+sup.phone:"",a.notes].filter(Boolean).join(" · ");
+      $("spTotal").textContent=formatCOP(t.total);$("spPaid").textContent=formatCOP(t.paid);$("spBalance").textContent=t.balance<=.01?"Al día ✓":formatCOP(t.balance);
+      $("spCloseAccount").textContent=closed?"↩ Reabrir cuenta":"✅ Marcar pagada";
+      $("spDeleteAccount").classList.toggle("hidden",sp.items.length>0||sp.pays.length>0);
+      [$("spItemForm"),$("spPayForm")].forEach(f=>f.classList.toggle("hidden",closed));
+      $("spItems").innerHTML=sp.items.length?`<div class="ca-row head"><span>Fecha</span><span class="num">Cant.</span><span>Detalle</span><span class="num">V. unit.</span><span class="num">Total</span></div>`+sp.items.map(i=>`<div class="ca-row"><span class="c-date">${i.item_date?caDate(i.item_date):"—"}</span><span class="c-qty num">${formatInventoryQuantity(i.quantity)}</span><span class="c-desc"><strong>${escapeHTML(i.description)}</strong>${i.notes?`<span class="place">📝 ${escapeHTML(i.notes)}</span>`:""}<span class="place mob-only">${formatInventoryQuantity(i.quantity)} × ${formatCOP(i.unit_price)}</span>${closed?"":`<span class="acts"><button type="button" class="ca-ic" data-sp-edit="${i.id}" title="Editar">✎</button><button type="button" class="ca-ic" data-sp-del="${i.id}" title="Borrar">🗑</button></span>`}</span><span class="c-unit num">${formatCOP(i.unit_price)}</span><span class="c-tot num tot">${formatCOP(numberValue(i.quantity)*numberValue(i.unit_price))}</span></div>`).join(""):'<div class="empty">Todavía no hay nada anotado. Agrega arriba lo que nos hizo o vendió ☝️</div>';
+      $("spPays").innerHTML=sp.pays.length?sp.pays.map(p=>`<div class="ca-pay"><div><strong>${formatCOP(p.amount)}</strong> · ${escapeHTML(spKindText[p.kind]||p.kind)}<small>${caDate(p.payment_date)}${p.finance_accounts?.name?" · "+escapeHTML(p.finance_accounts.name):""}${p.reference?" · "+escapeHTML(p.reference):""}</small></div><span style="display:flex;gap:4px">${p.support_path?`<button type="button" class="ca-ic" data-sp-support="${escapeHTML(p.support_path)}" title="Ver comprobante">📎</button>`:""}<button type="button" class="ca-ic" data-sp-paydel="${p.id}" title="Anular pago">🗑</button></span></div>`).join(""):'<div class="empty">Sin pagos todavía.</div>';
+      spPayKindSync();
+    }
+    function spResetItemForm(){$("spItemForm").reset();$("spItemId").value="";$("spItemDate").value=todayISO();$("spItemQty").value=1;$("spItemSave").textContent="+ Agregar";$("spItemCancel").classList.add("hidden");$("spPriceHint").classList.add("hidden")}
+    function spPriceHint(){const h=sp.history.get(caKey($("spItemDesc").value)),box=$("spPriceHint");if(!h){box.classList.add("hidden");return}box.innerHTML=`💡 La última vez nos cobró <strong>${formatCOP(h.price)}</strong> (${caDate(h.date)}${h.label?" · "+escapeHTML(h.label):""}). <button type="button" class="mini" id="spUseLast">Usar ese precio</button>`;box.dataset.price=h.price;box.classList.remove("hidden")}
+    async function spSaveItem(e){
+      e.preventDefault();const id=$("spItemId").value,desc=$("spItemDesc").value.trim(),qty=numberValue($("spItemQty").value),price=numberValue($("spItemPrice").value);
+      if(!desc)return alert("Escribe qué nos hizo o vendió.");if(!(qty>0))return alert("La cantidad debe ser mayor que cero.");if(!(price>=0))return alert("El valor no puede ser negativo.");
+      const payload={item_date:$("spItemDate").value||todayISO(),quantity:qty,description:desc,unit_price:price,notes:$("spItemNotes").value.trim()||null};
+      loading(true,"Guardando…");try{const r=id?await db.from("supplier_account_items").update(payload).eq("id",id):await db.from("supplier_account_items").insert({...payload,account_id:sp.current.id,sort_order:sp.items.length*10});if(r.error)throw r.error;showToast(id?"✓ Cambio guardado":"✓ Anotado");await loadSuppliersPay();await spOpen(sp.current.id);setTimeout(()=>$("spItemDesc")?.focus(),50)}catch(err){alert(err.message)}finally{loading(false)}
+    }
+    function spEditItem(id){const i=sp.items.find(x=>x.id===id);if(!i)return;$("spItemId").value=i.id;$("spItemDate").value=i.item_date||"";$("spItemQty").value=numberValue(i.quantity);$("spItemDesc").value=i.description;$("spItemPrice").value=numberValue(i.unit_price);$("spItemNotes").value=i.notes||"";$("spItemSave").textContent="Guardar cambio";$("spItemCancel").classList.remove("hidden");$("spPriceHint").classList.add("hidden");$("spItemForm").scrollIntoView({behavior:"smooth",block:"center"});$("spItemDesc").focus()}
+    async function spDeleteItem(id){const i=sp.items.find(x=>x.id===id);if(!i||!confirm(`¿Borrar “${i.description}” de la cuenta?`))return;loading(true,"Borrando…");try{const {error}=await db.from("supplier_account_items").delete().eq("id",id);if(error)throw error;showToast("Borrado");await loadSuppliersPay();await spOpen(sp.current.id)}catch(err){alert(err.message)}finally{loading(false)}}
+    function spResetPayForm(){$("spPayForm").reset();$("spPayDate").value=todayISO();$("spPayKind").value="payment";const accs=sp.accounts||[];if(!accs.some(a=>a.id===sp.payAcc))sp.payAcc=(accs.find(a=>/efectivo|caja/i.test(a.name))||accs[0]||{}).id||null;$("spPayAccounts").innerHTML=accs.map(a=>{const b=sp.balances.find(x=>x.account_id===a.id);return `<button type="button" class="qs-chip" data-sp-acc="${a.id}">${escapeHTML(a.name)}${b?` <small>${formatCOP(b.balance)}</small>`:""}</button>`}).join("")||'<span class="subtle">No hay cuentas activas en Finanzas.</span>';spPayKindSync()}
+    function spPayKindSync(){const pay=$("spPayKind").value==="payment";$("spPayAccWrap").classList.toggle("hidden",!pay);$("spPayAccounts").querySelectorAll("[data-sp-acc]").forEach(b=>b.classList.toggle("on",b.dataset.spAcc===sp.payAcc))}
+    async function spSavePay(e){
+      e.preventDefault();const amount=numberValue($("spPayAmount").value),kind=$("spPayKind").value,t=spTotals();
+      if(!(amount>0))return alert("Escribe el valor del pago.");if(kind==="payment"&&!sp.payAcc)return alert("Elige de qué cuenta sale la plata.");
+      if(amount>t.balance+.5)return alert(`El pago (${formatCOP(amount)}) es mayor que lo que le debemos (${formatCOP(Math.max(t.balance,0))}). Primero anota lo que nos hizo.`);
+      const acc=(sp.accounts||[]).find(a=>a.id===sp.payAcc),bal=sp.balances.find(b=>b.account_id===sp.payAcc);
+      if(kind==="payment"&&bal&&amount>numberValue(bal.balance)+.5&&!confirm(`En ${acc?.name||"esa cuenta"} hay ${formatCOP(bal.balance)} y vas a pagar ${formatCOP(amount)}. ¿Registrarlo igual?`))return;
+      loading(true,"Registrando pago…");
+      try{let path=null;const f=$("spPaySupport").files?.[0];if(f)path=await uploadSupport(f,"proveedores");
+        const {error}=await db.rpc("supplier_register_payment",{p_account_id:sp.current.id,p_amount:amount,p_finance_account_id:kind==="payment"?sp.payAcc:null,p_payment_date:$("spPayDate").value||todayISO(),p_kind:kind,p_reference:$("spPayRef").value.trim()||null,p_notes:null,p_support_path:path});if(error)throw error;
+        const done=amount>=t.balance-.5;showToast(done?"🎉 ¡Cuenta pagada completa! (quedó en Finanzas)":kind==="payment"?"✓ Pago registrado (también quedó en Finanzas)":"✓ Descuento registrado");
+        await loadSuppliersPay();await spOpen(sp.current.id);
+      }catch(err){alert(err.message)}finally{loading(false)}
+    }
+    async function spDeletePay(id){const p=sp.pays.find(x=>x.id===id);if(!p||!confirm(`¿Anular el pago de ${formatCOP(p.amount)} del ${caDate(p.payment_date)}?${p.kind==="payment"?" También se anulará el egreso en Finanzas.":""}`))return;loading(true,"Anulando…");try{const {error}=await db.rpc("supplier_void_payment",{p_payment_id:id});if(error)throw error;showToast("Pago anulado");await loadSuppliersPay();await spOpen(sp.current.id)}catch(err){alert(err.message)}finally{loading(false)}}
+    async function spToggleClose(){
+      const a=sp.current,t=spTotals();
+      if(a.status==="closed"){if(!confirm("¿Reabrir esta cuenta para seguir anotando?"))return}
+      else if(!confirm(t.balance>.01?`Todavía le debemos ${formatCOP(t.balance)}. ¿Marcarla como pagada de todas formas?`:`¿Marcar la cuenta ${a.label} como pagada? Queda en el historial.`))return;
+      const closing=a.status!=="closed";const {error}=await db.from("supplier_accounts").update({status:closing?"closed":"open",closed_on:closing?todayISO():null,updated_at:new Date().toISOString()}).eq("id",a.id);if(error)return alert(error.message);
+      showToast(closing?"✓ Cuenta marcada como pagada":"Cuenta reabierta");await loadSuppliersPay();if(closing)closeModal("spModal");else await spOpen(a.id);
+    }
+    async function spDeleteAccount(){if(!confirm("¿Eliminar esta cuenta vacía?"))return;const {error}=await db.from("supplier_accounts").delete().eq("id",sp.current.id);if(error)return alert(error.message);closeModal("spModal");showToast("Cuenta eliminada");loadSuppliersPay()}
+    function wireSuppliersPay(){
+      $("spSearch").addEventListener("input",renderSuppliersPay);$("spFilter").addEventListener("change",renderSuppliersPay);
+      $("spGrid").addEventListener("click",e=>{const c=e.target.closest("[data-sp]");if(c)spOpen(c.dataset.sp)});
+      $("spNewButton").addEventListener("click",spOpenNew);$("spNewForm").addEventListener("submit",spSaveNew);
+      $("spNewSupplier").addEventListener("input",spSupplierChanged);$("spNewSupplier").addEventListener("change",spSupplierChanged);
+      $("spItemForm").addEventListener("submit",spSaveItem);$("spItemCancel").addEventListener("click",spResetItemForm);
+      $("spItemDesc").addEventListener("change",spPriceHint);$("spItemDesc").addEventListener("input",spPriceHint);
+      $("spPriceHint").addEventListener("click",e=>{if(e.target.id==="spUseLast")$("spItemPrice").value=$("spPriceHint").dataset.price});
+      $("spItems").addEventListener("click",e=>{const ed=e.target.closest("[data-sp-edit]"),del=e.target.closest("[data-sp-del]");if(ed)spEditItem(ed.dataset.spEdit);if(del)spDeleteItem(del.dataset.spDel)});
+      $("spPayForm").addEventListener("submit",spSavePay);$("spPayKind").addEventListener("change",spPayKindSync);
+      $("spPayAll").addEventListener("click",()=>{$("spPayAmount").value=Math.max(0,Math.round(spTotals().balance));$("spPayAmount").focus()});
+      $("spPayAccounts").addEventListener("click",e=>{const b=e.target.closest("[data-sp-acc]");if(b){sp.payAcc=b.dataset.spAcc;spPayKindSync()}});
+      $("spPays").addEventListener("click",e=>{const d=e.target.closest("[data-sp-paydel]"),s=e.target.closest("[data-sp-support]");if(d)spDeletePay(d.dataset.spPaydel);if(s)openSupport(s.dataset.spSupport)});
+      $("spCloseAccount").addEventListener("click",spToggleClose);$("spDeleteAccount").addEventListener("click",spDeleteAccount);
+    }
+    try{wireSuppliersPay()}catch(e){console.error("Proveedores",e)}
+
     // V9.21: Reportes
     const rep={period:"month",data:null};
     function repRange(p){const n=new Date(),y=n.getFullYear(),m=n.getMonth(),iso=d=>localISO(d);if(p==="last")return [iso(new Date(y,m-1,1)),iso(new Date(y,m,0)),"el mes pasado"];if(p==="3m")return [iso(new Date(y,m-2,1)),iso(n),"los últimos 3 meses"];if(p==="year")return [iso(new Date(y,0,1)),iso(n),"este año"];return [iso(new Date(y,m,1)),iso(n),"este mes"]}
@@ -2700,7 +2908,7 @@
       if(!item){box.innerHTML='<span class="mv-pick">👆 Escoge el insumo</span>';return}
       const cur=item.has_variants?(variant?Number(variant.current_stock)||0:null):Number(item.current_stock)||0,photo=variant?.photo_data||item.photo_data;
       const after=cur===null?null:dir==="in"?cur+q:cur-q;
-      box.innerHTML=`${photo?`<img src="${escapeHTML(photo)}" alt=""/>`:'<div class="mv-ph">📦</div>'}<div class="mv-txt"><strong>${escapeHTML(item.name)}${variant?` · ${escapeHTML(variant.label)}`:""}</strong><span>${cur===null?"Escoge el color / talla exacto":`Hay <b>${formatInventoryQuantity(cur)}</b> ${escapeHTML(item.unit)}`}</span></div>${after===null||!q?"":`<div class="mv-after ${dir}${after<0?" neg":""}"><small>Quedará en</small><b>${formatInventoryQuantity(after)}</b><small>${escapeHTML(item.unit)}</small></div>`}`;
+      box.innerHTML=`${photo?`<img loading="lazy" decoding="async" src="${escapeHTML(photo)}" alt=""/>`:'<div class="mv-ph">📦</div>'}<div class="mv-txt"><strong>${escapeHTML(item.name)}${variant?` · ${escapeHTML(variant.label)}`:""}</strong><span>${cur===null?"Escoge el color / talla exacto":`Hay <b>${formatInventoryQuantity(cur)}</b> ${escapeHTML(item.unit)}`}</span></div>${after===null||!q?"":`<div class="mv-after ${dir}${after<0?" neg":""}"><small>Quedará en</small><b>${formatInventoryQuantity(after)}</b><small>${escapeHTML(item.unit)}</small></div>`}`;
     }
     function mvSetType(type){$("inventoryMovementType").value=type;const r=[...MV_REASONS.in,...MV_REASONS.out].find(x=>x[0]===type);if(r&&(mvAutoReason||!$("inventoryMovementReason").value.trim())){$("inventoryMovementReason").value=r[2];mvAutoReason=true}$("inventoryMovementType").dispatchEvent(new Event("change"));mvRender()}
     function wireInventoryV923(){
@@ -3205,7 +3413,7 @@
     function resetInventoryUnitPhoto(data=null){state.inventoryUnitPhotoData=data;$("inventoryUnitPhotoFile").value="";$("inventoryUnitPhotoPreview").classList.toggle("hidden",!data);$("inventoryUnitPhotoPlaceholder").classList.toggle("hidden",Boolean(data));$("inventoryUnitRemovePhotoButton").classList.toggle("hidden",!data);if(data)$("inventoryUnitPhotoPreview").src=data;else $("inventoryUnitPhotoPreview").removeAttribute("src")}
     function inventoryUnitStatusBadge(unit){return `<span class="unit-status ${escapeHTML(unit.status)}">${escapeHTML(inventoryUnitStatusText[unit.status]||unit.status)}</span>`}
     function openInventoryUnits(itemId,variantId=""){const item=state.inventoryItems.find(i=>i.id===itemId),variant=variantId?state.inventoryVariants.find(v=>v.id===variantId):null;if(!item)return;if(!item.track_individual_units)return showToast("Activa el detalle por unidad o lote al editar el insumo");state.inventoryUnitsContext={itemId,variantId:variantId||null};$("inventoryUnitsTitle").textContent=variant?`Unidades / lotes · ${variant.label}`:`Unidades / lotes · ${item.name}`;$("inventoryUnitsSubtitle").textContent=`${variant?.code||item.code} · Existencia ${formatInventoryQuantity(variant?.current_stock??item.current_stock)} ${item.unit}`;renderInventoryUnits();openModal("inventoryUnitsModal")}
-    function renderInventoryUnits(){const ctx=state.inventoryUnitsContext;if(!ctx)return;const item=state.inventoryItems.find(i=>i.id===ctx.itemId),variant=ctx.variantId?state.inventoryVariants.find(v=>v.id===ctx.variantId):null,all=ctx.variantId?inventoryUnitsForVariant(ctx.variantId):inventoryUnitsForItem(ctx.itemId).filter(u=>!u.inventory_variant_id),active=all.filter(u=>u.active),stock=Number(variant?.current_stock??item?.current_stock)||0;$("inventoryUnitsSummary").innerHTML=`<strong>${escapeHTML(inventoryUnitSummary(active))}</strong><span>${active.length} registro${active.length===1?"":"s"} activo${active.length===1?"":"s"} · Existencia contable: ${formatInventoryQuantity(stock)} ${escapeHTML(item?.unit||"Unidad")}. El detalle es informativo y no modifica el saldo.</span>`;$("inventoryUnitsList").innerHTML=all.length?all.map(u=>`<div class="inventory-unit-row ${u.active?"":"inactive"}">${u.photo_data?`<img class="inventory-unit-photo" src="${escapeHTML(u.photo_data)}" alt="">`:'<div class="inventory-unit-photo placeholder">▣</div>'}<div class="inventory-unit-copy"><div>${inventoryUnitStatusBadge(u)} ${u.remaining_percent!==null&&u.remaining_percent!==undefined?`<strong>${formatInventoryQuantity(u.remaining_percent)} % restante</strong>`:""}</div><strong>${escapeHTML(u.unit_code)}</strong>${u.location?`<span>Ubicación: ${escapeHTML(u.location)}</span>`:""}${u.opened_date?`<span>Abierto/iniciado: ${escapeHTML(formatDate(u.opened_date))}</span>`:""}${u.notes?`<small>${escapeHTML(u.notes)}</small>`:""}${!u.active?'<small>Registro archivado</small>':""}</div><div class="table-actions">${hasPermission("inventory.manage")?`<button class="mini" onclick="window.editInventoryUnit('${u.id}')">Editar</button>`:""}</div></div>`).join(""):'<div class="empty">Aún no has registrado el estado de ninguna unidad o lote.</div>';$("addInventoryUnitButton").classList.toggle("hidden",!hasPermission("inventory.manage"))}
+    function renderInventoryUnits(){const ctx=state.inventoryUnitsContext;if(!ctx)return;const item=state.inventoryItems.find(i=>i.id===ctx.itemId),variant=ctx.variantId?state.inventoryVariants.find(v=>v.id===ctx.variantId):null,all=ctx.variantId?inventoryUnitsForVariant(ctx.variantId):inventoryUnitsForItem(ctx.itemId).filter(u=>!u.inventory_variant_id),active=all.filter(u=>u.active),stock=Number(variant?.current_stock??item?.current_stock)||0;$("inventoryUnitsSummary").innerHTML=`<strong>${escapeHTML(inventoryUnitSummary(active))}</strong><span>${active.length} registro${active.length===1?"":"s"} activo${active.length===1?"":"s"} · Existencia contable: ${formatInventoryQuantity(stock)} ${escapeHTML(item?.unit||"Unidad")}. El detalle es informativo y no modifica el saldo.</span>`;$("inventoryUnitsList").innerHTML=all.length?all.map(u=>`<div class="inventory-unit-row ${u.active?"":"inactive"}">${u.photo_data?`<img loading="lazy" decoding="async" class="inventory-unit-photo" src="${escapeHTML(u.photo_data)}" alt="">`:'<div class="inventory-unit-photo placeholder">▣</div>'}<div class="inventory-unit-copy"><div>${inventoryUnitStatusBadge(u)} ${u.remaining_percent!==null&&u.remaining_percent!==undefined?`<strong>${formatInventoryQuantity(u.remaining_percent)} % restante</strong>`:""}</div><strong>${escapeHTML(u.unit_code)}</strong>${u.location?`<span>Ubicación: ${escapeHTML(u.location)}</span>`:""}${u.opened_date?`<span>Abierto/iniciado: ${escapeHTML(formatDate(u.opened_date))}</span>`:""}${u.notes?`<small>${escapeHTML(u.notes)}</small>`:""}${!u.active?'<small>Registro archivado</small>':""}</div><div class="table-actions">${hasPermission("inventory.manage")?`<button class="mini" onclick="window.editInventoryUnit('${u.id}')">Editar</button>`:""}</div></div>`).join(""):'<div class="empty">Aún no has registrado el estado de ninguna unidad o lote.</div>';$("addInventoryUnitButton").classList.toggle("hidden",!hasPermission("inventory.manage"))}
     function newInventoryUnit(){const ctx=state.inventoryUnitsContext;if(!ctx)return;$("inventoryUnitForm").reset();$("inventoryUnitId").value="";$("inventoryUnitItemId").value=ctx.itemId;$("inventoryUnitVariantId").value=ctx.variantId||"";$("inventoryUnitStatus").value="new";$("inventoryUnitRemaining").value="100";$("inventoryUnitActive").checked=true;resetInventoryUnitPhoto();const item=state.inventoryItems.find(i=>i.id===ctx.itemId),variant=ctx.variantId?state.inventoryVariants.find(v=>v.id===ctx.variantId):null;$("inventoryUnitModalTitle").textContent="Nueva unidad o lote";$("inventoryUnitModalSubtitle").textContent=`${item?.name||""}${variant?` · ${variant.label}`:""}`;openModal("inventoryUnitEditModal");setTimeout(()=>$("inventoryUnitCode").focus(),50)}
     async function editInventoryUnit(id){if(!await ensurePhotos("inventory"))return;const u=state.inventoryUnits.find(x=>x.id===id);if(!u)return;$("inventoryUnitId").value=u.id;$("inventoryUnitItemId").value=u.inventory_item_id;$("inventoryUnitVariantId").value=u.inventory_variant_id||"";$("inventoryUnitCode").value=u.unit_code||"";$("inventoryUnitStatus").value=u.status||"other";$("inventoryUnitRemaining").value=u.remaining_percent??"";$("inventoryUnitOpenedDate").value=u.opened_date||"";$("inventoryUnitLocation").value=u.location||"";$("inventoryUnitNotes").value=u.notes||"";$("inventoryUnitActive").checked=Boolean(u.active);resetInventoryUnitPhoto(u.photo_data||null);const item=state.inventoryItems.find(i=>i.id===u.inventory_item_id),variant=u.inventory_variant_id?state.inventoryVariants.find(v=>v.id===u.inventory_variant_id):null;$("inventoryUnitModalTitle").textContent=`Editar ${u.unit_code}`;$("inventoryUnitModalSubtitle").textContent=`${item?.name||""}${variant?` · ${variant.label}`:""}`;openModal("inventoryUnitEditModal")}
     function syncInventoryUnitStatus(){const status=$("inventoryUnitStatus").value;if(status==="new"&&$("inventoryUnitRemaining").value==="")$("inventoryUnitRemaining").value="100";if(status==="empty")$("inventoryUnitRemaining").value="0"}
@@ -3227,7 +3435,7 @@
       $("inventoryMovementResponsible").innerHTML='<option value="">Usuario actual</option>'+[...state.profiles.entries()].sort((a,b)=>a[1].localeCompare(b[1],"es")).map(([id,name])=>`<option value="${id}">${escapeHTML(name)}</option>`).join("")
     }
     function updateInventoryMovementVariantOptions(selected=""){const item=state.inventoryItems.find(i=>i.id===$("inventoryMovementItem").value),field=$("inventoryMovementVariantField");if(!item?.has_variants){field.classList.add("hidden");$("inventoryMovementVariant").innerHTML='<option value="">No aplica</option>';$("inventoryMovementVariantPreview").classList.add("hidden");updateInventoryMovementUI();return}const variants=inventoryVariantsForItem(item.id,true).sort((a,b)=>a.label.localeCompare(b.label,"es"));field.classList.remove("hidden");$("inventoryMovementVariant").innerHTML='<option value="">Selecciona color, talla o combinación…</option>'+variants.map(v=>`<option value="${v.id}" ${v.id===selected?"selected":""}>${escapeHTML(v.label)} · ${formatInventoryQuantity(v.current_stock)} ${escapeHTML(item.unit)}</option>`).join("");updateInventoryMovementUI()}
-    function updateInventoryMovementUI(){const item=state.inventoryItems.find(i=>i.id===$("inventoryMovementItem").value),variant=state.inventoryVariants.find(v=>v.id===$("inventoryMovementVariant").value),type=$("inventoryMovementType").value,direction=movementDirection(type);$("inventoryMovementCostField").classList.toggle("hidden",type!=="purchase");if(item){const available=item.has_variants?(variant?Number(variant.current_stock)||0:null):Number(item.current_stock)||0;$("inventoryMovementSource").innerHTML=`<strong>${escapeHTML(item.code)} · ${escapeHTML(item.name)}${variant?` · ${escapeHTML(variant.label)}`:""}</strong><span>${available===null?"Selecciona la variante exacta":`Existencia disponible: ${formatInventoryQuantity(available)} ${escapeHTML(item.unit)}`} · Movimiento de ${direction==="in"?"entrada":"salida"}</span>`;if(variant){const preview=$("inventoryMovementVariantPreview");preview.classList.remove("hidden");preview.innerHTML=`${variant.photo_data?`<img src="${escapeHTML(variant.photo_data)}" alt=""/>`:""}<div><strong>${escapeHTML(variant.label)}</strong><br><span>${escapeHTML(variantAttributesText(variant.attributes))}</span></div>`}else $("inventoryMovementVariantPreview").classList.add("hidden");if(direction==="out"&&available!==null)$("inventoryMovementQuantity").max=String(available);else $("inventoryMovementQuantity").removeAttribute("max")}else{$("inventoryMovementSource").innerHTML='<strong>Selecciona un insumo</strong><span>La existencia se actualizará al guardar.</span>';$("inventoryMovementQuantity").removeAttribute("max");$("inventoryMovementVariantPreview").classList.add("hidden")}}
+    function updateInventoryMovementUI(){const item=state.inventoryItems.find(i=>i.id===$("inventoryMovementItem").value),variant=state.inventoryVariants.find(v=>v.id===$("inventoryMovementVariant").value),type=$("inventoryMovementType").value,direction=movementDirection(type);$("inventoryMovementCostField").classList.toggle("hidden",type!=="purchase");if(item){const available=item.has_variants?(variant?Number(variant.current_stock)||0:null):Number(item.current_stock)||0;$("inventoryMovementSource").innerHTML=`<strong>${escapeHTML(item.code)} · ${escapeHTML(item.name)}${variant?` · ${escapeHTML(variant.label)}`:""}</strong><span>${available===null?"Selecciona la variante exacta":`Existencia disponible: ${formatInventoryQuantity(available)} ${escapeHTML(item.unit)}`} · Movimiento de ${direction==="in"?"entrada":"salida"}</span>`;if(variant){const preview=$("inventoryMovementVariantPreview");preview.classList.remove("hidden");preview.innerHTML=`${variant.photo_data?`<img loading="lazy" decoding="async" src="${escapeHTML(variant.photo_data)}" alt=""/>`:""}<div><strong>${escapeHTML(variant.label)}</strong><br><span>${escapeHTML(variantAttributesText(variant.attributes))}</span></div>`}else $("inventoryMovementVariantPreview").classList.add("hidden");if(direction==="out"&&available!==null)$("inventoryMovementQuantity").max=String(available);else $("inventoryMovementQuantity").removeAttribute("max")}else{$("inventoryMovementSource").innerHTML='<strong>Selecciona un insumo</strong><span>La existencia se actualizará al guardar.</span>';$("inventoryMovementQuantity").removeAttribute("max");$("inventoryMovementVariantPreview").classList.add("hidden")}}
     async function openInventoryMovement(itemId="",workOrderId="",type="purchase",variantId=""){
       if(!$("inventoryVariantsModal").classList.contains("hidden"))closeModal("inventoryVariantsModal");
       if(!hasPermission("inventory.manage"))return showToast("No tienes permiso para registrar movimientos");if(!state.inventoryItems.length)await loadInventory();if(!state.workOrders.length&&hasPermission("work_orders.view")){const {data}=await db.from("work_orders").select("id,order_number,quote_number,client_name,status").neq("status","cancelled").order("created_at",{ascending:false});state.workOrders=mergeById(state.workOrders,data||[])}
@@ -3700,7 +3908,7 @@
     function catalogIsIncomplete(p){return Boolean(p.catalog_visible&&(!p.catalog_image_data||!catalogDisplayName(p)||!String(p.catalog_short_description||p.description||"").trim()))}
     function renderCatalogAdmin(){if($("view-products")?.classList.contains("active")){renderProducts();renderProductStats()}}
     function resetCatalogImage(data=null){state.catalogPhotoData=data||null;$("catalogImagePreview").src=data||"";$("catalogImagePreview").classList.toggle("hidden",!data);$("catalogImagePlaceholder").classList.toggle("hidden",Boolean(data));$("catalogRemoveImageButton").classList.toggle("hidden",!data);$("catalogImageFile").value=""}
-    function renderCatalogGallery(){const box=$("catalogGalleryGrid"),items=state.catalogGalleryDraft||[];$("catalogGalleryCount").textContent=`${items.length} de 4`;box.innerHTML=items.map((src,i)=>`<div class="catalog-gallery-card"><img src="${escapeHTML(src)}" alt="Imagen adicional ${i+1}"/><button class="catalog-gallery-remove" type="button" data-remove-catalog-gallery="${i}">×</button></div>`).join("")+(items.length<4?'<label class="catalog-gallery-add">+ Agregar fotografía<input id="catalogGalleryFile" type="file" accept="image/*" /></label>':"")}
+    function renderCatalogGallery(){const box=$("catalogGalleryGrid"),items=state.catalogGalleryDraft||[];$("catalogGalleryCount").textContent=`${items.length} de 4`;box.innerHTML=items.map((src,i)=>`<div class="catalog-gallery-card"><img loading="lazy" decoding="async" src="${escapeHTML(src)}" alt="Imagen adicional ${i+1}"/><button class="catalog-gallery-remove" type="button" data-remove-catalog-gallery="${i}">×</button></div>`).join("")+(items.length<4?'<label class="catalog-gallery-add">+ Agregar fotografía<input id="catalogGalleryFile" type="file" accept="image/*" /></label>':"")}
     function compressCatalogImage(file){return new Promise((resolve,reject)=>{if(!file)return resolve(null);if(!file.type.startsWith("image/"))return reject(new Error("Selecciona un archivo de imagen."));const reader=new FileReader();reader.onerror=()=>reject(new Error("No fue posible leer la imagen."));reader.onload=()=>{const image=new Image();image.onerror=()=>reject(new Error("La fotografía no es válida."));image.onload=()=>{const max=1200,scale=Math.min(1,max/Math.max(image.width,image.height)),w=Math.max(1,Math.round(image.width*scale)),h=Math.max(1,Math.round(image.height*scale)),canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;const ctx=canvas.getContext("2d");ctx.fillStyle="#ffffff";ctx.fillRect(0,0,w,h);ctx.drawImage(image,0,0,w,h);let data=canvas.toDataURL("image/jpeg",.84);if(data.length>900000)data=canvas.toDataURL("image/jpeg",.7);if(data.length>1100000)return reject(new Error("La imagen sigue siendo demasiado pesada. Usa una fotografía más pequeña."));resolve(data)};image.src=reader.result};reader.readAsDataURL(file)})}
     function syncCatalogPriceMode(){const disabled=$("catalogPriceMode").value==="quote";$("catalogPriceField").classList.toggle("hidden-by-mode",disabled);$("catalogPrice").disabled=disabled}
     async function editCatalogProduct(id){

@@ -2881,7 +2881,8 @@
       $("dfInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();dfAsk($("dfInput").value)}});
       $("dfMsgs").addEventListener("click",e=>{const b=e.target.closest("[data-df-q]");if(b)dfAsk(b.dataset.dfQ)});
     }
-    try{wireDonFer()}catch(e){console.error("Don Fer",e)}
+    function dfInit(){try{wireDonFer()}catch(e){console.error("Don Fer",e)}}
+    if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",dfInit);else dfInit();
 
     // V9.21: Reportes
     const rep={period:"month",data:null};

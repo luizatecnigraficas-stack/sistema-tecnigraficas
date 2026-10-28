@@ -2919,8 +2919,8 @@
     function dfShrink(file){return new Promise((ok,bad)=>{if(!file||!/^image\//.test(file.type))return bad(new Error("Ese archivo no es una imagen."));const url=URL.createObjectURL(file),im=new Image();im.onload=()=>{const k=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(url);ok(c.toDataURL("image/jpeg",.85))};im.onerror=()=>{URL.revokeObjectURL(url);bad(new Error("No pude abrir esa imagen."))};im.src=url})}
     async function dfSetImg(file){try{df.img=await dfShrink(file);$("dfAttImg").src=df.img;$("dfAtt").classList.remove("hidden");$("dfInput").placeholder="Dile qué hago con la foto…";$("dfInput").focus()}catch(e){showToast(e.message)}}
     function dfClearImg(){df.img=null;$("dfAtt").classList.add("hidden");$("dfFile").value="";$("dfInput").placeholder="Escribe tu pregunta…"}
-    const dfSugs=["¿Cuántos stickers de 5x5 salen en un pliego Lite?","¿Cuánto nos cobró el herrero por el último rompetráfico?","¿Cuánto le debemos a proveedores?","Regístrame un egreso de $8.000 en efectivo por un domicilio","📎 Mándame una foto de una lista de precios y la cargo a Cartera"];
-    function dfFormat(t){return escapeHTML(t).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/^#{1,3} (.+)$/gm,"<strong>$1</strong>").replace(/^[-*] /gm,"• ")}
+    const dfSugs=["¿Cuántos stickers de 5x5 salen en un pliego Lite?","¿Cuánto nos cobró el herrero por el último rompetráfico?","¿Cuánto le debemos a proveedores?","Regístrame un egreso de $8.000 en efectivo por un domicilio","Hazme una cotización de 1.000 volantes media carta para Arquidiócesis","📎 Mándame una foto de una lista de precios y la cargo a Cartera"];
+    function dfFormat(t){return escapeHTML(t).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/^#{1,3} (.+)$/gm,"<strong>$1</strong>").replace(/^[-*] /gm,"• ").replace(/(https:\/\/sistema\.sastecnigraficas\.com\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:#0b6f93;font-weight:800">📄 Abrir</a>')}
     function dfRender(){
       const box=$("dfMsgs");
       box.innerHTML=(df.msgs.length?"":`<div class="df-msg bot">¡Hola${state.profile?.full_name?" "+escapeHTML(String(state.profile.full_name).split(" ")[0]):""}! 👋 Soy Don Fer. Pregúntame lo que necesites del sistema.</div><div class="df-sugs">${dfSugs.map(q=>`<button type="button" data-df-q="${escapeHTML(q)}">${escapeHTML(q)}</button>`).join("")}</div>`)
@@ -2944,7 +2944,7 @@
       df.busy=true;dfRender();
       try{const {data,error}=await db.functions.invoke("tecni-asistente",{body:{confirm:{kind:m.card.kind,data:m.card.data}}});if(error)throw new Error("No pude conectarme. Revisa tu internet.");
         m.card.state=data?.error?"":"ok";df.msgs.push({role:"assistant",content:data?.reply||"Listo.",error:!!data?.error});
-        if(!data?.error){navigate.last={};if($("view-suppliers")?.classList.contains("active"))loadSuppliersPay();if($("view-payments")?.classList.contains("active"))loadCartera();if($("view-finance")?.classList.contains("active"))loadFinance()}
+        if(!data?.error){navigate.last={};if($("view-suppliers")?.classList.contains("active"))loadSuppliersPay();if($("view-payments")?.classList.contains("active"))loadCartera();if($("view-finance")?.classList.contains("active"))loadFinance();if($("view-quotes")?.classList.contains("active"))loadQuotes()}
       }catch(err){df.msgs.push({role:"assistant",content:err.message,error:true})}finally{df.busy=false;dfRender()}
     }
     function wireDonFer(){

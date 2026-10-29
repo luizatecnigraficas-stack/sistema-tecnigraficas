@@ -603,6 +603,14 @@
     body.wo-dragging,body.wo-dragging *{cursor:grabbing!important;-webkit-user-select:none;user-select:none}
     #rowMenu .wo-menu-label,.wo-menu-label{display:block;padding:4px 12px 2px;font-size:10.5px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
     .nav-mini-btn{display:none}
+    /* V9.41 estética: modo discreto, títulos, ayuda plegable y botones parejos */
+    body.privado .content :is(.today-tile.due strong,.today-tile.pay strong,[id$="StatMonth"],[id$="StatHave"],[id$="StatAfter"],.stat-value,.ca-due,.money,.wo-chip.warn,.wo-chip.bad,.sp-money strong,#todayIn,#todayOut,.fin-acc strong,.pcard-price){filter:blur(7px);user-select:none;transition:filter .15s}
+    .today-tile{border-top-width:3px!important;padding:12px 14px!important}.today-tile strong{font-size:19px!important}.today-tile.due{border-top-color:#f3a6cc!important}.today-tile.deliver{border-top-color:#f6dd7a!important}.today-tile{border-top-color:#8fd3ea}
+    .eye-btn{padding:9px 11px;font-size:15px;line-height:1}body.privado .eye-btn{background:#20222a;color:#fff}
+    .topbar h1{font-size:17px!important}.topbar p{font-size:10.5px}.view-head h2{font-size:16px!important}.view-head p{font-size:11px!important}
+    .btn.primary{background:#20222a!important;color:#fff;box-shadow:none!important}.btn.primary:hover{background:#3a3e4b!important}
+    .qs-top{background:#fff6c7!important;color:#5a4800!important;box-shadow:none!important;border:1px solid #f1dc7a!important}
+    details.help-tip{margin-top:12px}details.help-tip summary{display:inline-block;cursor:pointer;list-style:none;font-size:11px;font-weight:800;color:#7b8494;border:1px solid var(--line);background:#fff;border-radius:999px;padding:4px 11px}details.help-tip summary::-webkit-details-marker{display:none}details.help-tip[open] summary{margin-bottom:6px}details.help-tip p{margin:0;font-size:11.5px!important;color:var(--muted)}
     /* V9.40 títulos más chicos, flechas, colores suaves y cartera discreta */
     .wo-col header strong{font-size:11.5px!important;font-weight:850}.wo-col header small{font-size:9.5px!important}.wo-col header b{font-size:10.5px;padding:0 7px}
     .wo-col{padding:8px;border-top-width:3px!important}.wo-col.col-design{border-top-color:#f3a6cc}.wo-col.col-client{border-top-color:#c4b5fd}.wo-col.col-doing{border-top-color:#8fd3ea}.wo-col.col-ready{border-top-color:#f6dd7a}.wo-col.col-done{border-top-color:#9adbbd}.wo-col.col-todo{border-top-color:#b7b3ee}.wo-col.col-pause{border-top-color:#c9ced8}
@@ -740,7 +748,7 @@
     <main class="main">
       <header class="topbar">
         <div style="display:flex;align-items:center;gap:12px"><button class="btn secondary mobile-menu" id="mobileMenu">☰</button><div><h1 id="pageTitle">Inicio</h1><p id="pageSubtitle">Resumen general de Tecnigráficas</p></div></div>
-        <div class="top-actions"><button class="btn qs-top hidden" id="topQuickSale" type="button">⚡ Venta rápida</button><button class="btn primary" id="topNewQuote">+ Nueva cotización</button></div>
+        <div class="top-actions"><button class="btn secondary eye-btn" id="privacyBtn" type="button" title="Esconder los valores ($) de la pantalla">👁</button><button class="btn qs-top hidden" id="topQuickSale" type="button">⚡ Venta rápida</button><button class="btn primary" id="topNewQuote">+ Nueva cotización</button></div>
       </header>
 
       <div class="content">
@@ -3324,6 +3332,8 @@
     function woCancel(){woStop()}
     function woEnd(x,y){woMove(x,y);const t=woD.target,id=woD.id;woStop();if(t)woDrop(id,t.k,t.idx)}
     Object.assign(window,{woScroll,woArchive,woArchiveColumn,woMoveTo,woToggle,woSetBoard,woOpenBoard,woNewBoard,woRenameBoard,woArchiveBoard,woDeleteBoard,woNewTask,woEditTask,woDeleteTask});
+    (function(){const b=document.getElementById("privacyBtn");if(!b)return;const set=on=>{document.body.classList.toggle("privado",on);b.title=on?"Mostrar los valores ($)":"Esconder los valores ($) de la pantalla";try{localStorage.setItem("tecniPrivado",on?"1":"0")}catch(e){}};let on=false;try{on=localStorage.getItem("tecniPrivado")==="1"}catch(e){}set(on);b.addEventListener("click",()=>{const v=!document.body.classList.contains("privado");set(v);showToast(v?"👁 Valores escondidos":"👁 Valores visibles")})})();
+    (function(){document.querySelectorAll(".content .view > p.subtle, .content .view > p.wo-help").forEach(p=>{if(p.closest("details"))return;const d=document.createElement("details");d.className="help-tip";d.innerHTML="<summary>❔ Ayuda</summary>";p.replaceWith(d);d.appendChild(p)})})();
     (function(){const b=document.getElementById("navMiniBtn");if(!b)return;const set=on=>{document.body.classList.toggle("nav-mini",on);b.textContent=on?"»":"«";b.title=on?"Mostrar el menú":"Esconder el menú";try{localStorage.setItem("tecniNavMini",on?"1":"0")}catch(e){}};let on=false;try{on=localStorage.getItem("tecniNavMini")==="1"}catch(e){}set(on);b.addEventListener("click",()=>set(!document.body.classList.contains("nav-mini")));document.querySelectorAll("#nav button").forEach(x=>{if(!x.title)x.title=x.textContent.trim()})})();
     // V9.09: venta rápida, comprobantes y niveles de acceso
     function financePermsInstalled(){return state.permissions instanceof Map&&state.permissions.has("finance.view")}

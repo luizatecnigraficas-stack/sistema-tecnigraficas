@@ -511,7 +511,7 @@
     .rep-note{margin-top:12px;font-size:11px}
     @media(max-width:760px){.rep-prow{grid-template-columns:minmax(0,1fr) 100px}.rep-prow span:nth-child(2),.rep-prow span:nth-child(4){display:none}.rep-bars{height:170px;gap:3px}.rep-bar .v{display:none}}
     /* V9.22 Producción en tablero */
-    .wo-board{display:grid;grid-template-columns:repeat(6,minmax(220px,1fr));gap:12px;overflow-x:auto;padding-bottom:6px;align-items:start}
+    .wo-board{display:grid;grid-template-columns:repeat(7,minmax(215px,1fr));gap:12px;overflow-x:auto;padding-bottom:6px;align-items:start}
     .wo-board.single{grid-template-columns:minmax(260px,520px)}
     .wo-col{background:#e7ebf2;border-radius:16px;padding:10px;min-height:200px}
     .wo-col header{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:4px 6px 10px}.wo-col header strong{font-size:14px}.wo-col header b{background:#fff;border-radius:999px;padding:1px 9px;font-size:12px;align-self:center}.wo-col header small{grid-column:1/-1;color:var(--muted);font-size:11px}
@@ -603,6 +603,20 @@
     body.wo-dragging,body.wo-dragging *{cursor:grabbing!important;-webkit-user-select:none;user-select:none}
     #rowMenu .wo-menu-label,.wo-menu-label{display:block;padding:4px 12px 2px;font-size:10.5px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
     .nav-mini-btn{display:none}
+    /* V9.38 tarjetas compactas, tableros y tarjetas rápidas */
+    .wo-card{padding:10px 11px;gap:6px}.wo-client{font-size:14px}
+    .wo-mini{display:flex;flex-wrap:wrap;gap:4px;align-items:center}.wo-mini .wo-chip{padding:3px 8px;font-size:10.5px}
+    .wo-exp{margin-left:auto;border:1px solid var(--line);background:#fff;border-radius:8px;width:30px;height:24px;cursor:pointer;font-size:12px;color:#4a5160;line-height:1}.wo-exp:hover{background:#f0f2f6}
+    .wo-card:not(.open) .wo-more{display:none}.wo-more{display:flex;flex-direction:column;gap:7px;border-top:1px dashed #e3e6ec;padding-top:7px}
+    .wo-notes{white-space:pre-wrap;font-size:12.5px;color:#3d4350;max-height:260px;overflow:auto}
+    .wo-chip.task{background:#eef0ff;color:#4b45b8}
+    .wo-col.col-todo{border-top:4px solid #4b45b8}
+    .wo-folder{background:linear-gradient(120deg,#fff,#f4f1ff);border:1.5px dashed #a9a3e6;border-radius:14px;padding:11px 12px;cursor:pointer;display:flex;flex-direction:column;gap:3px}.wo-folder:hover{border-style:solid}.wo-folder strong{font-size:14px}.wo-folder small{font-size:11.5px;color:var(--muted)}.wo-folder .late{color:#b42318}.wo-folder .btn{margin-top:6px;align-self:flex-start}
+    .wo-add{width:100%;margin-top:8px;border:0;background:transparent;border-radius:10px;padding:9px;text-align:left;font-weight:800;color:#5b6272;cursor:pointer;font-family:inherit;font-size:12.5px}.wo-add:hover{background:rgba(255,255,255,.7);color:var(--ink)}
+    .wo-boards{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;align-items:center}
+    .wo-bwrap{display:inline-flex;align-items:center;gap:2px;flex:0 0 auto}
+    .wo-bchip{flex:0 0 auto;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-family:inherit;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap}.wo-bchip b{background:#eef0f4;border-radius:999px;padding:0 7px;font-size:11px;margin-left:3px}.wo-bchip.on{background:var(--ink);color:#fff;border-color:var(--ink)}.wo-bchip.on b{background:rgba(255,255,255,.2)}.wo-bchip.add{border-style:dashed;color:#5b6272}
+    .wo-bmenu{border:0;background:transparent;font-size:18px;cursor:pointer;padding:2px 6px}
     @media(min-width:761px){
       .nav-mini-btn{display:flex;align-items:center;justify-content:center;align-self:flex-end;flex:0 0 auto;width:30px;height:30px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#cdd2dd;cursor:pointer;font-size:17px;font-weight:900;margin-bottom:-10px;font-family:inherit}
       .nav-mini-btn:hover{background:rgba(255,255,255,.1);color:#fff}
@@ -800,10 +814,10 @@
         </section>
         <section class="view" id="view-production">
           <div class="view-head"><div><h2>Producción</h2><p>Órdenes creadas únicamente desde cotizaciones aprobadas.</p></div><button class="btn primary" id="productionFromQuoteButton">Ver cotizaciones aprobadas</button></div>
-          <div class="toolbar wo-toolbar"><input class="search" id="productionSearch" placeholder="Buscar cliente, orden o cotización…" /><select id="productionStatusFilter" class="search" style="flex:0 0 200px"><option value="">Tablero de trabajo</option><option value="archived">📦 Ver archivados</option><option value="cancelled">Ver cancelados</option></select><button class="btn secondary" id="productionRefreshButton">Actualizar</button></div>
-          <div class="wo-tabs" id="woTabs" role="tablist"></div>
+          <div class="toolbar wo-toolbar"><input class="search" id="productionSearch" placeholder="Buscar cliente, orden o cotización…" /><select id="productionStatusFilter" class="search" style="flex:0 0 200px"><option value="">Tablero de trabajo</option><option value="archived">📦 Ver archivados</option><option value="cancelled">Ver cancelados</option></select><button class="btn secondary" id="woDetailsBtn" type="button">▾ Ver detalles</button><button class="btn secondary" id="productionRefreshButton">Actualizar</button></div>
+          <div class="wo-boards" id="woBoards"></div><div class="wo-tabs" id="woTabs" role="tablist"></div>
           <div class="wo-board" id="productionBody"></div>
-          <p class="subtle wo-help">Toca una tarjeta para ver todo el pedido. <strong>Arrástrala</strong> para cambiarla de columna o de puesto (en el celular: deja el dedo apretado y suéltala sobre la pestaña). El botón <strong>Siguiente paso →</strong> también la pasa a la de al lado. En <strong>⋯</strong> están: mover a, 📦 archivar, pagos, materiales y cancelar.</p>
+          <p class="subtle wo-help">Toca <strong>▾</strong> para ver los detalles de una tarjeta, o “Ver detalles” arriba para abrirlas todas. Toca la tarjeta para ver todo el pedido. <strong>Arrástrala</strong> para cambiarla de columna o de puesto (en el celular: deja el dedo apretado y suéltala sobre la pestaña). El botón <strong>Siguiente paso →</strong> también la pasa a la de al lado. En <strong>⋯</strong> están: mover a, 📦 archivar, pagos, materiales y cancelar.</p>
         </section>
 
         <section class="view" id="view-payments">
@@ -1438,6 +1452,7 @@
     </form>
   </div>
 
+  <div class="modal-backdrop hidden" id="woTaskModal"><form class="modal" id="woTaskForm" style="width:min(560px,100%)"><div class="modal-head"><div><h3 id="woTaskTitle">Tarjeta</h3><small>Tarea o pendiente (no maneja plata)</small></div><button type="button" class="modal-close" data-close="woTaskModal">×</button></div><input type="hidden" id="woTaskId"/><div class="form-grid"><div class="field full"><label>¿Qué hay que hacer? *</label><input id="woTaskName" required/></div><div class="field full"><label>Notas</label><textarea id="woTaskNotes" rows="6"></textarea></div><div class="field"><label>Fecha</label><input id="woTaskDue" type="date"/></div><div class="field"><label>Columna</label><select id="woTaskCol"></select></div><div class="field full"><label>Tablero</label><select id="woTaskBoard"></select></div></div><div class="modal-actions"><button type="button" class="btn secondary hidden" id="woTaskDelete" style="margin-right:auto;color:#b42318">🗑 Eliminar</button><button type="button" class="btn secondary" data-close="woTaskModal">Cancelar</button><button type="submit" class="btn primary">Guardar</button></div></form></div>
   <div class="modal-backdrop hidden" id="paymentHistoryModal">
     <div class="modal" style="width:min(900px,100%)">
       <div class="modal-head"><div><h3>Historial de pagos</h3><div class="subtle" id="paymentHistoryTitle">—</div></div><button type="button" class="modal-close" data-close="paymentHistoryModal">×</button></div>
@@ -3162,40 +3177,85 @@
     }
     document.addEventListener("click",e=>{if(e.target.closest("#surveyButton"))openSurveySummary()});
     window.sendSurvey=sendSurvey;window.clientSurveys=clientSurveys;
-    // V9.37: Producción tipo Trello (arrastrar, ordenar, archivar) y menú que se esconde
-    let woLastCols=[];
-    async function woArchive(ids,on){
+    // V9.37/V9.38: Producción tipo Trello (arrastrar, ordenar, archivar, tableros, tarjetas rápidas) y menú que se esconde
+    let woLastCols=[],woBoard="",woOpenAll=false;const woOpen=new Set();
+    try{woBoard=localStorage.getItem("tecniWoBoard")||"";woOpenAll=localStorage.getItem("tecniWoOpenAll")==="1"}catch(e){}
+    function woKey(r){return r.__task?"t:"+r.id:r.id}
+    function woIsOpen(k){return woOpenAll?!woOpen.has(k):woOpen.has(k)}
+    function woToggle(k){woOpen.has(k)?woOpen.delete(k):woOpen.add(k);renderProduction()}
+    function woFind(key){const isT=String(key).startsWith("t:"),id=isT?key.slice(2):key;return {isT,id,r:isT?(state.prodTasks||[]).find(x=>x.id===id):state.workOrders.find(x=>x.id===id)}}
+    async function woArchive(keys,on){
       if(!hasPermission("work_orders.update"))return showToast("No tienes permiso para archivar");
-      const now=on?new Date().toISOString():null;ids.forEach(id=>{const o=state.workOrders.find(x=>x.id===id);if(o)o.archived_at=now});renderProduction();
-      const {error}=await db.from("work_orders").update({archived_at:now}).in("id",ids);if(error){alert(error.message);return loadProduction()}
-      showToast(on?(ids.length>1?`📦 ${ids.length} tarjetas archivadas`:"📦 Tarjeta archivada"):"↩ Volvió al tablero");loadDashboard()
+      const now=on?new Date().toISOString():null,oi=[],ti=[];keys.forEach(k=>{const f=woFind(k);if(!f.r)return;f.r.archived_at=now;(f.isT?ti:oi).push(f.id)});renderProduction();
+      const res=await Promise.all([oi.length?db.from("work_orders").update({archived_at:now}).in("id",oi):{error:null},ti.length?db.from("production_tasks").update({archived_at:now}).in("id",ti):{error:null}]);
+      const bad=res.find(r=>r.error);if(bad){alert(bad.error.message);return loadProduction()}
+      const n=oi.length+ti.length;showToast(on?(n>1?`📦 ${n} tarjetas archivadas`:"📦 Tarjeta archivada"):"↩ Volvió al tablero");if(oi.length)loadDashboard()
     }
-    function woArchiveColumn(k){const c=woLastCols.find(x=>x.k===k);if(!c||!c.rows.length)return;if(!confirm(`¿Archivar las ${c.rows.length} tarjetas de “${c.t.replace(/^\S+\s/,"")}”?\n\nSalen del tablero, pero NO se borran: las ves en “📦 Ver archivados” y la Cartera y los pagos siguen igual.`))return;woArchive(c.rows.map(o=>o.id),true)}
+    function woArchiveColumn(k){const c=woLastCols.find(x=>x.k===k);if(!c||!c.rows.length)return;if(!confirm(`¿Archivar las ${c.rows.length} tarjetas de “${c.t.replace(/^\S+\s/,"")}”${woBoard?` en el tablero ${woBoardById(woBoard)?.name||""}`:""}?\n\nSalen del tablero, pero NO se borran: las ves en “📦 Ver archivados” y la Cartera y los pagos siguen igual.`))return;woArchive(c.rows.map(woKey),true)}
     function woPlace(rows,idx){
-      // Devuelve la posición nueva y las tarjetas de arriba que hay que numerar
       const prev=idx>0?rows[idx-1]:null,next=rows[idx]||null,ups=[];let pos;
-      if(prev&&prev.board_position==null){let base=0;for(let i=0;i<idx;i++){if(rows[i].board_position!=null)base=rows[i].board_position;else{base+=1024;ups.push({id:rows[i].id,pos:base})}}pos=base+1024}
+      if(prev&&prev.board_position==null){let base=0;for(let i=0;i<idx;i++){if(rows[i].board_position!=null)base=rows[i].board_position;else{base+=1024;ups.push({r:rows[i],pos:base})}}pos=base+1024}
       else if(!prev)pos=next&&next.board_position!=null?next.board_position-1024:1024;
       else pos=next&&next.board_position!=null?(prev.board_position+next.board_position)/2:prev.board_position+1024;
       return {pos,ups}
     }
-    async function woDrop(id,colKey,idx){
-      const o=state.workOrders.find(x=>x.id===id),col=WO_COLS.find(c=>c.k===colKey);if(!o||!col)return;
+    function woUpdate(r,p){return r.__task?db.from("production_tasks").update(p).eq("id",r.id):db.from("work_orders").update(p).eq("id",r.id)}
+    async function woDrop(key,colKey,idx){
+      const {isT,id,r:o}=woFind(key),col=WO_COLS.find(c=>c.k===colKey);if(!o||!col)return;
       if(!hasPermission("work_orders.update")){renderProduction();return showToast("No tienes permiso para mover tarjetas")}
-      const newStatus=col.st.includes(o.status)?o.status:col.st[0],changed=newStatus!==o.status;
-      const live=(woLastCols.find(c=>c.k===colKey)||{rows:[]}).rows,rows=live.filter(x=>x.id!==id);
-      if(!changed&&(idx==null||live.findIndex(x=>x.id===id)===idx)){renderProduction();return}
-      if(changed&&newStatus==="delivered"&&hasPermission("payments.view")){const f=orderFinancial(o);if(f.balance>.01&&!confirm(`Esta orden todavía tiene un saldo de ${formatCOP(f.balance)}. ¿Marcarla como entregada de todas formas?`)){renderProduction();return}}
+      if(!isT&&!col.st.length){renderProduction();return showToast("Los pedidos no van en 📝 Pendientes: esa columna es para tareas")}
+      const newStatus=isT?null:(col.st.includes(o.status)?o.status:col.st[0]),changed=isT?o.col!==colKey:newStatus!==o.status;
+      const live=(woLastCols.find(c=>c.k===colKey)||{rows:[]}).rows,rows=live.filter(x=>woKey(x)!==key);
+      if(!changed&&(idx==null||live.findIndex(x=>woKey(x)===key)===idx)){renderProduction();return}
+      if(!isT&&changed&&newStatus==="delivered"&&hasPermission("payments.view")){const f=orderFinancial(o);if(f.balance>.01&&!confirm(`Esta orden todavía tiene un saldo de ${formatCOP(f.balance)}. ¿Marcarla como entregada de todas formas?`)){renderProduction();return}}
       let pos=null,ups=[];if(idx!=null){const r=woPlace(rows,Math.max(0,Math.min(idx,rows.length)));pos=r.pos;ups=r.ups}
-      o.status=newStatus;o.board_position=pos;ups.forEach(u=>{const x=state.workOrders.find(y=>y.id===u.id);if(x)x.board_position=u.pos});
+      if(isT)o.col=colKey;else o.status=newStatus;o.board_position=pos;ups.forEach(u=>u.r.board_position=u.pos);
       if(changed&&window.innerWidth<=900)woTab=colKey;
       renderProduction();
-      const p={board_position:pos,updated_by:state.session.user.id};if(changed)p.status=newStatus;
-      const res=await Promise.all([db.from("work_orders").update(p).eq("id",id),...ups.map(u=>db.from("work_orders").update({board_position:u.pos}).eq("id",u.id))]);
+      const p={board_position:pos};if(isT){if(changed)p.col=colKey}else{p.updated_by=state.session.user.id;if(changed)p.status=newStatus}
+      const res=await Promise.all([woUpdate(o,p),...ups.map(u=>woUpdate(u.r,{board_position:u.pos}))]);
       const bad=res.find(r=>r.error);if(bad){alert(bad.error.message);return loadProduction()}
-      if(changed){showToast(`✓ ${workOrderRecipient(o)||"Orden"}: ${workOrderStatusLabel(newStatus).toLowerCase()}`);await Promise.all([loadProduction(),loadDashboard()])}
+      if(changed&&!isT){showToast(`✓ ${workOrderRecipient(o)||"Orden"}: ${workOrderStatusLabel(newStatus).toLowerCase()}`);await Promise.all([loadProduction(),loadDashboard()])}
+      else if(changed)showToast(`✓ ${o.title}: ${col.t.replace(/^\S+\s/,"").toLowerCase()}`)
     }
-    function woMoveTo(id,k){woDrop(id,k,null)}
+    function woMoveTo(key,k){woDrop(key,k,null)}
+    async function woSetBoard(key,boardId){
+      const f=woFind(key);if(!f.r)return;if(!hasPermission("work_orders.update"))return showToast("No tienes permiso");
+      f.r.board_id=boardId||null;f.r.board_position=null;renderProduction();
+      const {error}=await woUpdate(f.r,{board_id:boardId||null,board_position:null});if(error){alert(error.message);return loadProduction()}
+      showToast(boardId?`📁 Pasó a ${woBoardById(boardId)?.name||"el tablero"}`:"🏠 Pasó al tablero general")
+    }
+    function woOpenBoard(id){woBoard=id||"";try{localStorage.setItem("tecniWoBoard",woBoard)}catch(e){}renderProduction();try{$("view-production").scrollIntoView({block:"start"})}catch(e){}}
+    const woNorm=x=>String(x||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim();
+    async function woNewBoard(){
+      if(!hasPermission("work_orders.update"))return;const name=(prompt("Nombre del tablero nuevo (por ejemplo: El Túnel, Cocinando para Vender):")||"").trim();if(!name)return;
+      const {data,error}=await db.from("production_boards").insert({name}).select().single();if(error)return alert(error.message);
+      state.prodBoards.push(data);const n=woNorm(name);
+      const mine=state.workOrders.filter(o=>!o.board_id&&!o.archived_at&&!["delivered","cancelled"].includes(o.status)&&n.length>2&&woNorm(o.client_name).includes(n));
+      if(mine.length&&confirm(`Encontré ${mine.length} pedido${mine.length===1?"":"s"} activo${mine.length===1?"":"s"} de “${mine[0].client_name}”. ¿Los paso a este tablero?`)){const r=await db.from("work_orders").update({board_id:data.id}).in("id",mine.map(o=>o.id));if(r.error)alert(r.error.message);else mine.forEach(o=>o.board_id=data.id)}
+      showToast(`📁 Tablero “${name}” creado`);woOpenBoard(data.id)
+    }
+    async function woRenameBoard(id){const b=woBoardById(id);if(!b)return;const name=(prompt("Nuevo nombre del tablero:",b.name)||"").trim();if(!name||name===b.name)return;const {error}=await db.from("production_boards").update({name}).eq("id",id);if(error)return alert(error.message);b.name=name;renderProduction()}
+    async function woArchiveBoard(id,on){const b=woBoardById(id);if(!b)return;if(on&&!confirm(`¿Archivar el tablero “${b.name}”?\n\nSus tarjetas se esconden con él. Lo puedes reabrir desde “📦 Ver archivados”.`))return;const now=on?new Date().toISOString():null;const {error}=await db.from("production_boards").update({archived_at:now}).eq("id",id);if(error)return alert(error.message);b.archived_at=now;if(on){woOpenBoard("");showToast("📦 Tablero archivado")}else{$("productionStatusFilter").value="";woOpenBoard(id);showToast("↩ Tablero reabierto")}}
+    async function woDeleteBoard(id){const b=woBoardById(id);if(!b)return;if(!confirm(`¿Eliminar el tablero “${b.name}”?\n\nNo se borra ninguna tarjeta ni pedido: todo lo que tenía pasa al tablero 🏠 General.`))return;const {error}=await db.from("production_boards").delete().eq("id",id);if(error)return alert(error.message);state.prodBoards=state.prodBoards.filter(x=>x.id!==id);state.workOrders.forEach(o=>{if(o.board_id===id)o.board_id=null});(state.prodTasks||[]).forEach(t=>{if(t.board_id===id)t.board_id=null});woOpenBoard("");showToast("Tablero eliminado")}
+    function woFillTaskForm(t,col){
+      $("woTaskId").value=t?.id||"";$("woTaskTitle").textContent=t?"Tarjeta":"Nueva tarjeta";$("woTaskName").value=t?.title||"";$("woTaskNotes").value=t?.notes||"";$("woTaskDue").value=t?.due_date||"";
+      $("woTaskCol").innerHTML=WO_COLS.map(c=>`<option value="${c.k}">${c.t}</option>`).join("");$("woTaskCol").value=t?.col||col||"todo";
+      const bs=(state.prodBoards||[]).filter(b=>!b.archived_at||b.id===t?.board_id);$("woTaskBoard").innerHTML='<option value="">🏠 General (sin tablero)</option>'+bs.map(b=>`<option value="${b.id}">📁 ${escapeHTML(b.name)}</option>`).join("");$("woTaskBoard").value=t?(t.board_id||""):woBoard;
+      $("woTaskDelete").classList.toggle("hidden",!t);openModal("woTaskModal");setTimeout(()=>{if(!t&&!$("woTaskForm").contains(document.activeElement))$("woTaskName").focus()},60)
+    }
+    function woNewTask(col){if(state.prodMissing)return alert("Falta crear las tablas de tarjetas en Supabase.");woFillTaskForm(null,col)}
+    function woEditTask(id){const t=(state.prodTasks||[]).find(x=>x.id===id);if(t)woFillTaskForm(t)}
+    async function woSaveTask(e){
+      e.preventDefault();if(!hasPermission("work_orders.update"))return showToast("No tienes permiso");
+      const id=$("woTaskId").value,p={title:$("woTaskName").value.trim(),notes:$("woTaskNotes").value.trim()||null,due_date:$("woTaskDue").value||null,col:$("woTaskCol").value,board_id:$("woTaskBoard").value||null};if(!p.title)return;
+      const old=id&&state.prodTasks.find(x=>x.id===id);if(old&&(old.col!==p.col||old.board_id!==p.board_id))p.board_position=null;
+      const r=id?await db.from("production_tasks").update(p).eq("id",id).select().single():await db.from("production_tasks").insert(p).select().single();if(r.error)return alert(r.error.message);
+      const t=Object.assign(r.data,{__task:true});if(id)state.prodTasks=state.prodTasks.map(x=>x.id===id?t:x);else state.prodTasks.push(t);
+      closeModal("woTaskModal");showToast(id?"Tarjeta guardada":"📝 Tarjeta creada");renderProduction()
+    }
+    async function woDeleteTask(id){const t=(state.prodTasks||[]).find(x=>x.id===id);if(!t||!confirm(`¿Eliminar la tarjeta “${t.title}”? Esto no se puede deshacer (si solo quieres quitarla de la vista, mejor archívala).`))return;const {error}=await db.from("production_tasks").delete().eq("id",id);if(error)return alert(error.message);state.prodTasks=state.prodTasks.filter(x=>x.id!==id);closeModal("woTaskModal");showToast("Tarjeta eliminada");renderProduction()}
+    try{$("woTaskForm").addEventListener("submit",woSaveTask);$("woTaskDelete").addEventListener("click",()=>woDeleteTask($("woTaskId").value));$("woDetailsBtn").addEventListener("click",()=>{woOpenAll=!woOpenAll;woOpen.clear();try{localStorage.setItem("tecniWoOpenAll",woOpenAll?"1":"0")}catch(e){}renderProduction()})}catch(e){console.warn(e)}
     const woD={};
     function woDragInit(){
       const board=$("productionBody");if(!board||board.dataset.dragInit)return;board.dataset.dragInit="1";
@@ -3236,7 +3296,7 @@
     function woStop(){cancelAnimationFrame(woD.raf);woD.on=false;woD.ghost&&woD.ghost.remove();woD.line&&woD.line.remove();woD.card&&woD.card.classList.remove("wo-lifted");document.body.classList.remove("wo-dragging");document.querySelectorAll(".wo-over").forEach(n=>n.classList.remove("wo-over"));woD.last=Date.now()}
     function woCancel(){woStop()}
     function woEnd(x,y){woMove(x,y);const t=woD.target,id=woD.id;woStop();if(t)woDrop(id,t.k,t.idx)}
-    window.woArchive=woArchive;window.woArchiveColumn=woArchiveColumn;window.woMoveTo=woMoveTo;
+    Object.assign(window,{woArchive,woArchiveColumn,woMoveTo,woToggle,woSetBoard,woOpenBoard,woNewBoard,woRenameBoard,woArchiveBoard,woDeleteBoard,woNewTask,woEditTask,woDeleteTask});
     (function(){const b=document.getElementById("navMiniBtn");if(!b)return;const set=on=>{document.body.classList.toggle("nav-mini",on);b.textContent=on?"»":"«";b.title=on?"Mostrar el menú":"Esconder el menú";try{localStorage.setItem("tecniNavMini",on?"1":"0")}catch(e){}};let on=false;try{on=localStorage.getItem("tecniNavMini")==="1"}catch(e){}set(on);b.addEventListener("click",()=>set(!document.body.classList.contains("nav-mini")));document.querySelectorAll("#nav button").forEach(x=>{if(!x.title)x.title=x.textContent.trim()})})();
     // V9.09: venta rápida, comprobantes y niveles de acceso
     function financePermsInstalled(){return state.permissions instanceof Map&&state.permissions.has("finance.view")}
@@ -3763,19 +3823,24 @@
       if(ordersRes.error){showToast("No fue posible cargar producción");return}
       state.workOrders=ordersRes.data||[];state.payments=paymentsRes.error?[]:(paymentsRes.data||[]);
       const ids=state.workOrders.filter(o=>o.status!=="cancelled").map(o=>o.id);state.productionItems=[];for(let i=0;i<ids.length;i+=150){const r=await db.from("work_order_items").select("work_order_id,quantity,unit,description,sort_order").in("work_order_id",ids.slice(i,i+150)).order("sort_order");if(!r.error)state.productionItems.push(...(r.data||[]))}
+      const [bRes,tRes]=await Promise.all([db.from("production_boards").select("*").order("created_at"),db.from("production_tasks").select("*").order("created_at")]);
+      state.prodMissing=!!(bRes.error||tRes.error);state.prodBoards=bRes.error?[]:(bRes.data||[]);state.prodTasks=tRes.error?[]:(tRes.data||[]).map(t=>(t.__task=true,t));
       renderProduction()
     }
-    const WO_COLS=[{k:"design",t:"🎨 Por diseñar",st:["pending_design"],help:"Hay que hacer o ajustar el arte"},{k:"client",t:"👀 Esperando al cliente",st:["waiting_approval"],help:"Ya le mandamos el diseño"},{k:"pause",t:"⏸️ En pausa",st:["paused"],help:"Esperando algo, sin afán"},{k:"doing",t:"🖨 Haciéndose",st:["in_production","finishing"],help:"Impresión y acabados"},{k:"ready",t:"📦 Listo para entregar",st:["ready"],help:"Solo falta entregarlo"},{k:"done",t:"✅ Entregado",st:["delivered"],help:"Últimos 7 días"}];
+    const WO_COLS=[{k:"todo",t:"📝 Pendientes",st:[],help:"Tareas y cosas por hacer"},{k:"design",t:"🎨 Por diseñar",st:["pending_design"],help:"Hay que hacer o ajustar el arte"},{k:"client",t:"👀 Esperando al cliente",st:["waiting_approval"],help:"Ya le mandamos el diseño"},{k:"pause",t:"⏸️ En pausa",st:["paused"],help:"Esperando algo, sin afán"},{k:"doing",t:"🖨 Haciéndose",st:["in_production","finishing"],help:"Impresión y acabados"},{k:"ready",t:"📦 Listo para entregar",st:["ready"],help:"Solo falta entregarlo"},{k:"done",t:"✅ Entregado",st:["delivered"],help:"Últimos 7 días"}];
     const WO_NEXT={paused:"pending_design",pending_design:"waiting_approval",waiting_approval:"in_production",in_production:"ready",finishing:"ready",ready:"delivered"},WO_PREV={waiting_approval:"pending_design",in_production:"waiting_approval",finishing:"in_production",ready:"in_production",delivered:"ready"};
     const WO_NEXT_TXT={paused:"▶️ Reanudar",pending_design:"Diseño listo →",waiting_approval:"Cliente aprobó →",in_production:"Ya está listo →",finishing:"Ya está listo →",ready:"Entregado ✓"};
     let woTab="design";
     function woDateChip(d){if(!d)return '<span class="wo-chip">📅 Sin fecha</span>';const t=localISODate(),n=new Date(),tm=localISO(new Date(n.getFullYear(),n.getMonth(),n.getDate()+1));if(d<t)return `<span class="wo-chip late">⚠️ Atrasada · ${caDate(d)}</span>`;if(d===t)return '<span class="wo-chip soon">📅 Hoy</span>';if(d===tm)return '<span class="wo-chip soon">📅 Mañana</span>';return `<span class="wo-chip">📅 ${caDate(d)}</span>`}
+    function woBoardById(id){return (state.prodBoards||[]).find(b=>b.id===id)}
+    function woBoardMenu(key,cur){if(state.prodMissing)return "";const bs=(state.prodBoards||[]).filter(b=>!b.archived_at&&b.id!==cur);const opts=bs.map(b=>`<button type="button" onclick="window.woSetBoard('${key}','${b.id}')">📁 ${escapeHTML(b.name)}</button>`);if(cur)opts.unshift(`<button type="button" onclick="window.woSetBoard('${key}','')">🏠 General (sin tablero)</button>`);return opts.length?'<hr><small class="wo-menu-label">Pasar al tablero:</small>'+opts.join(""):""}
     function woCard(o){
-      const can=hasPermission("work_orders.update"),items=(state.productionItems||[]).filter(i=>i.work_order_id===o.id),f=hasPermission("payments.view")?orderFinancial(o):null,who=state.profiles.get(o.assigned_to);
-      const what=items.length?items.slice(0,2).map(i=>`<li>${formatInventoryQuantity(i.quantity)} ${escapeHTML(i.unit||"")} · ${escapeHTML(i.description||"")}</li>`).join("")+(items.length>2?`<li class="more">y ${items.length-2} más…</li>`:""):"";
+      const can=hasPermission("work_orders.update"),items=(state.productionItems||[]).filter(i=>i.work_order_id===o.id),f=hasPermission("payments.view")?orderFinancial(o):null,who=state.profiles.get(o.assigned_to),open=woIsOpen(o.id),b=o.board_id&&woBoardById(o.board_id);
+      const what=items.length?items.slice(0,4).map(i=>`<li>${formatInventoryQuantity(i.quantity)} ${escapeHTML(i.unit||"")} · ${escapeHTML(i.description||"")}</li>`).join("")+(items.length>4?`<li class="more">y ${items.length-4} más…</li>`:""):"";
       const pay=f?(f.status==="paid"?'<span class="wo-chip ok">💰 Pagado</span>':f.paid>0?`<span class="wo-chip warn">💰 Debe ${formatCOP(f.balance)}</span>`:`<span class="wo-chip bad">💰 Sin pago · ${formatCOP(f.balance)}</span>`):"";
+      const payMini=f?(f.status==="paid"?'<span class="wo-chip ok" title="Pagado">💰✓</span>':`<span class="wo-chip ${f.paid>0?"warn":"bad"}" title="Debe">💰 ${formatCOP(f.balance)}</span>`):"";
       const menu=[`<button type="button" onclick="window.openWorkOrder('${o.id}')">Abrir pedido completo</button>`];
-      if(can&&WO_PREV[o.status])menu.push(`<button type="button" onclick="window.changeWorkOrderStatus('${o.id}','${WO_PREV[o.status]}')">← Volver un paso</button>`);
+      if(can&&!o.archived_at&&WO_PREV[o.status])menu.push(`<button type="button" onclick="window.changeWorkOrderStatus('${o.id}','${WO_PREV[o.status]}')">← Volver un paso</button>`);
       if(can&&o.status==="in_production")menu.push(`<button type="button" onclick="window.changeWorkOrderStatus('${o.id}','finishing')">✂ Marcar: en acabados</button>`);
       if(can&&o.status==="finishing")menu.push(`<button type="button" onclick="window.changeWorkOrderStatus('${o.id}','in_production')">🖨 Quitar “en acabados”</button>`);
       if(hasPermission("payments.view"))menu.push(`<button type="button" onclick="window.openPaymentHistory('${o.id}')">Ver pagos</button>`);
@@ -3783,29 +3848,57 @@
       if(hasPermission("inventory.view"))menu.push(`<button type="button" onclick="window.openInventoryHistory(null,'${o.id}')">Materiales usados</button>`);
       if(hasPermission("inventory.manage")&&o.status!=="cancelled")menu.push(`<button type="button" onclick="window.openInventoryMovement('', '${o.id}', 'consumption')">Usar insumo</button>`);
       if(can&&o.archived_at)menu.push(`<hr><button type="button" onclick="window.woArchive(['${o.id}'],false)">↩ Sacar del archivo (volver al tablero)</button>`);
-      if(can&&!o.archived_at&&o.status!=="cancelled"){const here=WO_COLS.find(c=>c.st.includes(o.status));menu.push('<hr><small class="wo-menu-label">Mover a:</small>'+WO_COLS.filter(c=>c!==here).map(c=>`<button type="button" onclick="window.woMoveTo('${o.id}','${c.k}')">${c.t}</button>`).join(''));menu.push(`<button type="button" onclick="window.woArchive(['${o.id}'],true)">📦 Archivar (sacar del tablero)</button>`)}
-      if(can&&o.status!=="cancelled")menu.push(`<hr><button type="button" class="danger" onclick="window.cancelWorkOrder('${o.id}')">Cancelar pedido (el cliente desistió)</button>`);
+      if(can&&!o.archived_at&&o.status!=="cancelled"){const here=WO_COLS.find(c=>c.st.includes(o.status));menu.push('<hr><small class="wo-menu-label">Mover a:</small>'+WO_COLS.filter(c=>c!==here&&c.st.length).map(c=>`<button type="button" onclick="window.woMoveTo('${o.id}','${c.k}')">${c.t}</button>`).join(''));menu.push(woBoardMenu(o.id,o.board_id));menu.push(`<hr><button type="button" onclick="window.woArchive(['${o.id}'],true)">📦 Archivar (sacar del tablero)</button>`)}
+      if(can&&o.status!=="cancelled")menu.push(`<button type="button" class="danger" onclick="window.cancelWorkOrder('${o.id}')">Cancelar pedido (el cliente desistió)</button>`);
       if(can&&o.status==="cancelled")menu.push(`<button type="button" onclick="window.changeWorkOrderStatus('${o.id}','pending_design')">↺ Reactivar pedido</button>`);
       if(hasPermission("work_orders.delete"))menu.push(`<button type="button" class="danger" onclick="window.deleteWorkOrder('${o.id}')">Eliminar</button>`);
       const next=can&&!o.archived_at&&WO_NEXT[o.status]?`<button type="button" class="wo-next${o.status==="ready"?" done":""}" onclick="window.changeWorkOrderStatus('${o.id}','${WO_NEXT[o.status]}')">${WO_NEXT_TXT[o.status]}</button>`:"";
-      return `<article data-woid="${o.id}" class="wo-card${can&&!o.archived_at&&o.status!=="cancelled"?" wo-drag":""}${o.priority==="urgent"?" urgent":""}${o.status==="cancelled"?" cancelled":""}" onclick="if(!event.target.closest('button,a'))window.openWorkOrder('${o.id}')"><div class="wo-top"><div><strong class="wo-client">${escapeHTML(workOrderRecipient(o))}</strong><small>${escapeHTML(o.order_number||"")}${o.quote_number?" · "+escapeHTML(o.quote_number):""}</small></div><span class="table-actions"><button class="row-menu-btn dots" type="button" aria-haspopup="menu" aria-label="Más opciones" onclick="window.toggleRowMenu(this)">⋯</button><span class="row-menu-source" hidden>${menu.join("")}</span></span></div>${o.priority==="urgent"?'<span class="wo-chip urgent">🔥 Urgente</span>':""}${o.status==="finishing"?'<span class="wo-chip fin">✂ En acabados</span>':""}${o.archived_at?`<span class="wo-chip">📦 Archivada · ${escapeHTML(workOrderStatusLabel(o.status))}</span>`:""}${what?`<ul class="wo-what">${what}</ul>`:""}<div class="wo-chips">${o.status==="delivered"||o.status==="cancelled"?"":woDateChip(o.promised_date)}${pay}<span class="wo-chip">👤 ${escapeHTML(who||"Sin asignar")}</span></div>${next}</article>`;
+      return `<article data-woid="${o.id}" class="wo-card${can&&!o.archived_at&&o.status!=="cancelled"?" wo-drag":""}${o.priority==="urgent"?" urgent":""}${o.status==="cancelled"?" cancelled":""}${open?" open":""}" onclick="if(!event.target.closest('button,a'))window.openWorkOrder('${o.id}')"><div class="wo-top"><div><strong class="wo-client">${escapeHTML(workOrderRecipient(o))}</strong><small>${escapeHTML(o.order_number||"")}${o.quote_number?" · "+escapeHTML(o.quote_number):""}${!woBoard&&b?" · 📁 "+escapeHTML(b.name):""}</small></div><span class="table-actions"><button class="row-menu-btn dots" type="button" aria-haspopup="menu" aria-label="Más opciones" onclick="window.toggleRowMenu(this)">⋯</button><span class="row-menu-source" hidden>${menu.join("")}</span></span></div><div class="wo-mini">${o.priority==="urgent"?'<span class="wo-chip urgent" title="Urgente">🔥</span>':""}${o.status==="finishing"?'<span class="wo-chip fin" title="En acabados">✂</span>':""}${o.status==="delivered"||o.status==="cancelled"?"":woDateChip(o.promised_date)}${payMini}<button type="button" class="wo-exp" title="${open?"Ocultar detalles":"Ver detalles"}" onclick="window.woToggle('${o.id}')">${open?"▴":"▾"}</button></div><div class="wo-more">${o.archived_at?`<span class="wo-chip">📦 Archivada · ${escapeHTML(workOrderStatusLabel(o.status))}</span>`:""}${what?`<ul class="wo-what">${what}</ul>`:""}<div class="wo-chips">${o.priority==="urgent"?'<span class="wo-chip urgent">🔥 Urgente</span>':""}${o.status==="finishing"?'<span class="wo-chip fin">✂ En acabados</span>':""}${pay}<span class="wo-chip">👤 ${escapeHTML(who||"Sin asignar")}</span></div>${next}</div></article>`;
+    }
+    function woTaskCard(t){
+      const can=hasPermission("work_orders.update"),key="t:"+t.id,open=woIsOpen(key),b=t.board_id&&woBoardById(t.board_id);
+      const menu=[`<button type="button" onclick="window.woEditTask('${t.id}')">✏️ Abrir / editar</button>`];
+      if(can&&t.archived_at)menu.push(`<hr><button type="button" onclick="window.woArchive(['${key}'],false)">↩ Sacar del archivo (volver al tablero)</button>`);
+      if(can&&!t.archived_at){menu.push('<hr><small class="wo-menu-label">Mover a:</small>'+WO_COLS.filter(c=>c.k!==t.col).map(c=>`<button type="button" onclick="window.woMoveTo('${key}','${c.k}')">${c.t}</button>`).join(''));menu.push(woBoardMenu(key,t.board_id));menu.push(`<hr><button type="button" onclick="window.woArchive(['${key}'],true)">📦 Archivar (sacar del tablero)</button>`)}
+      if(can)menu.push(`<button type="button" class="danger" onclick="window.woDeleteTask('${t.id}')">🗑 Eliminar tarjeta</button>`);
+      return `<article data-woid="${key}" class="wo-card wo-task${can&&!t.archived_at?" wo-drag":""}${open?" open":""}" onclick="if(!event.target.closest('button,a'))window.woEditTask('${t.id}')"><div class="wo-top"><div><strong class="wo-client">${escapeHTML(t.title)}</strong>${!woBoard&&b?`<small>📁 ${escapeHTML(b.name)}</small>`:""}</div><span class="table-actions"><button class="row-menu-btn dots" type="button" aria-haspopup="menu" aria-label="Más opciones" onclick="window.toggleRowMenu(this)">⋯</button><span class="row-menu-source" hidden>${menu.join("")}</span></span></div><div class="wo-mini"><span class="wo-chip task" title="Tarjeta rápida (sin plata)">📝</span>${t.col!=="done"&&t.due_date?woDateChip(t.due_date):""}${t.archived_at?'<span class="wo-chip">📦 Archivada</span>':""}${t.notes?`<button type="button" class="wo-exp" title="${open?"Ocultar notas":"Ver notas"}" onclick="window.woToggle('${key}')">${open?"▴":"▾"}</button>`:""}</div>${t.notes?`<div class="wo-more"><div class="wo-notes">${escapeHTML(t.notes)}</div></div>`:""}</article>`;
+    }
+    function woFolderCard(b,rows,k){const t=localISODate(),late=k==="done"?0:rows.filter(r=>{const d=r.__task?r.due_date:r.promised_date;return d&&d<t}).length;return `<article class="wo-folder" onclick="window.woOpenBoard('${b.id}')"><strong>📁 ${escapeHTML(b.name)}</strong><small>${rows.length} tarjeta${rows.length===1?"":"s"}${late?` · <b class="late">⚠️ ${late} atrasada${late===1?"":"s"}</b>`:""} · Abrir →</small></article>`}
+    function woRenderBoards(){
+      const el=$("woBoards");if(!el)return;if(state.prodMissing||$("productionStatusFilter").value){el.innerHTML="";return}
+      const can=hasPermission("work_orders.update"),bs=(state.prodBoards||[]).filter(b=>!b.archived_at);
+      const cnt=id=>state.workOrders.filter(o=>!o.archived_at&&o.board_id===id&&!["delivered","cancelled"].includes(o.status)).length+(state.prodTasks||[]).filter(t=>!t.archived_at&&t.board_id===id&&t.col!=="done").length;
+      el.innerHTML=`<button type="button" class="wo-bchip${!woBoard?" on":""}" onclick="window.woOpenBoard('')">🏠 General</button>`+bs.map(b=>`<span class="wo-bwrap"><button type="button" class="wo-bchip${woBoard===b.id?" on":""}" onclick="window.woOpenBoard('${b.id}')">📁 ${escapeHTML(b.name)} <b>${cnt(b.id)}</b></button>${woBoard===b.id&&can?`<span class="table-actions"><button class="row-menu-btn wo-bmenu" type="button" aria-label="Opciones del tablero" onclick="window.toggleRowMenu(this)">⋯</button><span class="row-menu-source" hidden><button type="button" onclick="window.woRenameBoard('${b.id}')">✏️ Cambiar nombre</button><button type="button" onclick="window.woArchiveBoard('${b.id}',true)">📦 Archivar tablero (proyecto terminado)</button>${hasPermission("work_orders.delete")?`<button type="button" class="danger" onclick="window.woDeleteBoard('${b.id}')">🗑 Eliminar tablero</button>`:""}</span></span>`:""}</span>`).join("")+(can?`<button type="button" class="wo-bchip add" onclick="window.woNewBoard()">＋ Tablero</button>`:"");
     }
     function renderProduction(){
       const term=$("productionSearch").value.trim().toLowerCase(),view=$("productionStatusFilter").value,weekAgo=new Date(Date.now()-7*864e5).toISOString(),seePay=hasPermission("payments.view"),canUp=hasPermission("work_orders.update");
-      const match=o=>!term||[o.order_number,o.quote_number,o.client_name,o.contact_name].some(x=>String(x||"").toLowerCase().includes(term));
-      const byDate=(a,b)=>(b.priority==="urgent")-(a.priority==="urgent")||String(a.promised_date||"9999").localeCompare(String(b.promised_date||"9999"));
-      const single=(title,help,rows,empty)=>{$("woTabs").innerHTML="";woLastCols=[];$("productionBody").className="wo-board single";$("productionBody").innerHTML=`<section class="wo-col"><header><strong>${title}</strong><small>${help}</small></header><div class="wo-list">${rows.map(woCard).join("")||`<div class="empty">${empty}</div>`}</div></section>`};
+      const match=o=>!term||[o.order_number,o.quote_number,o.client_name,o.contact_name,o.title,o.notes].some(x=>String(x||"").toLowerCase().includes(term));
+      const due=r=>r.__task?r.due_date:r.promised_date;
+      const byDate=(a,b)=>(b.priority==="urgent")-(a.priority==="urgent")||String(due(a)||"9999").localeCompare(String(due(b)||"9999"));
+      const any=r=>r.__task?woTaskCard(r):woCard(r);
+      if(woBoard&&!(woBoardById(woBoard)&&!woBoardById(woBoard).archived_at))woBoard="";
+      woRenderBoards();
+      $("woDetailsBtn")&&($("woDetailsBtn").textContent=woOpenAll?"▴ Resumir tarjetas":"▾ Ver detalles");
+      const single=(title,help,rows,empty,extra="")=>{$("woTabs").innerHTML="";woLastCols=[];$("productionBody").className="wo-board single";$("productionBody").innerHTML=`<section class="wo-col"><header><strong>${title}</strong><small>${help}</small></header><div class="wo-list">${extra}${rows.map(any).join("")||`<div class="empty">${empty}</div>`}</div></section>`};
       if(view==="cancelled")return single("❌ Cancelados","Pedidos que el cliente no siguió",state.workOrders.filter(o=>o.status==="cancelled"&&match(o)),"No hay pedidos cancelados.");
-      if(view==="archived")return single("📦 Archivados","Lo que sacaste del tablero. Para devolver uno: ⋯ → Sacar del archivo",state.workOrders.filter(o=>o.archived_at&&o.status!=="cancelled"&&match(o)).sort((a,b)=>String(b.archived_at).localeCompare(String(a.archived_at))),"No hay tarjetas archivadas.");
+      if(view==="archived"){const ab=(state.prodBoards||[]).filter(b=>b.archived_at);return single("📦 Archivados","Lo que sacaste del tablero. Para devolver una tarjeta: ⋯ → Sacar del archivo",[...state.workOrders.filter(o=>o.archived_at&&o.status!=="cancelled"&&match(o)),...(state.prodTasks||[]).filter(t=>t.archived_at&&match(t))].sort((a,b)=>String(b.archived_at).localeCompare(String(a.archived_at))),"No hay tarjetas archivadas.",ab.map(b=>`<article class="wo-folder"><strong>📁 ${escapeHTML(b.name)}</strong><small>Tablero archivado</small>${canUp?`<button type="button" class="btn secondary" onclick="window.woArchiveBoard('${b.id}',false)">↩ Reabrir tablero</button>`:""}</article>`).join(""))}
       $("productionBody").className="wo-board";
       const owes=o=>seePay&&orderFinancial(o).balance>.01;
       const order=(rows,base)=>{const pos=rows.filter(o=>o.board_position!=null).sort((a,b)=>a.board_position-b.board_position),rest=rows.filter(o=>o.board_position==null).sort(base);return pos.concat(rest)};
       const doneSort=(a,b)=>String(b.delivered_at||b.updated_at).localeCompare(String(a.delivered_at||a.updated_at));
-      const cols=WO_COLS.map(c=>({...c,rows:order(state.workOrders.filter(o=>!o.archived_at&&c.st.includes(o.status)&&match(o)&&(c.k!=="done"||String(o.delivered_at||o.updated_at||o.created_at)>=weekAgo||owes(o))),c.k==="done"?doneSort:byDate)}));
+      const liveBoard=r=>!r.board_id||!woBoardById(r.board_id)||!woBoardById(r.board_id).archived_at;
+      const activeBoards=(state.prodBoards||[]).filter(b=>!b.archived_at);
+      const cols=WO_COLS.map(c=>{
+        const all=[...state.workOrders.filter(o=>!o.archived_at&&c.st.includes(o.status)&&match(o)&&(c.k!=="done"||String(o.delivered_at||o.updated_at||o.created_at)>=weekAgo||owes(o))),...(state.prodTasks||[]).filter(t=>!t.archived_at&&t.col===c.k&&match(t))].filter(liveBoard).filter(r=>!woBoard||r.board_id===woBoard);
+        let rows=all,folders=[];
+        if(!woBoard&&!term){const inB=r=>r.board_id&&woBoardById(r.board_id);rows=all.filter(r=>!inB(r));folders=activeBoards.map(b=>({b,rows:all.filter(r=>r.board_id===b.id)})).filter(x=>x.rows.length)}
+        return {...c,rows:order(rows,c.k==="done"?doneSort:byDate),folders,count:all.length}
+      });
       woLastCols=cols;
       if(!cols.some(c=>c.k===woTab))woTab="design";
-      $("woTabs").innerHTML=cols.map(c=>`<button type="button" class="wo-tab${c.k===woTab?" on":""}" data-wotab="${c.k}">${c.t.split(" ")[0]} <b>${c.rows.length}</b><span>${c.t.replace(/^\S+\s/,"")}</span></button>`).join("");
-      $("productionBody").innerHTML=cols.map(c=>`<section class="wo-col col-${c.k}${c.k===woTab?" on":""}" data-col="${c.k}"><header><strong>${c.t}</strong><b>${c.rows.length}</b>${canUp&&c.rows.length?`<button type="button" class="wo-arch-all" title="Archivar todas las de esta columna" onclick="window.woArchiveColumn('${c.k}')">📦</button>`:""}<small>${c.k==="done"?(seePay?"Últimos 7 días y lo que todavía deben":"Últimos 7 días"):c.help}</small></header><div class="wo-list">${c.rows.map(woCard).join("")||'<div class="wo-empty">Nada por aquí 👌</div>'}</div></section>`).join("");
+      $("woTabs").innerHTML=cols.map(c=>`<button type="button" class="wo-tab${c.k===woTab?" on":""}" data-wotab="${c.k}">${c.t.split(" ")[0]} <b>${c.count}</b><span>${c.t.replace(/^\S+\s/,"")}</span></button>`).join("");
+      const addBtn=k=>canUp&&!state.prodMissing?`<button type="button" class="wo-add" onclick="window.woNewTask('${k}')">＋ Añadir tarjeta</button>`:"";
+      $("productionBody").innerHTML=cols.map(c=>`<section class="wo-col col-${c.k}${c.k===woTab?" on":""}" data-col="${c.k}"><header><strong>${c.t}</strong><b>${c.count}</b>${canUp&&c.rows.length?`<button type="button" class="wo-arch-all" title="Archivar todas las de esta columna" onclick="window.woArchiveColumn('${c.k}')">📦</button>`:""}<small>${c.k==="done"?(seePay?"Últimos 7 días y lo que todavía deben":"Últimos 7 días"):c.help}</small></header><div class="wo-list">${c.folders.map(x=>woFolderCard(x.b,x.rows,c.k)).join("")}${c.rows.map(any).join("")||(c.folders.length?"":'<div class="wo-empty">Nada por aquí 👌</div>')}</div>${addBtn(c.k)}</section>`).join("");
       woDragInit();
     }
     async function cancelWorkOrder(id){const o=state.workOrders.find(x=>x.id===id);if(!o)return;if(!confirm(`¿Cancelar el pedido de ${workOrderRecipient(o)}? Úsalo cuando el cliente desistió y el trabajo ya no se hace. Se puede reactivar después.`))return;await changeWorkOrderStatus(id,"cancelled",null,true)}

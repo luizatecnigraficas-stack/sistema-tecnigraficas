@@ -3929,8 +3929,8 @@
       const cols=WO_COLS.map(c=>{
         const all=[...state.workOrders.filter(o=>!o.archived_at&&c.st.includes(o.status)&&match(o)&&(c.k!=="done"||String(o.delivered_at||o.updated_at||o.created_at)>=weekAgo||owes(o))),...(state.prodTasks||[]).filter(t=>!t.archived_at&&t.col===c.k&&match(t))].filter(liveBoard).filter(r=>!woBoard||r.board_id===woBoard);
         let rows=all,folders=[];
-        if(!woBoard&&!term){const inB=r=>r.board_id&&woBoardById(r.board_id);rows=all.filter(r=>!inB(r));folders=activeBoards.map(b=>({b,rows:all.filter(r=>r.board_id===b.id)})).filter(x=>x.rows.length)}
-        return {...c,rows:order(rows,c.k==="done"?doneSort:byDate),folders,count:all.length}
+        if(!woBoard&&!term){const inB=r=>r.board_id&&woBoardById(r.board_id);rows=all.filter(r=>!inB(r));folders=[]}
+        return {...c,rows:order(rows,c.k==="done"?doneSort:byDate),folders,count:rows.length}
       });
       woLastCols=cols;
       if(!cols.some(c=>c.k===woTab))woTab="design";

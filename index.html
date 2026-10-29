@@ -603,6 +603,22 @@
     body.wo-dragging,body.wo-dragging *{cursor:grabbing!important;-webkit-user-select:none;user-select:none}
     #rowMenu .wo-menu-label,.wo-menu-label{display:block;padding:4px 12px 2px;font-size:10.5px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
     .nav-mini-btn{display:none}
+    /* V9.40 títulos más chicos, flechas, colores suaves y cartera discreta */
+    .wo-col header strong{font-size:11.5px!important;font-weight:850}.wo-col header small{font-size:9.5px!important}.wo-col header b{font-size:10.5px;padding:0 7px}
+    .wo-col{padding:8px;border-top-width:3px!important}.wo-col.col-design{border-top-color:#f3a6cc}.wo-col.col-client{border-top-color:#c4b5fd}.wo-col.col-doing{border-top-color:#8fd3ea}.wo-col.col-ready{border-top-color:#f6dd7a}.wo-col.col-done{border-top-color:#9adbbd}.wo-col.col-todo{border-top-color:#b7b3ee}.wo-col.col-pause{border-top-color:#c9ced8}
+    .wo-next{background:#eef6fa!important;color:#0b6f93!important;border:1px solid #c7e6f1!important;font-weight:850}.wo-next.done{background:#e9f8f0!important;color:#11703d!important;border-color:#bfe8d2!important}
+    .wo-bchip{font-size:11.5px;padding:5px 11px}
+    .wo-scroll{margin-left:auto;display:inline-flex;gap:6px;flex:0 0 auto}.wo-scroll button{width:34px;height:30px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:12px;color:#4a5160}.wo-scroll button:hover{background:#eef6fa;color:#0b6f93}
+    .wo-board{cursor:grab}.wo-board.wo-panning{cursor:grabbing;user-select:none}.wo-board .wo-card,.wo-board .wo-folder{cursor:pointer}
+    @media(max-width:900px){.wo-scroll{display:none}}
+    .ca-grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+    .ca-card{padding:10px 12px;border-radius:12px;gap:3px;border-left-width:4px;border-left-color:#d6dae3;box-shadow:0 2px 8px rgba(25,30,45,.04)}
+    .ca-card:hover{transform:none;box-shadow:0 6px 16px rgba(25,30,45,.08)}
+    .ca-card .ca-name{font-size:13.5px;font-weight:850}
+    .ca-label{font-size:9.5px;padding:2px 7px}
+    .ca-card .ca-due,.ca-card.sp .ca-due{font-size:11.5px;font-weight:700;color:#5c6372}.ca-card.zero .ca-due{font-size:11px;color:#3d8f63}.ca-card.closed .ca-due{font-size:11px}
+    .ca-card.zero{border-left-color:#bfe8d2}.ca-card.sp{border-left-color:#c7e6f1}
+    .ca-flag{font-size:9.5px;padding:2px 7px}
     /* V9.39 tarjetas más pequeñas */
     .wo-card{padding:9px 10px;gap:5px;border-radius:12px}.wo-card .wo-client{font-size:12.5px;line-height:1.25}.wo-top small{font-size:10px}
     .wo-card .wo-mini .wo-chip{padding:2px 7px;font-size:9.5px}.wo-exp{width:26px;height:21px;font-size:11px}
@@ -2640,7 +2656,7 @@
       $("caGrid").innerHTML=rows.length?rows.map(r=>{
         const bal=numberValue(r.balance),closed=r.status==="closed",zero=!closed&&bal<=.01,last=[r.last_item_date,r.last_payment_date].filter(Boolean).sort().pop();
         const flags=[numberValue(r.pending_delivery)?`<span class="ca-flag">📦 ${r.pending_delivery} sin entregar</span>`:""].join("");
-        return `<button type="button" class="ca-card${closed?" closed":zero?" zero":""}" data-ca="${r.client_account_id}"><div class="ca-top"><span class="ca-name">${escapeHTML(r.client_name)}</span><span class="ca-label">${escapeHTML(r.label)}${closed?" · cerrada":""}</span></div><span class="ca-due">${closed?"Cerrada "+caDate(r.closed_on):zero?"Al día ✓":formatCOP(bal)}</span><small>Entregado ${formatCOP(r.total)} · Abonado ${formatCOP(r.paid)}</small><small>${last?"Último movimiento: "+caDate(last):"Sin movimientos todavía"}</small>${flags?`<div class="ca-flags">${flags}</div>`:""}</button>`
+        return `<button type="button" class="ca-card${closed?" closed":zero?" zero":""}" data-ca="${r.client_account_id}"><div class="ca-top"><span class="ca-name">${escapeHTML(r.client_name)}</span><span class="ca-label">${escapeHTML(r.label)}${closed?" · cerrada":""}</span></div><span class="ca-due">${closed?"Cerrada "+caDate(r.closed_on):zero?"Al día ✓":formatCOP(bal)}</span>${flags?`<div class="ca-flags">${flags}</div>`:""}</button>`
       }).join(""):`<div class="pgrid-empty">${f==="due"?"Nadie nos debe en cuentas 🎉 Toca <strong>+ Abrir cuenta</strong> para empezar una.":"No hay cuentas con ese filtro."}</div>`;
     }
     async function caLoadClients(){if(ca.clients.length)return;const [c,p]=await Promise.all([db.from("clients").select("id,name,phone").eq("active",true).order("name"),db.from("products").select("id,name,sale_price,active").eq("active",true).order("name")]);ca.clients=c.data||[];ca.products=p.data||[]}
@@ -3226,6 +3242,7 @@
       else if(changed)showToast(`✓ ${o.title}: ${col.t.replace(/^\S+\s/,"").toLowerCase()}`)
     }
     function woMoveTo(key,k){woDrop(key,k,null)}
+    function woScroll(d){const b=$("productionBody");b.scrollBy({left:d*Math.max(240,b.clientWidth*.75),behavior:"smooth"})}
     async function woSetBoard(key,boardId){
       const f=woFind(key);if(!f.r)return;if(!hasPermission("work_orders.update"))return showToast("No tienes permiso");
       f.r.board_id=boardId||null;f.r.board_position=null;renderProduction();
@@ -3266,6 +3283,9 @@
     const woD={};
     function woDragInit(){
       const board=$("productionBody");if(!board||board.dataset.dragInit)return;board.dataset.dragInit="1";
+      board.addEventListener("pointerdown",e=>{if(e.pointerType==="touch"||e.button>0)return;if(!e.target.closest(".wo-card,.wo-folder,button,a,input,select,textarea")){woD.pan={x:e.clientX,left:board.scrollLeft};board.classList.add("wo-panning");return}});
+      document.addEventListener("pointermove",e=>{if(woD.pan){board.scrollLeft=woD.pan.left-(e.clientX-woD.pan.x)}});
+      document.addEventListener("pointerup",()=>{if(woD.pan){woD.pan=null;board.classList.remove("wo-panning")}});
       board.addEventListener("pointerdown",e=>{if(e.pointerType==="touch"||e.button>0)return;const card=e.target.closest(".wo-card.wo-drag");if(!card||e.target.closest("button,a,input,select,textarea"))return;woD.wait={card,x:e.clientX,y:e.clientY}});
       document.addEventListener("pointermove",e=>{if(e.pointerType==="touch")return;if(woD.wait&&!woD.on){if(Math.hypot(e.clientX-woD.wait.x,e.clientY-woD.wait.y)>6)woBegin(woD.wait.card,e.clientX,e.clientY);return}if(woD.on)woMove(e.clientX,e.clientY)});
       document.addEventListener("pointerup",e=>{if(e.pointerType==="touch")return;woD.wait=null;if(woD.on)woEnd(e.clientX,e.clientY)});
@@ -3303,7 +3323,7 @@
     function woStop(){cancelAnimationFrame(woD.raf);woD.on=false;woD.ghost&&woD.ghost.remove();woD.line&&woD.line.remove();woD.card&&woD.card.classList.remove("wo-lifted");document.body.classList.remove("wo-dragging");document.querySelectorAll(".wo-over").forEach(n=>n.classList.remove("wo-over"));woD.last=Date.now()}
     function woCancel(){woStop()}
     function woEnd(x,y){woMove(x,y);const t=woD.target,id=woD.id;woStop();if(t)woDrop(id,t.k,t.idx)}
-    Object.assign(window,{woArchive,woArchiveColumn,woMoveTo,woToggle,woSetBoard,woOpenBoard,woNewBoard,woRenameBoard,woArchiveBoard,woDeleteBoard,woNewTask,woEditTask,woDeleteTask});
+    Object.assign(window,{woScroll,woArchive,woArchiveColumn,woMoveTo,woToggle,woSetBoard,woOpenBoard,woNewBoard,woRenameBoard,woArchiveBoard,woDeleteBoard,woNewTask,woEditTask,woDeleteTask});
     (function(){const b=document.getElementById("navMiniBtn");if(!b)return;const set=on=>{document.body.classList.toggle("nav-mini",on);b.textContent=on?"»":"«";b.title=on?"Mostrar el menú":"Esconder el menú";try{localStorage.setItem("tecniNavMini",on?"1":"0")}catch(e){}};let on=false;try{on=localStorage.getItem("tecniNavMini")==="1"}catch(e){}set(on);b.addEventListener("click",()=>set(!document.body.classList.contains("nav-mini")));document.querySelectorAll("#nav button").forEach(x=>{if(!x.title)x.title=x.textContent.trim()})})();
     // V9.09: venta rápida, comprobantes y niveles de acceso
     function financePermsInstalled(){return state.permissions instanceof Map&&state.permissions.has("finance.view")}
@@ -3872,10 +3892,11 @@
     }
     function woFolderCard(b,rows,k){const t=localISODate(),late=k==="done"?0:rows.filter(r=>{const d=r.__task?r.due_date:r.promised_date;return d&&d<t}).length;return `<article class="wo-folder" onclick="window.woOpenBoard('${b.id}')"><strong>📁 ${escapeHTML(b.name)}</strong><small>${rows.length} tarjeta${rows.length===1?"":"s"}${late?` · <b class="late">⚠️ ${late} atrasada${late===1?"":"s"}</b>`:""} · Abrir →</small></article>`}
     function woRenderBoards(){
-      const el=$("woBoards");if(!el)return;if(state.prodMissing||$("productionStatusFilter").value){el.innerHTML="";return}
+      const el=$("woBoards");if(!el)return;if($("productionStatusFilter").value){el.innerHTML="";return}if(state.prodMissing){el.innerHTML=`<span class="wo-scroll"><button type="button" onclick="window.woScroll(-1)">◀</button><button type="button" onclick="window.woScroll(1)">▶</button></span>`;return}
       const can=hasPermission("work_orders.update"),bs=(state.prodBoards||[]).filter(b=>!b.archived_at);
       const cnt=id=>state.workOrders.filter(o=>!o.archived_at&&o.board_id===id&&!["delivered","cancelled"].includes(o.status)).length+(state.prodTasks||[]).filter(t=>!t.archived_at&&t.board_id===id&&t.col!=="done").length;
-      el.innerHTML=`<button type="button" class="wo-bchip${!woBoard?" on":""}" onclick="window.woOpenBoard('')">🏠 General</button>`+bs.map(b=>`<span class="wo-bwrap"><button type="button" class="wo-bchip${woBoard===b.id?" on":""}" onclick="window.woOpenBoard('${b.id}')">📁 ${escapeHTML(b.name)} <b>${cnt(b.id)}</b></button>${woBoard===b.id&&can?`<span class="table-actions"><button class="row-menu-btn wo-bmenu" type="button" aria-label="Opciones del tablero" onclick="window.toggleRowMenu(this)">⋯</button><span class="row-menu-source" hidden><button type="button" onclick="window.woRenameBoard('${b.id}')">✏️ Cambiar nombre</button><button type="button" onclick="window.woArchiveBoard('${b.id}',true)">📦 Archivar tablero (proyecto terminado)</button>${hasPermission("work_orders.delete")?`<button type="button" class="danger" onclick="window.woDeleteBoard('${b.id}')">🗑 Eliminar tablero</button>`:""}</span></span>`:""}</span>`).join("")+(can?`<button type="button" class="wo-bchip add" onclick="window.woNewBoard()">＋ Tablero</button>`:"");
+      const nav=`<span class="wo-scroll"><button type="button" title="Ver columnas a la izquierda" onclick="window.woScroll(-1)">◀</button><button type="button" title="Ver columnas a la derecha" onclick="window.woScroll(1)">▶</button></span>`;
+      el.innerHTML=`<button type="button" class="wo-bchip${!woBoard?" on":""}" onclick="window.woOpenBoard('')">🏠 General</button>`+bs.map(b=>`<span class="wo-bwrap"><button type="button" class="wo-bchip${woBoard===b.id?" on":""}" onclick="window.woOpenBoard('${b.id}')">📁 ${escapeHTML(b.name)} <b>${cnt(b.id)}</b></button>${woBoard===b.id&&can?`<span class="table-actions"><button class="row-menu-btn wo-bmenu" type="button" aria-label="Opciones del tablero" onclick="window.toggleRowMenu(this)">⋯</button><span class="row-menu-source" hidden><button type="button" onclick="window.woRenameBoard('${b.id}')">✏️ Cambiar nombre</button><button type="button" onclick="window.woArchiveBoard('${b.id}',true)">📦 Archivar tablero (proyecto terminado)</button>${hasPermission("work_orders.delete")?`<button type="button" class="danger" onclick="window.woDeleteBoard('${b.id}')">🗑 Eliminar tablero</button>`:""}</span></span>`:""}</span>`).join("")+(can?`<button type="button" class="wo-bchip add" onclick="window.woNewBoard()">＋ Tablero</button>`:"")+nav;
     }
     function renderProduction(){
       const term=$("productionSearch").value.trim().toLowerCase(),view=$("productionStatusFilter").value,weekAgo=new Date(Date.now()-7*864e5).toISOString(),seePay=hasPermission("payments.view"),canUp=hasPermission("work_orders.update");

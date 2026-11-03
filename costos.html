@@ -176,11 +176,11 @@ function fmtMoneyInput(el){const d=String(el.value).replace(/\D/g,"");el.value=d
 document.addEventListener("input",e=>{if(e.target.matches("input[data-money]"))fmtMoneyInput(e.target)});
 
 /* ---------- Datos ---------- */
-const kindTxt={lamina:"Lámina",unidad:"Unidad",paquete:"Paquete",fijo:"Fijo por pedido",servicio:"Servicio que cobramos"};
+const kindTxt={lamina:"Lámina",unidad:"Unidad",paquete:"Paquete",fijo:"Fijo por pedido",servicio:"Servicio que cobramos",m2:"Por metro cuadrado (m²)"};
 function label(it){return [it.name,it.detail].filter(Boolean).join(" · ")+(it.unit_kind==="lamina"&&it.width_cm?` (${+it.width_cm}×${+it.height_cm} cm)`:"")}
 function unitPrice(it){return it.unit_kind==="paquete"&&num(it.pack_qty)>0?num(it.price)/num(it.pack_qty):num(it.price)}
 function perCm2(it){const a=num(it.width_cm)*num(it.height_cm);return a>0?num(it.price)/a:0}
-function derived(it){if(it.unit_kind==="lamina")return `= ${money2(perCm2(it))} el cm²`;if(it.unit_kind==="paquete")return `= ${money2(unitPrice(it))} c/u (paquete de ${(+it.pack_qty).toLocaleString("es-CO")})`;return kindTxt[it.unit_kind]||""}
+function derived(it){if(it.unit_kind==="lamina")return `= ${money2(perCm2(it))} el cm²`;if(it.unit_kind==="paquete")return `= ${money2(unitPrice(it))} c/u (paquete de ${(+it.pack_qty).toLocaleString("es-CO")})`;if(it.unit_kind==="m2")return "el metro cuadrado (lo usa el Costeo rápido)";return kindTxt[it.unit_kind]||""}
 function fresh(it){if(!it.updated_on)return{c:"warn",t:"Sin confirmar"};const [y,m,d]=it.updated_on.split("-").map(Number);const days=Math.floor((Date.now()-new Date(y,m-1,d))/864e5);
   if(days<=0)return{c:"ok",t:"✓ Confirmado hoy"};if(days<=60)return{c:"ok",t:`✓ Hace ${days} día${days===1?"":"s"}`};const mo=Math.round(days/30);return{c:days<=120?"warn":"bad",t:days<=120?`Hace ${mo} meses`:`Hace ${mo} meses · revisar`}}
 const byCat=c=>S.items.filter(i=>i.active&&i.category===c);

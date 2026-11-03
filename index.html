@@ -2646,6 +2646,22 @@
       setTimeout(()=>{const acc=$("financeMovementAccount");const cash=[...(acc?.options||[])].find(o=>/efectivo|caja/i.test(o.textContent));if(cash&&acc){acc.value=cash.value;acc.dispatchEvent(new Event("change",{bubbles:true}))}const c=$("financeMovementConcept");if(c&&!c.value.trim())c.value="Domicilio";$("financeMovementAmount")?.focus()},250);
     }
     window.finDomicilio=finDomicilio;
+    // V9.47: lugares frecuentes de domicilio con su valor (app_settings "domicilio_lugares")
+    let finPlaces=null;
+    async function finLoadPlaces(){if(finPlaces)return finPlaces;try{const r=await db.from("app_settings").select("value").eq("key","domicilio_lugares").maybeSingle();finPlaces=JSON.parse(r.data?.value||"[]")}catch(e){finPlaces=[]}return finPlaces}
+    async function finSavePlaces(){try{await db.from("app_settings").upsert({key:"domicilio_lugares",value:JSON.stringify(finPlaces),updated_by:state.session.user.id,updated_at:new Date().toISOString()})}catch(e){console.error(e)}}
+    function finRenderPlaces(){
+      let box=$("finDomPlaces");const field=$("financeMovementConcept")?.closest(".field");if(!field)return;
+      if(!box){box=document.createElement("div");box.id="finDomPlaces";box.className="field full";field.before(box);
+        box.addEventListener("click",async e=>{const b=e.target.closest("[data-place]");if(!b)return;e.preventDefault();
+          if(b.dataset.place==="+"){const n=(prompt("¿Cómo se llama el lugar?")||"").trim();if(!n)return;const v=Number(String(prompt("¿Cuánto cuesta el domicilio? (solo el número)")||"0").replace(/\D/g,""))||0;finPlaces.push({n,v});await finSavePlaces();finRenderPlaces();$("financeMovementConcept").value="Domicilio · "+n;$("financeMovementAmount").value=v||"";$("financeMovementAmount").focus();return}
+          const pl=finPlaces[+b.dataset.place];if(!pl)return;$("financeMovementConcept").value="Domicilio · "+pl.n;$("financeMovementAmount").value=pl.v||"";box.querySelectorAll("[data-place]").forEach(x=>x.classList.toggle("on",x===b));if(!pl.v)$("financeMovementAmount").focus()})}
+      box.innerHTML=`<label>¿A dónde fue el domicilio?</label><div class="fin-chips">${finPlaces.map((p,i)=>`<button type="button" class="fin-chip-btn" data-place="${i}">${escapeHTML(p.n)}${p.v?` · ${formatCOP(p.v)}`:""}</button>`).join("")}<button type="button" class="fin-chip-btn" data-place="+">＋ Otro lugar</button></div>`;
+    }
+    {const __fd=finDomicilio;finDomicilio=async function(){await finLoadPlaces();await __fd();setTimeout(finRenderPlaces,300)};window.finDomicilio=finDomicilio}
+    document.addEventListener("click",e=>{if(e.target.closest?.("[data-close='financeMovementModal'],#financeMovementModal .modal-close"))$("finDomPlaces")?.remove()},true);
+    {const __ofm2=openFinanceMovement;openFinanceMovement=async function(...a){$("finDomPlaces")?.remove();return __ofm2.apply(this,a)}}
+    document.addEventListener("submit",e=>{if(e.target.id!=="financeMovementForm"||!finPlaces)return;const c=String($("financeMovementConcept")?.value||""),m=c.match(/^Domicilio · (.+)$/),v=Number($("financeMovementAmount")?.value||0);if(!m||!(v>0))return;const pl=finPlaces.find(x=>x.n===m[1].trim());if(pl&&pl.v!==v){pl.v=v;finSavePlaces()}$("finDomPlaces")?.remove()},true);
 
     // V9.19: Productos + Página web en una sola sección
     function productMissingPhoto(p){return Boolean(p.active&&p.catalog_visible&&!p.catalog_image_data)}

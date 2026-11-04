@@ -826,6 +826,15 @@
     #productionBody .wo-col.wo-over{filter:brightness(.96)}
     #productionBody .wo-add:hover{background:rgba(255,255,255,.7)}
     @media(max-width:900px){#productionBody .wo-col{max-width:none}#productionBody .tc-title{font-size:13.5px;line-height:18px}#productionBody .tb{font-size:11px}}
+
+    /* V9.50 botón Producción arriba y tablero más alto */
+    .top-prod{background:linear-gradient(135deg,#f7b9d3,#9fc7f3)!important;color:#2b3245!important;border:0;font-weight:850;box-shadow:0 4px 14px rgba(159,140,220,.35)!important}
+    .top-prod:hover{filter:brightness(1.05);transform:translateY(-1px)}
+    body:has(#view-production.active) .top-prod{outline:2px solid #fff;box-shadow:0 0 0 2px #c9c3f2!important}
+    #view-production>.view-head{display:none}
+    #view-production .wo-toolbar{margin-bottom:10px}
+    #productionBody .wo-col{max-height:calc(100vh - 185px)}#productionBody.wo-board{min-height:calc(100vh - 235px)}
+    @media(max-width:520px){.top-prod{padding:9px 10px}}
 </style>
 </head>
 <body>
@@ -876,7 +885,7 @@
     <main class="main">
       <header class="topbar">
         <div style="display:flex;align-items:center;gap:12px"><button class="btn secondary mobile-menu" id="mobileMenu">☰</button><div><h1 id="pageTitle">Inicio</h1><p id="pageSubtitle">Resumen general de Tecnigráficas</p></div></div>
-        <div class="top-actions"><button class="btn secondary eye-btn" id="privacyBtn" type="button" title="Esconder los valores ($) de la pantalla">👁</button><button class="btn qs-top hidden" id="topQuickSale" type="button">⚡ Venta rápida</button><button class="btn primary" id="topNewQuote">+ Nueva cotización</button></div>
+        <div class="top-actions"><button class="btn secondary eye-btn" id="privacyBtn" type="button" title="Esconder los valores ($) de la pantalla">👁</button><button class="btn top-prod hidden" id="topProduction" type="button" title="Ir al tablero de Producción">🗂 Producción</button><button class="btn qs-top hidden" id="topQuickSale" type="button">⚡ Venta rápida</button><button class="btn primary" id="topNewQuote">+ Nueva cotización</button></div>
       </header>
 
       <div class="content">
@@ -1998,7 +2007,7 @@
       try{const {data,error}=await db.from("business_settings").select("*").eq("id",true).maybeSingle();if(error)throw error;if(data)state.business={...state.business,...data}}catch(error){console.warn("Se usarán los datos predeterminados de Tecnigráficas para los recibos.",error)}
     }
 
-    function applyPermissionUI(){
+    function applyPermissionUI(){try{$("topProduction").classList.toggle("hidden",!hasPermission("work_orders.view"))}catch(e){}
       document.querySelectorAll("#nav button[data-view]").forEach(btn=>{const required=viewPermissions[btn.dataset.view];btn.classList.toggle("hidden",Boolean(required&&!hasPermission(required)))});
       $("addRemissionButton").classList.toggle("hidden",!hasPermission("quotes.create"));
       $("financeNav").classList.toggle("hidden",!canViewFinance());$("suppliersNav")?.classList.toggle("hidden",!canViewFinance());document.querySelector('#nav button[data-view="costing"]')?.classList.toggle("hidden",!hasPermission("quotes.create"));
@@ -3552,6 +3561,7 @@
     function woCancel(){woStop()}
     function woEnd(x,y){woMove(x,y);const t=woD.target,id=woD.id;woStop();if(t)woDrop(id,t.k,t.idx)}
     Object.assign(window,{woScroll,woArchive,woArchiveColumn,woMoveTo,woToggle,woSetBoard,woOpenBoard,woNewBoard,woRenameBoard,woArchiveBoard,woDeleteBoard,woNewTask,woEditTask,woDeleteTask});
+    (function(){const b=document.getElementById("topProduction");if(b)b.addEventListener("click",()=>{navigate("production");try{window.scrollTo({top:0})}catch(e){}})})();
     (function(){const b=document.getElementById("privacyBtn");if(!b)return;const set=on=>{document.body.classList.toggle("privado",on);b.title=on?"Mostrar los valores ($)":"Esconder los valores ($) de la pantalla";try{localStorage.setItem("tecniPrivado",on?"1":"0")}catch(e){}};let on=false;try{on=localStorage.getItem("tecniPrivado")==="1"}catch(e){}set(on);b.addEventListener("click",()=>{const v=!document.body.classList.contains("privado");set(v);showToast(v?"👁 Valores escondidos":"👁 Valores visibles")})})();
     (function(){document.querySelectorAll(".content .view > p.subtle, .content .view > p.wo-help").forEach(p=>{if(p.closest("details"))return;const d=document.createElement("details");d.className="help-tip";d.innerHTML="<summary>❔ Ayuda</summary>";p.replaceWith(d);d.appendChild(p)})})();
     (function(){const b=document.getElementById("navMiniBtn");if(!b)return;const set=on=>{document.body.classList.toggle("nav-mini",on);b.textContent=on?"»":"«";b.title=on?"Mostrar el menú":"Esconder el menú";try{localStorage.setItem("tecniNavMini",on?"1":"0")}catch(e){}};let on=false;try{on=localStorage.getItem("tecniNavMini")==="1"}catch(e){}set(on);b.addEventListener("click",()=>set(!document.body.classList.contains("nav-mini")));document.querySelectorAll("#nav button").forEach(x=>{if(!x.title)x.title=x.textContent.trim()})})();

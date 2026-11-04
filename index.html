@@ -792,6 +792,40 @@
     .cb-add{margin-top:6px}.cb-add input{width:100%;box-sizing:border-box;border:0;background:#f1f2f4;border-radius:6px;padding:8px 10px;font:inherit;font-size:14px}.cb-add input:focus{background:#fff;box-shadow:inset 0 0 0 2px #388bff;outline:0}
     .cb-foot{display:flex;gap:6px;flex-wrap:wrap;padding:12px 20px 18px;border-top:1px solid #e9ebee}.cb-foot .danger{color:#ae2e24}
     @media(max-width:640px){#woCardModal{padding:0}#woCardModal .modal.cb{max-height:100dvh;height:100dvh;border-radius:0}.cb-title{font-size:18px}}
+
+    /* V9.49 más pequeño (caben las 7 listas), fondo rosado-azul y listas pastel */
+    #woShell{--wo-bg:linear-gradient(135deg,#f7b9d3 0%,#c9c3f2 50%,#9fc7f3 100%);padding:8px 8px 2px}
+    #woShell .wo-bchip{background:rgba(255,255,255,.55);color:#2b3245;font-size:11.5px;padding:5px 10px}
+    #woShell .wo-bchip:hover{background:rgba(255,255,255,.8)}#woShell .wo-bchip.on{background:#fff;color:#172b4d}
+    #woShell .wo-bchip.add,#woShell .wo-bmenu,#woShell .wo-scroll button{background:rgba(255,255,255,.45);color:#2b3245}
+    #woShell .wo-tab{background:rgba(255,255,255,.55);color:#2b3245}#woShell .wo-tab span{color:#4a5160}
+    #productionBody.wo-board{gap:6px}
+    #productionBody .wo-col{flex:1 0 138px;width:auto;min-width:138px;max-width:272px;padding:5px 3px 3px;border-radius:10px;box-shadow:0 1px 2px rgba(9,30,66,.12)}
+    #productionBody .wo-col header{padding:2px 2px 5px 8px}
+    #productionBody .wo-col header strong{font-size:12px!important}
+    #productionBody .wo-col header b{font-size:10.5px!important}
+    #productionBody .wo-lmenu{width:26px;height:26px;font-size:14px}
+    #productionBody .wo-list{gap:6px;padding:1px 3px}
+    #productionBody .wo-card.tc{padding:6px 9px;border-radius:7px;min-height:30px;gap:3px}
+    #productionBody .tc-title{font-size:12px;line-height:16px}
+    #productionBody .tb{font-size:10px;line-height:16px;padding:0 3px}
+    #productionBody .tb.who{width:20px;height:20px;font-size:8.5px}
+    #productionBody .tc-check{height:13px;font-size:8px;line-height:10px}#productionBody .wo-card.tc:hover .tc-check,#productionBody .tc-check.on{width:13px}
+    #productionBody .tc-edit .row-menu-btn{width:24px;height:24px;font-size:11px}
+    #productionBody .wo-add{font-size:11.5px;padding:5px 6px}
+    #productionBody .tc-composer textarea{font-size:12px;min-height:48px;padding:6px 9px}
+    #productionBody .tc-composer .acts .ok{font-size:12px;padding:5px 10px}
+    #productionBody .wo-col.collapsed{flex:0 0 34px;min-width:34px}
+    #productionBody .wo-col.col-todo{background:#eeeaff}
+    #productionBody .wo-col.col-design{background:#fde8f2}
+    #productionBody .wo-col.col-client{background:#f3e9fb}
+    #productionBody .wo-col.col-pause{background:#eef0f4}
+    #productionBody .wo-col.col-doing{background:#e2f0fb}
+    #productionBody .wo-col.col-ready{background:#fdf5d6}
+    #productionBody .wo-col.col-done{background:#e2f5ea}
+    #productionBody .wo-col.wo-over{filter:brightness(.96)}
+    #productionBody .wo-add:hover{background:rgba(255,255,255,.7)}
+    @media(max-width:900px){#productionBody .wo-col{max-width:none}#productionBody .tc-title{font-size:13.5px;line-height:18px}#productionBody .tb{font-size:11px}}
 </style>
 </head>
 <body>
@@ -3522,12 +3556,12 @@
     (function(){document.querySelectorAll(".content .view > p.subtle, .content .view > p.wo-help").forEach(p=>{if(p.closest("details"))return;const d=document.createElement("details");d.className="help-tip";d.innerHTML="<summary>❔ Ayuda</summary>";p.replaceWith(d);d.appendChild(p)})})();
     (function(){const b=document.getElementById("navMiniBtn");if(!b)return;const set=on=>{document.body.classList.toggle("nav-mini",on);b.textContent=on?"»":"«";b.title=on?"Mostrar el menú":"Esconder el menú";try{localStorage.setItem("tecniNavMini",on?"1":"0")}catch(e){}};let on=false;try{on=localStorage.getItem("tecniNavMini")==="1"}catch(e){}set(on);b.addEventListener("click",()=>set(!document.body.classList.contains("nav-mini")));document.querySelectorAll("#nav button").forEach(x=>{if(!x.title)x.title=x.textContent.trim()})})();
     // V9.43: Producción con estilo y forma de usar de Trello
-    const WO_BG={azul:"linear-gradient(135deg,#1f6fd6,#0b4a9c)",cielo:"linear-gradient(135deg,#2bb0c9,#1673c9)",lavanda:"linear-gradient(135deg,#9b8cf0,#5b4fc4)",rosa:"linear-gradient(135deg,#f29cc0,#c2569b)",menta:"linear-gradient(135deg,#5fd0a5,#1f8f7a)",atardecer:"linear-gradient(135deg,#f7b267,#e0607e)",grafito:"linear-gradient(135deg,#5b6272,#20222a)"};
-    const WO_BG_NAME={azul:"Azul",cielo:"Cielo",lavanda:"Lavanda",rosa:"Rosa",menta:"Menta",atardecer:"Atardecer",grafito:"Grafito"};
+    const WO_BG={algodon:"linear-gradient(135deg,#f7b9d3 0%,#c9c3f2 50%,#9fc7f3 100%)",azul:"linear-gradient(135deg,#1f6fd6,#0b4a9c)",cielo:"linear-gradient(135deg,#2bb0c9,#1673c9)",lavanda:"linear-gradient(135deg,#9b8cf0,#5b4fc4)",rosa:"linear-gradient(135deg,#f29cc0,#c2569b)",menta:"linear-gradient(135deg,#5fd0a5,#1f8f7a)",atardecer:"linear-gradient(135deg,#f7b267,#e0607e)",grafito:"linear-gradient(135deg,#5b6272,#20222a)"};
+    const WO_BG_NAME={algodon:"Rosado y azul",azul:"Azul",cielo:"Cielo",lavanda:"Lavanda",rosa:"Rosa",menta:"Menta",atardecer:"Atardecer",grafito:"Grafito"};
     let woComposing="",woCB=null;const woCollapsed=new Set();
     try{JSON.parse(localStorage.getItem("tecniWoCollapsed")||"[]").forEach(k=>woCollapsed.add(k))}catch(e){}
     function woColorMenu(boardId){return '<small class="wo-menu-label">🎨 Color del tablero</small>'+Object.keys(WO_BG).map(k=>`<button type="button" onclick="window.woSetColor('${boardId}','${k}')"><i class="wo-dot" style="background:${WO_BG[k]}"></i>${WO_BG_NAME[k]}</button>`).join("")}
-    function woApplyBg(){let k="azul";if(woBoard){const b=woBoardById(woBoard);if(b&&WO_BG[b.color])k=b.color}else{try{const v=localStorage.getItem("tecniWoBgGeneral");if(WO_BG[v])k=v}catch(e){}}const el=$("woShell");if(el)el.style.setProperty("--wo-bg",WO_BG[k])}
+    function woApplyBg(){let k="algodon";if(woBoard){const b=woBoardById(woBoard);if(b&&WO_BG[b.color])k=b.color}else{try{const v=localStorage.getItem("tecniWoBgGeneral");if(WO_BG[v])k=v}catch(e){}}const el=$("woShell");if(el)el.style.setProperty("--wo-bg",WO_BG[k])}
     async function woSetColor(boardId,k){if(!WO_BG[k])return;if(!boardId){try{localStorage.setItem("tecniWoBgGeneral",k)}catch(e){}woApplyBg();return}const b=woBoardById(boardId);if(!b)return;b.color=k;woApplyBg();const {error}=await db.from("production_boards").update({color:k}).eq("id",boardId);if(error)alert(error.message)}
     function woCollapse(k){woCollapsed.has(k)?woCollapsed.delete(k):woCollapsed.add(k);try{localStorage.setItem("tecniWoCollapsed",JSON.stringify([...woCollapsed]))}catch(e){}renderProduction()}
     function woCompose(k,keep){

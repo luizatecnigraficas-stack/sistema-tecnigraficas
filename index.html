@@ -856,6 +856,13 @@
     #productionBody .tc-edit .row-menu-btn{width:20px;height:20px;font-size:10px}
     #woShell .wo-bchip{font-size:10.5px;padding:4px 9px}
     @media(max-width:900px){#productionBody .tc-title{font-size:12px;line-height:15px}#productionBody .tb{font-size:10px}}
+
+    /* V9.53 cantidad en circulito */
+    #productionBody .tc-title span{flex:1 1 auto;min-width:0}
+    .tc-qty{flex:0 0 auto;margin-left:auto;background:#eef0ff;color:#3b3f9e;border-radius:999px;padding:0 6px;font-size:9px;line-height:15px;font-weight:800;min-width:15px;text-align:center}
+    .wo-card.tc:hover .tc-qty{margin-right:0}
+    .cb-hint{font-size:11px;color:#626f86}
+    @media(max-width:900px){.tc-qty{font-size:11px;line-height:17px}}
 </style>
 </head>
 <body>
@@ -3649,7 +3656,7 @@
         <div class="cb-sub">${isT?(r.completed_at?"✓ Marcada como lista":"Tarjeta"):`${escapeHTML(r.order_number||"")}${r.quote_number?" · "+escapeHTML(r.quote_number):""}${r.contact_name&&r.contact_name!==r.client_name?" · "+escapeHTML(r.contact_name):""}`}${r.archived_at?" · 📦 Archivada":""}</div></div>
         <div class="cb-quick">${quick.join("")}</div>
         <div class="cb-body">
-          <div class="cb-sec"><h5>🕒 Fecha${isT?"":" de entrega"}</h5><div class="cb-dates"><input type="date" id="cbDate" value="${date||""}" ${can?"":"disabled"}>${date?woDueBadge(date,isT&&!!r.completed_at):""}${!isT&&r.priority==="urgent"?'<span class="tb urgent">🔥 Urgente</span>':""}</div></div>
+          <div class="cb-sec"><h5>🔢 Cantidad</h5><div class="cb-dates"><input type="number" id="cbQty" min="0" step="any" inputmode="decimal" placeholder="${!isT&&items.length===1?formatInventoryQuantity(items[0].quantity):"Ej: 100"}" value="${r.quantity??""}" ${can?"":"disabled"} style="width:120px"><small class="cb-hint">Sale en un circulito al lado del nombre</small></div></div><div class="cb-sec"><h5>🕒 Fecha${isT?"":" de entrega"}</h5><div class="cb-dates"><input type="date" id="cbDate" value="${date||""}" ${can?"":"disabled"}>${date?woDueBadge(date,isT&&!!r.completed_at):""}${!isT&&r.priority==="urgent"?'<span class="tb urgent">🔥 Urgente</span>':""}</div></div>
           <div class="cb-sec"><h5>≡ Descripción</h5><textarea class="cb-desc" id="cbDesc" placeholder="Agrega una descripción más detallada…" ${can?"":"readonly"}>${escapeHTML(r.notes||"")}</textarea></div>
           ${items.length?`<div class="cb-sec"><h5>📦 Productos del pedido</h5><ul class="cb-prod">${items.map(i=>`<li>${formatInventoryQuantity(i.quantity)} ${escapeHTML(i.unit||"")} · ${escapeHTML(i.description||"")}</li>`).join("")}</ul></div>`:""}
           ${fin?`<div class="cb-sec"><h5>💰 Pago</h5><div class="cb-pay">${fin.status==="paid"?'<span class="tb ok">Pagado</span>':`<span>Debe <b class="money">${formatCOP(fin.balance)}</b></span>`}<span class="muted">Total <span class="money">${formatCOP(Number(r.source_quote_total)||0)}</span>${fin.paid>0?` · Abonado <span class="money">${formatCOP(fin.paid)}</span>`:""}</span></div></div>`:""}
@@ -3660,6 +3667,7 @@
         </div>
         ${foot.length?`<div class="cb-foot">${foot.join("")}</div>`:""}`;
       const title=$("cbTitle");if(title){title.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();title.blur()}});title.addEventListener("blur",()=>{const v=title.value.trim();if(v&&v!==r.title)woCBSave({title:v});else title.value=r.title})}
+      const qt=$("cbQty");if(qt)qt.addEventListener("change",()=>{const v=qt.value===""?null:Number(qt.value);woCBSave({quantity:v>0?v:null})});
       const dt=$("cbDate");if(dt)dt.addEventListener("change",()=>woCBSave(isT?{due_date:dt.value||null}:{promised_date:dt.value||null},true));
       const ds=$("cbDesc");if(ds){let tm;const save=()=>{clearTimeout(tm);const v=ds.value.trim()||null;if(v!==(r.notes||null))woCBSave({notes:v})};ds.addEventListener("input",()=>{$("woCardModal").dataset.dirty="";clearTimeout(tm);tm=setTimeout(save,700)});ds.addEventListener("blur",save);try{autoGrow(ds)}catch(e){}}
       const ai=$("cbAddItem");if(ai)ai.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();const v=ai.value.trim();if(v){woCLSet([...woCl(r),{t:v,d:false}],"cbAddItem")}}});
@@ -4216,6 +4224,8 @@
     function woBoardMenu(key,cur){if(state.prodMissing)return "";const bs=(state.prodBoards||[]).filter(b=>!b.archived_at&&b.id!==cur);const opts=bs.map(b=>`<button type="button" onclick="window.woSetBoard('${key}','${b.id}')">📁 ${escapeHTML(b.name)}</button>`);if(cur)opts.unshift(`<button type="button" onclick="window.woSetBoard('${key}','')">🏠 General (sin tablero)</button>`);return opts.length?'<hr><small class="wo-menu-label">Pasar al tablero:</small>'+opts.join(""):""}
     function woInitials(n){return String(n||"").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()}
     function woDueBadge(d,complete){if(!d)return "";const t=localISODate(),n=new Date(),tm=localISO(new Date(n.getFullYear(),n.getMonth(),n.getDate()+1));const cls=complete?"ok":d<t?"late":d<=tm?"soon":"";const txt=d===t?"Hoy":d===tm?"Mañana":caDate(d);return `<span class="tb ${cls}" title="Fecha de entrega">🕒 ${txt}</span>`}
+    function woQtyPill(q){const n=Number(q);return n>0?`<b class="tc-qty" title="Cantidad">${formatInventoryQuantity(n)}</b>`:""}
+    function woOrderQty(o,items){if(Number(o.quantity)>0)return o.quantity;return items&&items.length===1?items[0].quantity:null}
     function woCl(r){return Array.isArray(r.checklist)?r.checklist:[]}
     function woClBadge(r){const cl=woCl(r);if(!cl.length)return "";const d=cl.filter(x=>x.d).length;return `<span class="tb${d===cl.length?" ok":""}" title="Checklist">☑ ${d}/${cl.length}</span>`}
     function woOrderMenu(o){
@@ -4258,12 +4268,12 @@
       if(!woBoard&&b)bd.push(`<span class="tb">📁 ${escapeHTML(b.name)}</span>`);
       if(who)bd.push(`<span class="tb who" title="${escapeHTML(who)}">${escapeHTML(woInitials(who))}</span>`);
       const badges=bd.filter(Boolean).join("");
-      return `<article data-woid="${o.id}" class="wo-card tc${can&&!o.archived_at&&o.status!=="cancelled"?" wo-drag":""}${o.status==="cancelled"?" cancelled":""}" onclick="if(!event.target.closest('button,a'))window.woOpenCard('${o.id}')"><div class="tc-title"><span>${escapeHTML(workOrderRecipient(o))}</span></div>${badges?`<div class="tc-badges">${badges}</div>`:""}<span class="table-actions tc-edit"><button class="row-menu-btn" type="button" aria-haspopup="menu" aria-label="Acciones rápidas" title="Acciones rápidas" onclick="window.toggleRowMenu(this)">✎</button><span class="row-menu-source" hidden>${woOrderMenu(o)}</span></span></article>`;
+      return `<article data-woid="${o.id}" class="wo-card tc${can&&!o.archived_at&&o.status!=="cancelled"?" wo-drag":""}${o.status==="cancelled"?" cancelled":""}" onclick="if(!event.target.closest('button,a'))window.woOpenCard('${o.id}')"><div class="tc-title"><span>${escapeHTML(workOrderRecipient(o))}</span>${woQtyPill(woOrderQty(o,items))}</div>${badges?`<div class="tc-badges">${badges}</div>`:""}<span class="table-actions tc-edit"><button class="row-menu-btn" type="button" aria-haspopup="menu" aria-label="Acciones rápidas" title="Acciones rápidas" onclick="window.toggleRowMenu(this)">✎</button><span class="row-menu-source" hidden>${woOrderMenu(o)}</span></span></article>`;
     }
     function woTaskCard(t){
       const can=hasPermission("work_orders.update"),key="t:"+t.id,b=t.board_id&&woBoardById(t.board_id),done=!!t.completed_at;
       const bd=[t.col!=="done"||done?woDueBadge(t.due_date,done):"",t.notes?'<span class="tb" title="Tiene descripción">≡</span>':"",woClBadge(t),t.archived_at?'<span class="tb">📦 Archivada</span>':"",!woBoard&&b?`<span class="tb">📁 ${escapeHTML(b.name)}</span>`:""].filter(Boolean).join("");
-      return `<article data-woid="${key}" class="wo-card tc wo-task${can&&!t.archived_at?" wo-drag":""}${done?" complete":""}" onclick="if(!event.target.closest('button,a'))window.woOpenCard('${key}')"><div class="tc-title">${can?`<button type="button" class="tc-check${done?" on":""}" title="${done?"Quitar “lista”":"Marcar como lista"}" onclick="window.woComplete('${t.id}')">✓</button>`:""}<span>${escapeHTML(t.title)}</span></div>${bd?`<div class="tc-badges">${bd}</div>`:""}<span class="table-actions tc-edit"><button class="row-menu-btn" type="button" aria-haspopup="menu" aria-label="Acciones rápidas" title="Acciones rápidas" onclick="window.toggleRowMenu(this)">✎</button><span class="row-menu-source" hidden>${woTaskMenu(t)}</span></span></article>`;
+      return `<article data-woid="${key}" class="wo-card tc wo-task${can&&!t.archived_at?" wo-drag":""}${done?" complete":""}" onclick="if(!event.target.closest('button,a'))window.woOpenCard('${key}')"><div class="tc-title">${can?`<button type="button" class="tc-check${done?" on":""}" title="${done?"Quitar “lista”":"Marcar como lista"}" onclick="window.woComplete('${t.id}')">✓</button>`:""}<span>${escapeHTML(t.title)}</span>${woQtyPill(t.quantity)}</div>${bd?`<div class="tc-badges">${bd}</div>`:""}<span class="table-actions tc-edit"><button class="row-menu-btn" type="button" aria-haspopup="menu" aria-label="Acciones rápidas" title="Acciones rápidas" onclick="window.toggleRowMenu(this)">✎</button><span class="row-menu-source" hidden>${woTaskMenu(t)}</span></span></article>`;
     }
     function woFolderCard(b,rows,k){const t=localISODate(),late=k==="done"?0:rows.filter(r=>{const d=r.__task?r.due_date:r.promised_date;return d&&d<t}).length;return `<article class="wo-folder" onclick="window.woOpenBoard('${b.id}')"><strong>📁 ${escapeHTML(b.name)}</strong><small>${rows.length} tarjeta${rows.length===1?"":"s"}${late?` · <b class="late">⚠️ ${late} atrasada${late===1?"":"s"}</b>`:""} · Abrir →</small></article>`}
     function woRenderBoards(){

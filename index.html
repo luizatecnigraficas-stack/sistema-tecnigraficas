@@ -870,6 +870,15 @@
     #productionBody .wo-lmenu{width:26px;height:26px;font-size:14px}
     #productionBody .tc-title{font-size:8.5px;line-height:11.5px;font-weight:700}
     @media(max-width:900px){#productionBody .tc-title{font-size:11.5px;line-height:14px}}
+
+    /* V9.55 selector de color del tablero */
+    .wcp-sec{display:grid;gap:10px;padding:6px 0 14px}.wcp-sec b{font-size:13px}
+    .wcp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:8px}
+    .wcp-sw{height:34px;border-radius:8px;border:2px solid transparent;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.15)}.wcp-sw:hover{transform:scale(1.06)}.wcp-sw.on{border-color:#172b4d}
+    .wcp-own{display:flex;flex-wrap:wrap;gap:14px;align-items:center}.wcp-own label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:#44546f}
+    .wcp-own input[type=color]{width:64px;height:40px;border:1px solid var(--line);border-radius:8px;padding:2px;background:#fff;cursor:pointer}
+    .wcp-own label.off{opacity:.35;pointer-events:none}.wcp-own .wcp-one{flex-direction:row;align-items:center;gap:6px;font-weight:600}
+    .wcp-prev{height:56px;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
 </style>
 </head>
 <body>
@@ -1659,6 +1668,7 @@
   </div>
 
   <div class="modal-backdrop hidden" id="woTaskModal"><form class="modal" id="woTaskForm" style="width:min(560px,100%)"><div class="modal-head"><div><h3 id="woTaskTitle">Tarjeta</h3><small>Tarea o pendiente (no maneja plata)</small></div><button type="button" class="modal-close" data-close="woTaskModal">×</button></div><input type="hidden" id="woTaskId"/><div class="form-grid"><div class="field full"><label>¿Qué hay que hacer? *</label><input id="woTaskName" required/></div><div class="field full"><label>Notas</label><textarea id="woTaskNotes" rows="6"></textarea></div><div class="field"><label>Fecha</label><input id="woTaskDue" type="date"/></div><div class="field"><label>Columna</label><select id="woTaskCol"></select></div><div class="field full"><label>Tablero</label><select id="woTaskBoard"></select></div></div><div class="modal-actions"><button type="button" class="btn secondary hidden" id="woTaskDelete" style="margin-right:auto;color:#b42318">🗑 Eliminar</button><button type="button" class="btn secondary" data-close="woTaskModal">Cancelar</button><button type="submit" class="btn primary">Guardar</button></div></form></div>
+  <div class="modal-backdrop hidden" id="woColorModal"><div class="modal" id="woColorBox" style="width:min(480px,100%)"></div></div>
   <div class="modal-backdrop hidden" id="woCardModal"><div class="modal cb" id="woCardBox" role="dialog" aria-label="Tarjeta"></div></div>
   <div class="modal-backdrop hidden" id="paymentHistoryModal">
     <div class="modal" style="width:min(900px,100%)">
@@ -3605,9 +3615,25 @@
     const WO_BG_NAME={algodon:"Rosado y azul",azul:"Azul",cielo:"Cielo",lavanda:"Lavanda",rosa:"Rosa",menta:"Menta",atardecer:"Atardecer",grafito:"Grafito"};
     let woComposing="",woCB=null;const woCollapsed=new Set();
     try{JSON.parse(localStorage.getItem("tecniWoCollapsed")||"[]").forEach(k=>woCollapsed.add(k))}catch(e){}
-    function woColorMenu(boardId){return '<small class="wo-menu-label">🎨 Color del tablero</small>'+Object.keys(WO_BG).map(k=>`<button type="button" onclick="window.woSetColor('${boardId}','${k}')"><i class="wo-dot" style="background:${WO_BG[k]}"></i>${WO_BG_NAME[k]}</button>`).join("")}
-    function woApplyBg(){let k="algodon";if(woBoard){const b=woBoardById(woBoard);if(b&&WO_BG[b.color])k=b.color}else{try{const v=localStorage.getItem("tecniWoBgGeneral");if(WO_BG[v])k=v}catch(e){}}const el=$("woShell");if(el)el.style.setProperty("--wo-bg",WO_BG[k])}
-    async function woSetColor(boardId,k){if(!WO_BG[k])return;if(!boardId){try{localStorage.setItem("tecniWoBgGeneral",k)}catch(e){}woApplyBg();return}const b=woBoardById(boardId);if(!b)return;b.color=k;woApplyBg();const {error}=await db.from("production_boards").update({color:k}).eq("id",boardId);if(error)alert(error.message)}
+    function woColorMenu(boardId){return `<button type="button" onclick="window.woColorPicker('${boardId}')">🎨 Cambiar color del tablero…</button>`}
+    Object.assign(WO_BG,{lila:"linear-gradient(135deg,#e7c6ff,#b8c0ff)",durazno:"linear-gradient(135deg,#ffd6a5,#ffadad)",limon:"linear-gradient(135deg,#fdffb6,#caffbf)",mar:"linear-gradient(135deg,#9bf6ff,#a0c4ff)",algodon2:"linear-gradient(135deg,#ffc6ff,#bdb2ff)",arena:"linear-gradient(135deg,#f5e6cc,#e8cfa9)",salvia:"linear-gradient(135deg,#cfe1b9,#97a97c)",nube:"linear-gradient(135deg,#f1f3f8,#cfd6e4)",rojo:"linear-gradient(135deg,#ef5b5b,#b3261e)",naranja:"linear-gradient(135deg,#ff9f43,#e8590c)",amarillo:"linear-gradient(135deg,#ffd43b,#f59f00)",verde:"linear-gradient(135deg,#51cf66,#2b8a3e)",turquesa:"linear-gradient(135deg,#3bc9db,#0c8599)",morado:"linear-gradient(135deg,#9775fa,#6741d9)",magenta:"linear-gradient(135deg,#f06595,#c2255c)",cafe:"linear-gradient(135deg,#b08968,#7f5539)",dorado:"linear-gradient(135deg,#e9c46a,#b8860b)",negro:"linear-gradient(135deg,#343a40,#111318)"});
+    Object.assign(WO_BG_NAME,{lila:"Lila",durazno:"Durazno",limon:"Limón",mar:"Mar",algodon2:"Algodón",arena:"Arena",salvia:"Salvia",nube:"Nube",rojo:"Rojo",naranja:"Naranja",amarillo:"Amarillo",verde:"Verde",turquesa:"Turquesa",morado:"Morado",magenta:"Magenta",cafe:"Café",dorado:"Dorado",negro:"Negro"});
+    function woResolveBg(v){if(WO_BG[v])return WO_BG[v];const m=String(v||"").match(/^custom:(#[0-9a-f]{6})(?:,(#[0-9a-f]{6}))?$/i);if(!m)return null;return m[2]&&m[2].toLowerCase()!==m[1].toLowerCase()?`linear-gradient(135deg,${m[1]},${m[2]})`:m[1]}
+    function woCurBg(boardId){if(boardId){const b=woBoardById(boardId);return b&&b.color||"algodon"}try{return localStorage.getItem("tecniWoBgGeneral")||"algodon"}catch(e){return "algodon"}}
+    function woColorPicker(boardId){
+      const cur=woCurBg(boardId),m=String(cur).match(/^custom:(#[0-9a-f]{6})(?:,(#[0-9a-f]{6}))?$/i),c1=m?m[1]:"#f7b9d3",c2=m?(m[2]||m[1]):"#9fc7f3",one=m&&!m[2];
+      $("woColorBox").innerHTML=`<div class="modal-head"><div><h3>🎨 Color del tablero</h3><small>${boardId?escapeHTML(woBoardById(boardId)?.name||""):"🏠 General"}</small></div><button type="button" class="modal-close" onclick="window.woColorClose()">×</button></div>
+        <div class="wcp-sec"><b>Colores listos</b><div class="wcp-grid">${Object.keys(WO_BG).map(k=>`<button type="button" class="wcp-sw${cur===k?" on":""}" title="${WO_BG_NAME[k]||k}" style="background:${WO_BG[k]}" onclick="window.woColorPick('${boardId}','${k}')"></button>`).join("")}</div></div>
+        <div class="wcp-sec"><b>Tus colores (por ejemplo, los de la empresa)</b><div class="wcp-own"><label>Color 1<input type="color" id="wcpC1" value="${c1}"></label><label id="wcpC2wrap"${one?' class="off"':""}>Color 2<input type="color" id="wcpC2" value="${c2}"></label><label class="wcp-one"><input type="checkbox" id="wcpOne"${one?" checked":""}> Un solo color (sin degradado)</label></div>
+        <div class="wcp-prev" id="wcpPrev"></div><button type="button" class="btn primary" onclick="window.woColorSaveOwn('${boardId}')">Usar estos colores</button></div>`;
+      const prev=()=>{const one=$("wcpOne").checked;$("wcpC2wrap").classList.toggle("off",one);$("wcpPrev").style.background=one?$("wcpC1").value:`linear-gradient(135deg,${$("wcpC1").value},${$("wcpC2").value})`};
+      ["wcpC1","wcpC2","wcpOne"].forEach(id=>$(id).addEventListener("input",prev));$("wcpOne").addEventListener("change",prev);prev();openModal("woColorModal")
+    }
+    function woColorClose(){closeModal("woColorModal")}
+    function woColorPick(boardId,k){woSetColor(boardId,k);woColorClose()}
+    function woColorSaveOwn(boardId){const v=$("wcpOne").checked?`custom:${$("wcpC1").value}`:`custom:${$("wcpC1").value},${$("wcpC2").value}`;woSetColor(boardId,v);woColorClose()}
+    function woApplyBg(){const bg=woResolveBg(woCurBg(woBoard))||WO_BG.algodon;const el=$("woShell");if(el)el.style.setProperty("--wo-bg",bg)}
+    async function woSetColor(boardId,k){if(!woResolveBg(k))return;if(!boardId){try{localStorage.setItem("tecniWoBgGeneral",k)}catch(e){}woApplyBg();return}const b=woBoardById(boardId);if(!b)return;b.color=k;woApplyBg();const {error}=await db.from("production_boards").update({color:k}).eq("id",boardId);if(error)alert(error.message)}
     function woCollapse(k){woCollapsed.has(k)?woCollapsed.delete(k):woCollapsed.add(k);try{localStorage.setItem("tecniWoCollapsed",JSON.stringify([...woCollapsed]))}catch(e){}renderProduction()}
     function woCompose(k,keep){
       if(!hasPermission("work_orders.update")||state.prodMissing)return;
@@ -3692,7 +3718,7 @@
     async function woCBMove(k){if(!woCB)return;await woDrop(woCB.key,k,null);setTimeout(woRenderCard,80)}
     async function woCBBoard(id){if(!woCB)return;await woSetBoard(woCB.key,id);woRenderCard()}
     async function woCBNext(){const f=woCBRow();if(!f||f.isT||!WO_NEXT[f.r.status])return;await changeWorkOrderStatus(f.r.id,WO_NEXT[f.r.status]);woRenderCard()}
-    Object.assign(window,{woOpenCard,woCloseCard,woRenderCard,woComplete,woCompose,woCollapse,woSetColor,woCLToggle,woCLDel,woCLFromItems,woCBFocus,woCBMove,woCBBoard,woCBNext});
+    Object.assign(window,{woColorPicker,woColorClose,woColorPick,woColorSaveOwn,woOpenCard,woCloseCard,woRenderCard,woComplete,woCompose,woCollapse,woSetColor,woCLToggle,woCLDel,woCLFromItems,woCBFocus,woCBMove,woCBBoard,woCBNext});
     // V9.09: venta rápida, comprobantes y niveles de acceso
     function financePermsInstalled(){return state.permissions instanceof Map&&state.permissions.has("finance.view")}
     function supportsEnabled(){return financePermsInstalled()}
@@ -4288,7 +4314,7 @@
       const can=hasPermission("work_orders.update"),bs=(state.prodBoards||[]).filter(b=>!b.archived_at);
       const cnt=id=>state.workOrders.filter(o=>!o.archived_at&&o.board_id===id&&!["delivered","cancelled"].includes(o.status)).length+(state.prodTasks||[]).filter(t=>!t.archived_at&&t.board_id===id&&t.col!=="done").length;
       const nav=`<span class="wo-scroll"><button type="button" title="Ver columnas a la izquierda" onclick="window.woScroll(-1)">◀</button><button type="button" title="Ver columnas a la derecha" onclick="window.woScroll(1)">▶</button></span>`;
-      el.innerHTML=`<span class="wo-bwrap"><button type="button" class="wo-bchip${!woBoard?" on":""}" onclick="window.woOpenBoard('')">🏠 General</button>${!woBoard?`<span class="table-actions"><button class="row-menu-btn wo-bmenu" type="button" aria-label="Color del tablero" title="Color del tablero" onclick="window.toggleRowMenu(this)">🎨</button><span class="row-menu-source" hidden>${woColorMenu("")}</span></span>`:""}</span>`+bs.map(b=>`<span class="wo-bwrap"><button type="button" class="wo-bchip${woBoard===b.id?" on":""}" onclick="window.woOpenBoard('${b.id}')">📁 ${escapeHTML(b.name)} <b>${cnt(b.id)}</b></button>${woBoard===b.id&&can?`<span class="table-actions"><button class="row-menu-btn wo-bmenu" type="button" aria-label="Opciones del tablero" onclick="window.toggleRowMenu(this)">⋯</button><span class="row-menu-source" hidden>${woColorMenu(b.id)}<hr><button type="button" onclick="window.woRenameBoard('${b.id}')">✏️ Cambiar nombre</button><button type="button" onclick="window.woArchiveBoard('${b.id}',true)">📦 Archivar tablero (proyecto terminado)</button>${hasPermission("work_orders.delete")?`<button type="button" class="danger" onclick="window.woDeleteBoard('${b.id}')">🗑 Eliminar tablero</button>`:""}</span></span>`:""}</span>`).join("")+(can?`<button type="button" class="wo-bchip add" onclick="window.woNewBoard()">＋ Tablero</button>`:"")+nav;
+      el.innerHTML=`<span class="wo-bwrap"><button type="button" class="wo-bchip${!woBoard?" on":""}" onclick="window.woOpenBoard('')">🏠 General</button>${!woBoard?`<button class="wo-bmenu" type="button" aria-label="Color del tablero" title="Color del tablero" onclick="window.woColorPicker('')">🎨</button>`:""}</span>`+bs.map(b=>`<span class="wo-bwrap"><button type="button" class="wo-bchip${woBoard===b.id?" on":""}" onclick="window.woOpenBoard('${b.id}')">📁 ${escapeHTML(b.name)} <b>${cnt(b.id)}</b></button>${woBoard===b.id&&can?`<span class="table-actions"><button class="row-menu-btn wo-bmenu" type="button" aria-label="Opciones del tablero" onclick="window.toggleRowMenu(this)">⋯</button><span class="row-menu-source" hidden>${woColorMenu(b.id)}<hr><button type="button" onclick="window.woRenameBoard('${b.id}')">✏️ Cambiar nombre</button><button type="button" onclick="window.woArchiveBoard('${b.id}',true)">📦 Archivar tablero (proyecto terminado)</button>${hasPermission("work_orders.delete")?`<button type="button" class="danger" onclick="window.woDeleteBoard('${b.id}')">🗑 Eliminar tablero</button>`:""}</span></span>`:""}</span>`).join("")+(can?`<button type="button" class="wo-bchip add" onclick="window.woNewBoard()">＋ Tablero</button>`:"")+nav;
     }
     function renderProduction(){
       const term=$("productionSearch").value.trim().toLowerCase(),view=$("productionStatusFilter").value,weekAgo=new Date(Date.now()-7*864e5).toISOString(),seePay=hasPermission("payments.view"),canUp=hasPermission("work_orders.update");

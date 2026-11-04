@@ -885,6 +885,13 @@
     /* V9.56 que las tarjetas no se aplasten en listas largas */
     #productionBody .wo-list>*{flex-shrink:0}
     #productionBody .wo-card.tc{height:auto;overflow:visible}
+
+    /* V9.57 historial */
+    .wo-act-btn{position:relative}.wo-act-btn b{position:absolute;top:-6px;right:-6px;background:#e5487a;color:#fff;border-radius:999px;font-size:10px;line-height:16px;min-width:16px;padding:0 4px;text-align:center}
+    .wact-list{display:grid;gap:2px;max-height:65vh;overflow:auto;padding:4px 0}
+    .wact{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:8px}.wact.link{cursor:pointer}.wact.link:hover{background:#f1f2f4}.wact.new{background:#fdf0f6}
+    .wact-av{flex:0 0 28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#f7b9d3,#9fc7f3);color:#2b3245;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center}
+    .wact p{margin:0;font-size:13px;color:#172b4d;line-height:1.35}.wact p i{font-style:normal;font-weight:700;color:#44546f}.wact small{font-size:11px;color:#626f86}
 </style>
 </head>
 <body>
@@ -1032,7 +1039,7 @@
         </section>
         <section class="view" id="view-production">
           <div class="view-head"><div><h2>Producción</h2><p>Órdenes creadas únicamente desde cotizaciones aprobadas.</p></div><button class="btn primary" id="productionFromQuoteButton">Ver cotizaciones aprobadas</button></div>
-          <div class="toolbar wo-toolbar"><input class="search" id="productionSearch" placeholder="Buscar cliente, orden o cotización…" /><select id="productionStatusFilter" class="search" style="flex:0 0 200px"><option value="">Tablero de trabajo</option><option value="archived">📦 Ver archivados</option><option value="cancelled">Ver cancelados</option></select><button class="btn secondary" id="woDetailsBtn" type="button">▾ Ver detalles</button><button class="btn secondary" id="productionRefreshButton">Actualizar</button></div>
+          <div class="toolbar wo-toolbar"><input class="search" id="productionSearch" placeholder="Buscar cliente, orden o cotización…" /><select id="productionStatusFilter" class="search" style="flex:0 0 200px"><option value="">Tablero de trabajo</option><option value="archived">📦 Ver archivados</option><option value="cancelled">Ver cancelados</option></select><button class="btn secondary" id="woDetailsBtn" type="button">▾ Ver detalles</button><button class="btn secondary wo-act-btn hidden" id="woActBtn" type="button" title="Ver quién movió qué">🕘 Historial<b id="woActBadge" class="hidden"></b></button><button class="btn secondary" id="productionRefreshButton">Actualizar</button></div>
           <div class="wo-shell" id="woShell"><div class="wo-boards" id="woBoards"></div><div class="wo-tabs" id="woTabs" role="tablist"></div>
           <div class="wo-board" id="productionBody"></div></div>
           <p class="subtle wo-help">Funciona como Trello: <strong>＋ Añadir una tarjeta</strong> al final de cada lista (escribe y Enter). <strong>Arrastra</strong> las tarjetas entre listas (en el celular: deja el dedo apretado y suéltala sobre la pestaña). Pasa el mouse por una tarjeta para ver el <strong>círculo ✓</strong> (marcarla lista) y el lápiz <strong>✎</strong> (acciones rápidas). <strong>Tócala</strong> para abrirla: descripción, fecha, checklist, mover o archivar.</p>
@@ -1674,6 +1681,7 @@
   </div>
 
   <div class="modal-backdrop hidden" id="woTaskModal"><form class="modal" id="woTaskForm" style="width:min(560px,100%)"><div class="modal-head"><div><h3 id="woTaskTitle">Tarjeta</h3><small>Tarea o pendiente (no maneja plata)</small></div><button type="button" class="modal-close" data-close="woTaskModal">×</button></div><input type="hidden" id="woTaskId"/><div class="form-grid"><div class="field full"><label>¿Qué hay que hacer? *</label><input id="woTaskName" required/></div><div class="field full"><label>Notas</label><textarea id="woTaskNotes" rows="6"></textarea></div><div class="field"><label>Fecha</label><input id="woTaskDue" type="date"/></div><div class="field"><label>Columna</label><select id="woTaskCol"></select></div><div class="field full"><label>Tablero</label><select id="woTaskBoard"></select></div></div><div class="modal-actions"><button type="button" class="btn secondary hidden" id="woTaskDelete" style="margin-right:auto;color:#b42318">🗑 Eliminar</button><button type="button" class="btn secondary" data-close="woTaskModal">Cancelar</button><button type="submit" class="btn primary">Guardar</button></div></form></div>
+  <div class="modal-backdrop hidden" id="woActModal"><div class="modal" style="width:min(520px,100%)"><div class="modal-head"><div><h3>🕘 Historial del tablero</h3><small>Quién movió qué (lo más reciente arriba)</small></div><button type="button" class="modal-close" data-close="woActModal">×</button></div><div id="woActList" class="wact-list"></div></div></div>
   <div class="modal-backdrop hidden" id="woColorModal"><div class="modal" id="woColorBox" style="width:min(480px,100%)"></div></div>
   <div class="modal-backdrop hidden" id="woCardModal"><div class="modal cb" id="woCardBox" role="dialog" aria-label="Tarjeta"></div></div>
   <div class="modal-backdrop hidden" id="paymentHistoryModal">
@@ -3725,6 +3733,33 @@
     async function woCBBoard(id){if(!woCB)return;await woSetBoard(woCB.key,id);woRenderCard()}
     async function woCBNext(){const f=woCBRow();if(!f||f.isT||!WO_NEXT[f.r.status])return;await changeWorkOrderStatus(f.r.id,WO_NEXT[f.r.status]);woRenderCard()}
     Object.assign(window,{woColorPicker,woColorClose,woColorPick,woColorSaveOwn,woOpenCard,woCloseCard,woRenderCard,woComplete,woCompose,woCollapse,woSetColor,woCLToggle,woCLDel,woCLFromItems,woCBFocus,woCBMove,woCBBoard,woCBNext});
+    // V9.57: historial de movimientos del tablero
+    let woAct=[];
+    function woActSeen(){try{return localStorage.getItem("tecniWoActSeen")||""}catch(e){return ""}}
+    async function woLoadActivity(){
+      const r=await db.from("production_activity").select("*").order("created_at",{ascending:false}).limit(120);
+      const btn=$("woActBtn");if(!btn)return;if(r.error){btn.classList.add("hidden");return}
+      btn.classList.remove("hidden");woAct=r.data||[];const seen=woActSeen(),me=state.session?.user?.id;
+      const n=woAct.filter(a=>a.created_at>seen&&a.user_id!==me).length,b=$("woActBadge");b.textContent=n>99?"99+":n;b.classList.toggle("hidden",!n);
+      if(!$("woActModal").classList.contains("hidden"))woRenderActivity()
+    }
+    function woColName(v,kind){if(!v)return "";if(kind==="task"){const c=WO_COLS.find(c=>c.k===v);return c?c.t.replace(/^\S+\s/,""):v}return workOrderStatusLabel(v)||v}
+    function woAgo(iso){const d=(Date.now()-new Date(iso))/1000;if(d<60)return "hace un momento";if(d<3600)return `hace ${Math.round(d/60)} min`;if(d<86400)return `hace ${Math.round(d/3600)} h`;const x=new Date(iso);return x.toLocaleDateString("es-CO",{day:"numeric",month:"short"})+" "+x.toLocaleTimeString("es-CO",{hour:"numeric",minute:"2-digit"})}
+    function woRenderActivity(){
+      const seen=woActSeen();
+      $("woActList").innerHTML=woAct.length?woAct.map(a=>{
+        const who=escapeHTML(String(a.user_name||"Alguien").split(/\s+/)[0]),t=`<b>«${escapeHTML(a.item_title||"tarjeta")}»</b>`,f=escapeHTML(woColName(a.from_val,a.item_kind)),to=escapeHTML(woColName(a.to_val,a.item_kind));
+        const bn=id=>{const b=id&&woBoardById(id);return b?"📁 "+escapeHTML(b.name):"🏠 General"};
+        const txt={create:`creó ${t} en <i>${to}</i>`,move:`movió ${t} de <i>${f}</i> a <i>${to}</i>`,complete:`marcó ${t} como lista ✓`,uncomplete:`le quitó el ✓ a ${t}`,archive:`archivó ${t}`,unarchive:`sacó del archivo ${t}`,delete:`eliminó ${t}`,board:`pasó ${t} a ${bn(a.to_val)}`,rename:`cambió el nombre de «${escapeHTML(a.from_val||"")}» a ${t}`}[a.action]||`${escapeHTML(a.action)} ${t}`;
+        const key=a.item_kind==="task"?"t:"+a.item_id:a.item_id,exists=a.action!=="delete"&&woFind(key).r;
+        const bd=a.board_id&&woBoardById(a.board_id);
+        return `<div class="wact${a.created_at>seen&&a.user_id!==state.session?.user?.id?" new":""}${exists?" link":""}" ${exists?`onclick="window.woActOpen('${key}')"`:""}><span class="wact-av">${escapeHTML(woInitials(a.user_name||"?"))}</span><div><p><b>${who}</b> ${txt}</p><small>${woAgo(a.created_at)}${bd?" · 📁 "+escapeHTML(bd.name):""}</small></div></div>`}).join(""):'<div class="empty">Todavía no hay movimientos. Desde ahora aquí queda todo lo que se haga en el tablero.</div>'
+    }
+    function woOpenActivity(){woRenderActivity();openModal("woActModal");try{localStorage.setItem("tecniWoActSeen",new Date().toISOString())}catch(e){}$("woActBadge").classList.add("hidden")}
+    function woActOpen(key){closeModal("woActModal");woOpenCard(key)}
+    try{$("woActBtn").addEventListener("click",woOpenActivity)}catch(e){}
+    setInterval(()=>{try{if(state.session&&$("view-production").classList.contains("active")&&document.visibilityState==="visible")woLoadActivity()}catch(e){}},60000);
+    window.woActOpen=woActOpen;
     // V9.09: venta rápida, comprobantes y niveles de acceso
     function financePermsInstalled(){return state.permissions instanceof Map&&state.permissions.has("finance.view")}
     function supportsEnabled(){return financePermsInstalled()}
@@ -4252,7 +4287,7 @@
       const ids=state.workOrders.filter(o=>o.status!=="cancelled").map(o=>o.id);state.productionItems=[];for(let i=0;i<ids.length;i+=150){const r=await db.from("work_order_items").select("work_order_id,quantity,unit,description,sort_order").in("work_order_id",ids.slice(i,i+150)).order("sort_order");if(!r.error)state.productionItems.push(...(r.data||[]))}
       const [bRes,tRes]=await Promise.all([db.from("production_boards").select("*").order("created_at"),db.from("production_tasks").select("*").order("created_at")]);
       state.prodMissing=!!(bRes.error||tRes.error);state.prodBoards=bRes.error?[]:(bRes.data||[]);state.prodTasks=tRes.error?[]:(tRes.data||[]).map(t=>(t.__task=true,t));
-      renderProduction()
+      renderProduction();woLoadActivity()
     }
     const WO_COLS=[{k:"todo",t:"📝 Pendientes",st:[],help:"Tareas y cosas por hacer"},{k:"design",t:"🎨 Por diseñar",st:["pending_design"],help:"Hay que hacer o ajustar el arte"},{k:"client",t:"✏️ En diseño",st:["waiting_approval"],help:"Ya le mandamos el diseño"},{k:"pause",t:"⏸️ En pausa",st:["paused"],help:"Esperando algo, sin afán"},{k:"doing",t:"🖨 En producción",st:["in_production","finishing"],help:"Impresión y acabados"},{k:"ready",t:"📦 Listo para entregar",st:["ready"],help:"Solo falta entregarlo"},{k:"done",t:"✅ Entregado",st:["delivered"],help:"Últimos 7 días"}];
     const WO_NEXT={paused:"pending_design",pending_design:"waiting_approval",waiting_approval:"in_production",in_production:"ready",finishing:"ready",ready:"delivered"},WO_PREV={waiting_approval:"pending_design",in_production:"waiting_approval",finishing:"in_production",ready:"in_production",delivered:"ready"};

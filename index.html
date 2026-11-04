@@ -161,7 +161,7 @@
     .row-click{cursor:pointer}.row-meta{color:var(--muted)}
     .row-menu-btn.dots{border:1px solid var(--line);background:#fff;border-radius:10px;width:36px;height:32px;font-size:18px;line-height:1;font-weight:900;cursor:pointer;color:var(--ink)}
     .row-menu-btn.dots:hover,.row-menu-btn[aria-expanded="true"]{background:#edf0f5}
-    #rowMenu{position:fixed;z-index:200;min-width:210px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:6px;display:grid}
+    #rowMenu{position:fixed;z-index:200;min-width:210px;box-sizing:border-box;max-height:calc(100vh - 16px);overflow-y:auto;overscroll-behavior:contain;align-content:start;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:6px;display:grid}
     #rowMenu button{all:unset;box-sizing:border-box;display:block;width:100%;padding:10px 12px;border-radius:9px;font-size:12px;font-weight:700;color:var(--ink);cursor:pointer}
     #rowMenu button:hover,#rowMenu button:focus-visible{background:#f1f3f7}
     #rowMenu button.danger{color:var(--danger)}#rowMenu button.danger:hover{background:#ffeaea}
@@ -2616,13 +2616,13 @@
         menu.querySelectorAll("button").forEach(b=>{b.setAttribute("role","menuitem");b.addEventListener("click",()=>setTimeout(close,0))});
         document.body.appendChild(menu);owner=btn;btn.setAttribute("aria-expanded","true");
         const r=btn.getBoundingClientRect(),m=menu.getBoundingClientRect();
-        let top=r.bottom+6;if(top+m.height>innerHeight-8)top=Math.max(8,r.top-m.height-6);
+        const h=Math.min(m.height,innerHeight-16);let top=r.bottom+6;if(top+h>innerHeight-8)top=r.top-h-6>=8?r.top-h-6:Math.max(8,innerHeight-8-h);
         let left=r.right-m.width;if(left<8)left=8;
         menu.style.top=top+"px";menu.style.left=left+"px";menu.querySelector("button")?.focus();
       };
       document.addEventListener("click",e=>{if(menu&&!menu.contains(e.target)&&!e.target.closest(".row-menu-btn"))close()},true);
       document.addEventListener("keydown",e=>{if(e.key==="Escape")close()});
-      addEventListener("scroll",close,true);addEventListener("resize",close);
+      addEventListener("scroll",e=>{if(menu&&menu.contains(e.target))return;close()},true);addEventListener("resize",close);
     })();
 
     // Tablas como tarjetas en celular: etiqueta cada celda con el título de su columna.

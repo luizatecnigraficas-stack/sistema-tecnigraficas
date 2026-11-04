@@ -879,6 +879,8 @@
     .wcp-own input[type=color]{width:64px;height:40px;border:1px solid var(--line);border-radius:8px;padding:2px;background:#fff;cursor:pointer}
     .wcp-own label.off{opacity:.35;pointer-events:none}.wcp-own .wcp-one{flex-direction:row;align-items:center;gap:6px;font-weight:600}
     .wcp-prev{height:56px;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+
+    .top-prod{display:inline-flex;align-items:center;gap:6px}.tp-ic{width:16px;height:16px;flex:0 0 auto}
 </style>
 </head>
 <body>
@@ -929,7 +931,7 @@
     <main class="main">
       <header class="topbar">
         <div style="display:flex;align-items:center;gap:12px"><button class="btn secondary mobile-menu" id="mobileMenu">☰</button><div><h1 id="pageTitle">Inicio</h1><p id="pageSubtitle">Resumen general de Tecnigráficas</p></div></div>
-        <div class="top-actions"><button class="btn secondary eye-btn" id="privacyBtn" type="button" title="Esconder los valores ($) de la pantalla">👁</button><button class="btn top-prod hidden" id="topProduction" type="button" title="Ir al tablero de Producción">🗂 Producción</button><button class="btn qs-top hidden" id="topQuickSale" type="button">⚡ Venta rápida</button><button class="btn primary" id="topNewQuote">+ Nueva cotización</button></div>
+        <div class="top-actions"><button class="btn secondary eye-btn" id="privacyBtn" type="button" title="Esconder los valores ($) de la pantalla">👁</button><button class="btn top-prod hidden" id="topProduction" type="button" title="Ir al tablero de Producción"><svg class="tp-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><rect x="6.5" y="6.5" width="3" height="9" rx="1" fill="currentColor"/><rect x="10.5" y="6.5" width="3" height="5.5" rx="1" fill="currentColor"/><rect x="14.5" y="6.5" width="3" height="7.5" rx="1" fill="currentColor"/></svg>Producción</button><button class="btn qs-top hidden" id="topQuickSale" type="button">⚡ Venta rápida</button><button class="btn primary" id="topNewQuote">+ Nueva cotización</button></div>
       </header>
 
       <div class="content">

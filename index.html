@@ -905,6 +905,12 @@
     .wo-menu-dates{display:flex;flex-wrap:wrap;gap:4px;padding:2px 6px 6px}
     #rowMenu .wo-menu-dates button{display:inline-block;width:auto;flex:0 0 auto;border-radius:10px;background:#eef0f4;padding:4px 9px;font-size:11.5px;font-weight:600}
     #rowMenu .wo-menu-dates button:hover{background:#dfe1fb}
+    /* V9.59 Don Fer minimizar */
+    .df-panel.min{height:auto;width:min(300px,calc(100vw - 24px))}
+    .df-panel.min>:not(.df-head){display:none!important}
+    .df-panel.min .df-head{cursor:pointer;padding:8px 10px}.df-panel.min .df-head img{width:32px;height:32px}.df-panel.min .df-head small{display:none}
+    .df-head #dfMin{font-weight:900}
+    .df-head button+button{margin-left:6px}
 </style>
 </head>
 <body>
@@ -3328,7 +3334,10 @@
     }
     function wireDonFer(){
       $("dfFab").addEventListener("click",()=>{dfLoad();$("dfPanel").classList.remove("hidden");$("dfFab").classList.add("hidden");dfRender();setTimeout(()=>$("dfInput").focus(),50)});
-      $("dfClose").addEventListener("click",()=>{const n=dfPendingN();if(n&&!confirm(`Ojo: tienes ${n===1?"una tarjeta amarilla":n+" tarjetas amarillas"} SIN CONFIRMAR. Todavía no se ha guardado nada.\n\n¿Cerrar igual? (La tarjeta queda aquí para confirmarla después.)`))return;$("dfPanel").classList.add("hidden");$("dfFab").classList.remove("hidden");dfBadge()});
+      const dfSetMin=on=>{const p=$("dfPanel");p.classList.toggle("min",on);$("dfMin").textContent=on?"▢":"–";$("dfMin").title=on?"Abrir de nuevo":"Minimizar (la conversación queda abierta)";try{localStorage.setItem("tecniDfMin",on?"1":"")}catch(e){}if(!on){dfRender();setTimeout(()=>$("dfInput").focus(),50)}};
+      $("dfMin").addEventListener("click",e=>{e.stopPropagation();dfSetMin(!$("dfPanel").classList.contains("min"))});
+      $("dfPanel").querySelector(".df-head").addEventListener("click",e=>{if($("dfPanel").classList.contains("min")&&!e.target.closest("button"))dfSetMin(false)});
+      $("dfClose").addEventListener("click",()=>{const n=dfPendingN();if(n&&!confirm(`Ojo: tienes ${n===1?"una tarjeta amarilla":n+" tarjetas amarillas"} SIN CONFIRMAR. Todavía no se ha guardado nada.\n\n¿Cerrar igual? (La tarjeta queda aquí para confirmarla después.)`))return;$("dfPanel").classList.add("hidden");$("dfPanel").classList.remove("min");$("dfMin").textContent="–";$("dfFab").classList.remove("hidden");dfBadge()});
       $("dfClear").addEventListener("click",()=>{const n=dfPendingN();if(n&&!confirm(`Hay ${n===1?"una tarjeta":n+" tarjetas"} sin confirmar. Si borras la conversación, se pierde${n===1?"":"n"}. ¿Borrar igual?`))return;df.msgs=[];dfClearImg();dfRender()});
       $("dfClip").addEventListener("click",()=>$("dfFile").click());$("dfFile").addEventListener("change",e=>{const f=e.target.files?.[0];if(f)dfSetImg(f)});$("dfAttX").addEventListener("click",dfClearImg);
       $("dfInput").addEventListener("paste",e=>{const f=[...(e.clipboardData?.items||[])].find(x=>x.kind==="file"&&/^image\//.test(x.type))?.getAsFile();if(f){e.preventDefault();dfSetImg(f)}});
@@ -5718,7 +5727,7 @@
   </script>
   <button type="button" class="df-fab hidden" id="dfFab" title="Pregúntale a Don Fer"><img src="donfer-chat.webp" alt="" /><span>Pregúntale a Don Fer</span></button>
   <div class="df-panel hidden" id="dfPanel" role="dialog" aria-label="Asistente Don Fer">
-    <div class="df-head"><img src="donfer-chat.webp" alt="" /><div><strong>Don Fer</strong><small>Pregúntame precios, proveedores, stickers…</small></div><button type="button" id="dfClear" title="Nueva conversación">↺</button><button type="button" id="dfClose" title="Cerrar">×</button></div>
+    <div class="df-head"><img src="donfer-chat.webp" alt="" /><div><strong>Don Fer</strong><small>Pregúntame precios, proveedores, stickers…</small></div><button type="button" id="dfMin" title="Minimizar (la conversación queda abierta)">–</button><button type="button" id="dfClear" title="Nueva conversación">↺</button><button type="button" id="dfClose" title="Cerrar (la conversación queda guardada)">×</button></div>
     <div class="df-msgs" id="dfMsgs"></div>
     <div class="df-att hidden" id="dfAtt"><img id="dfAttImg" alt="" /><span>Foto lista para enviar</span><button type="button" id="dfAttX" title="Quitar foto">×</button></div>
     <form class="df-form" id="dfForm"><input type="file" id="dfFile" accept="image/*" hidden /><button type="button" class="df-clip" id="dfClip" title="Adjuntar foto (lista de precios, factura…)">📎</button><textarea id="dfInput" rows="1" placeholder="Escribe tu pregunta…"></textarea><button type="submit" id="dfSend">Enviar</button></form>

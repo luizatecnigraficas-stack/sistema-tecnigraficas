@@ -670,6 +670,7 @@
     .content:has(#view-production.active){max-width:none}
     .wo-boards{flex-wrap:wrap!important;overflow-x:visible!important;row-gap:6px}
     .wo-boards>*{flex:0 0 auto}
+    .df-pend{position:absolute;top:-4px;right:-4px;min-width:22px;height:22px;border-radius:11px;background:#e5484d;color:#fff;font:800 12px/22px system-ui;text-align:center;box-shadow:0 0 0 2px #fff;animation:dfp 1.4s ease-in-out infinite}@keyframes dfp{50%{transform:scale(1.15)}}
     /* V9.19 Productos unificados */
     .pchips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
     .pchip{border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;font-weight:800;font-size:14px;cursor:pointer;min-height:44px}
@@ -3284,7 +3285,16 @@
     function dfClearImg(){df.img=null;$("dfAtt").classList.add("hidden");$("dfFile").value="";$("dfInput").placeholder="Escribe tu pregunta…"}
     const dfSugs=["¿Cuántos stickers de 5x5 salen en un pliego Lite?","¿Cuánto nos cobró el herrero por el último rompetráfico?","¿Cuánto le debemos a proveedores?","Regístrame un egreso de $8.000 en efectivo por un domicilio","Hazme una cotización de 1.000 volantes media carta para Arquidiócesis","¿Qué hay atrasado en Producción?","📎 Mándame una foto de una lista de precios y la cargo a Cartera"];
     function dfFormat(t){return escapeHTML(t).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/^#{1,3} (.+)$/gm,"<strong>$1</strong>").replace(/^[-*] /gm,"• ").replace(/(https:\/\/sistema\.sastecnigraficas\.com\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:#0b6f93;font-weight:800">📄 Abrir</a>')}
+    // V9.51: la conversación de Don Fer se guarda en el navegador y avisa si hay tarjetas sin confirmar
+    const dfKey=()=>"donfer:"+(state.session?.user?.id||"anon");let dfLoaded=false;
+    function dfLoad(){if(dfLoaded)return;dfLoaded=true;try{const o=JSON.parse(localStorage.getItem(dfKey())||"null");if(o&&Date.now()-o.t<7*864e5&&Array.isArray(o.msgs)&&!df.msgs.length)df.msgs=o.msgs}catch(e){}}
+    function dfSave(){if(!dfLoaded)return;const keep=df.msgs.slice(-60),put=m=>{try{localStorage.setItem(dfKey(),JSON.stringify({t:Date.now(),msgs:m}));return true}catch(e){return false}};if(!put(keep))put(keep.map(m=>m.img?{...m,img:null,content:m.content+" [foto]"}:m))}
+    const dfPendingN=()=>df.msgs.filter(m=>m.card&&!m.card.state).length;
+    function dfBadge(){const n=dfPendingN(),f=$("dfFab");if(!f)return;let b=f.querySelector(".df-pend");if(n&&!b){b=document.createElement("span");b.className="df-pend";f.appendChild(b)}if(b){if(n)b.textContent=n;else b.remove()}f.title=n?`Tienes ${n} ${n===1?"tarjeta":"tarjetas"} de Don Fer sin confirmar`:"Don Fer"}
+    window.addEventListener("beforeunload",e=>{if(dfPendingN()){e.preventDefault();e.returnValue=""}});
+    {const t=setInterval(()=>{if(state.session?.user?.id){clearInterval(t);dfLoad();dfBadge()}},2000)}
     function dfRender(){
+      dfSave();dfBadge();
       const box=$("dfMsgs");
       box.innerHTML=(df.msgs.length?"":`<div class="df-msg bot">¡Hola${state.profile?.full_name?" "+escapeHTML(String(state.profile.full_name).split(" ")[0]):""}! 👋 Soy Don Fer. Pregúntame lo que necesites del sistema.</div><div class="df-sugs">${dfSugs.map(q=>`<button type="button" data-df-q="${escapeHTML(q)}">${escapeHTML(q)}</button>`).join("")}</div>`)
         +df.msgs.map((m,i)=>m.card?`<div class="df-card${m.card.state?" done":""}">${escapeHTML(m.card.resumen)}${m.card.state?`<div class="df-acts"><small>${m.card.state==="ok"?"✅ Confirmado":"✖ Cancelado"}</small></div>`:`<div class="df-acts"><button type="button" class="ok" data-df-ok="${i}">✅ Confirmar</button><button type="button" class="no" data-df-no="${i}">Cancelar</button></div>`}</div>`:`<div class="df-msg ${m.role==="user"?"me":m.error?"err":"bot"}">${m.role==="user"?(m.img?`<img src="${m.img}" alt="Foto adjunta" />`:"")+escapeHTML(m.content):dfFormat(m.content)}</div>`).join("")
@@ -3311,9 +3321,9 @@
       }catch(err){df.msgs.push({role:"assistant",content:err.message,error:true})}finally{df.busy=false;dfRender()}
     }
     function wireDonFer(){
-      $("dfFab").addEventListener("click",()=>{$("dfPanel").classList.remove("hidden");$("dfFab").classList.add("hidden");dfRender();setTimeout(()=>$("dfInput").focus(),50)});
-      $("dfClose").addEventListener("click",()=>{$("dfPanel").classList.add("hidden");$("dfFab").classList.remove("hidden")});
-      $("dfClear").addEventListener("click",()=>{df.msgs=[];dfClearImg();dfRender()});
+      $("dfFab").addEventListener("click",()=>{dfLoad();$("dfPanel").classList.remove("hidden");$("dfFab").classList.add("hidden");dfRender();setTimeout(()=>$("dfInput").focus(),50)});
+      $("dfClose").addEventListener("click",()=>{const n=dfPendingN();if(n&&!confirm(`Ojo: tienes ${n===1?"una tarjeta amarilla":n+" tarjetas amarillas"} SIN CONFIRMAR. Todavía no se ha guardado nada.\n\n¿Cerrar igual? (La tarjeta queda aquí para confirmarla después.)`))return;$("dfPanel").classList.add("hidden");$("dfFab").classList.remove("hidden");dfBadge()});
+      $("dfClear").addEventListener("click",()=>{const n=dfPendingN();if(n&&!confirm(`Hay ${n===1?"una tarjeta":n+" tarjetas"} sin confirmar. Si borras la conversación, se pierde${n===1?"":"n"}. ¿Borrar igual?`))return;df.msgs=[];dfClearImg();dfRender()});
       $("dfClip").addEventListener("click",()=>$("dfFile").click());$("dfFile").addEventListener("change",e=>{const f=e.target.files?.[0];if(f)dfSetImg(f)});$("dfAttX").addEventListener("click",dfClearImg);
       $("dfInput").addEventListener("paste",e=>{const f=[...(e.clipboardData?.items||[])].find(x=>x.kind==="file"&&/^image\//.test(x.type))?.getAsFile();if(f){e.preventDefault();dfSetImg(f)}});
       $("dfPanel").addEventListener("dragover",e=>e.preventDefault());$("dfPanel").addEventListener("drop",e=>{const f=e.dataTransfer?.files?.[0];if(f){e.preventDefault();dfSetImg(f)}});

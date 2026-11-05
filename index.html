@@ -898,6 +898,13 @@
     .wact{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:8px}.wact.link{cursor:pointer}.wact.link:hover{background:#f1f2f4}.wact.new{background:#fdf0f6}
     .wact-av{flex:0 0 28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#f7b9d3,#9fc7f3);color:#2b3245;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center}
     .wact p{margin:0;font-size:13px;color:#172b4d;line-height:1.35}.wact p i{font-style:normal;font-weight:700;color:#44546f}.wact small{font-size:11px;color:#626f86}
+    /* V9.58 fechas rápidas */
+    .cb-dq{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+    #woCardBox .cb-dq button{all:unset;box-sizing:border-box;border:0;background:#eef0f4;color:#44546f;border-radius:12px;padding:4px 9px;font:inherit;font-size:11.5px;font-weight:600;cursor:pointer}
+    #woCardBox .cb-dq button:hover{background:#dfe1fb;color:#3b3d8f}#woCardBox .cb-dq button.x{background:transparent;color:#ae2e24}
+    .wo-menu-dates{display:flex;flex-wrap:wrap;gap:4px;padding:2px 6px 6px}
+    #rowMenu .wo-menu-dates button{display:inline-block;width:auto;flex:0 0 auto;border-radius:10px;background:#eef0f4;padding:4px 9px;font-size:11.5px;font-weight:600}
+    #rowMenu .wo-menu-dates button:hover{background:#dfe1fb}
 </style>
 </head>
 <body>
@@ -3702,6 +3709,7 @@
       const quick=[];
       if(!isT&&can&&!r.archived_at&&WO_NEXT[r.status])quick.push(`<button type="button" class="primary" onclick="window.woCBNext()">${WO_NEXT_TXT[r.status]}</button>`);
       if(isT&&can)quick.push(`<button type="button" class="${r.completed_at?"done":""}" onclick="window.woComplete('${r.id}')">${r.completed_at?"✓ Lista":"○ Marcar como lista"}</button>`);
+      if(can)quick.push(`<button type="button" onclick="window.woCBDatePick()">🕒 Fecha</button>`);
       if(can)quick.push(`<button type="button" onclick="window.woCBFocus('cbAddItem')">☑ Checklist</button>`);
       if(!isT)quick.push(`<button type="button" onclick="window.woCloseCard();window.openWorkOrder('${r.id}')">📄 Pedido completo</button>`);
       if(!isT&&hasPermission("payments.create")&&fin&&fin.balance>.01&&r.status!=="cancelled")quick.push(`<button type="button" onclick="window.woCloseCard();window.openPaymentModal('${r.id}')">💵 Abono</button>`);
@@ -3717,7 +3725,7 @@
         <div class="cb-sub">${isT?(r.completed_at?"✓ Marcada como lista":"Tarjeta"):`${escapeHTML(r.order_number||"")}${r.quote_number?" · "+escapeHTML(r.quote_number):""}${r.contact_name&&r.contact_name!==r.client_name?" · "+escapeHTML(r.contact_name):""}`}${r.archived_at?" · 📦 Archivada":""}</div></div>
         <div class="cb-quick">${quick.join("")}</div>
         <div class="cb-body">
-          <div class="cb-sec"><h5>🔢 Cantidad</h5><div class="cb-dates"><input type="number" id="cbQty" min="0" step="any" inputmode="decimal" placeholder="${!isT&&items.length===1?formatInventoryQuantity(items[0].quantity):"Ej: 100"}" value="${r.quantity??""}" ${can?"":"disabled"} style="width:120px"><small class="cb-hint">Sale en un circulito al lado del nombre</small></div></div><div class="cb-sec"><h5>🕒 Fecha${isT?"":" de entrega"}</h5><div class="cb-dates"><input type="date" id="cbDate" value="${date||""}" ${can?"":"disabled"}>${date?woDueBadge(date,isT&&!!r.completed_at):""}${!isT&&r.priority==="urgent"?'<span class="tb urgent">🔥 Urgente</span>':""}</div></div>
+          <div class="cb-sec"><h5>🔢 Cantidad</h5><div class="cb-dates"><input type="number" id="cbQty" min="0" step="any" inputmode="decimal" placeholder="${!isT&&items.length===1?formatInventoryQuantity(items[0].quantity):"Ej: 100"}" value="${r.quantity??""}" ${can?"":"disabled"} style="width:120px"><small class="cb-hint">Sale en un circulito al lado del nombre</small></div></div><div class="cb-sec"><h5>🕒 Fecha${isT?"":" de entrega"}</h5><div class="cb-dates"><input type="date" id="cbDate" value="${date||""}" ${can?"":"disabled"}>${date?woDueBadge(date,isT&&!!r.completed_at):""}${!isT&&r.priority==="urgent"?'<span class="tb urgent">🔥 Urgente</span>':""}</div>${can?`<div class="cb-dq">${woDateChips().map(c=>`<button type="button" onclick="window.woSetDate('${key}','${c.v}')">${c.t}</button>`).join("")}${date?`<button type="button" class="x" onclick="window.woSetDate('${key}','')">✕ Quitar fecha</button>`:""}</div>`:""}</div>
           <div class="cb-sec"><h5>≡ Descripción</h5><textarea class="cb-desc" id="cbDesc" placeholder="Agrega una descripción más detallada…" ${can?"":"readonly"}>${escapeHTML(r.notes||"")}</textarea></div>
           ${items.length?`<div class="cb-sec"><h5>📦 Productos del pedido</h5><ul class="cb-prod">${items.map(i=>`<li>${formatInventoryQuantity(i.quantity)} ${escapeHTML(i.unit||"")} · ${escapeHTML(i.description||"")}</li>`).join("")}</ul></div>`:""}
           ${fin?`<div class="cb-sec"><h5>💰 Pago</h5><div class="cb-pay">${fin.status==="paid"?'<span class="tb ok">Pagado</span>':`<span>Debe <b class="money">${formatCOP(fin.balance)}</b></span>`}<span class="muted">Total <span class="money">${formatCOP(Number(r.source_quote_total)||0)}</span>${fin.paid>0?` · Abonado <span class="money">${formatCOP(fin.paid)}</span>`:""}</span></div></div>`:""}
@@ -3742,11 +3750,15 @@
     function woCLToggle(i){const f=woCBRow();if(!f)return;const l=woCl(f.r).map((x,j)=>j===i?{...x,d:!x.d}:x);woCLSet(l)}
     function woCLDel(i){const f=woCBRow();if(!f)return;woCLSet(woCl(f.r).filter((x,j)=>j!==i))}
     function woCLFromItems(){const f=woCBRow();if(!f||f.isT)return;const items=(state.productionItems||[]).filter(i=>i.work_order_id===f.r.id);woCLSet(items.map(i=>({t:`${formatInventoryQuantity(i.quantity)} ${i.unit||""} · ${i.description||""}`.replace(/\s+/g," ").trim(),d:false})))}
+    function woDateChips(){const n=new Date(),d=k=>localISO(new Date(n.getFullYear(),n.getMonth(),n.getDate()+k)),dow=n.getDay(),toFri=(5-dow+7)%7||7,toMon=(1-dow+7)%7||7;return [{t:"Hoy",v:d(0)},{t:"Mañana",v:d(1)},{t:"Pasado mañana",v:d(2)},{t:dow===5?"Próx. viernes":"Este viernes",v:d(toFri)},{t:"Próx. lunes",v:d(toMon)},{t:"En 1 semana",v:d(7)}]}
+    function woDateMenu(key,cur){return `<hr><small class="wo-menu-label">🕒 Fecha de entrega:</small><span class="wo-menu-dates">${woDateChips().slice(0,4).map(c=>`<button type="button" onclick="window.woSetDate('${key}','${c.v}')">${c.t}</button>`).join("")}<button type="button" onclick="window.woOpenCard('${key}');setTimeout(window.woCBDatePick,120)">📅 Otra…</button>${cur?`<button type="button" onclick="window.woSetDate('${key}','')">✕ Quitar</button>`:""}</span>`}
+    async function woSetDate(key,v){const f=woFind(key);if(!f||!f.r||!hasPermission("work_orders.update"))return;const p=f.isT?{due_date:v||null}:{promised_date:v||null};Object.assign(f.r,p);renderProduction();if(woCB&&woCB.key===key&&$("woCardModal")&&!$("woCardModal").classList.contains("hidden"))woRenderCard();const {error}=await woUpdate(f.r,f.isT?p:Object.assign({updated_by:state.session.user.id},p));if(error){alert(error.message);loadProduction()}else showToast(v?"Fecha puesta 🕒":"Fecha quitada")}
+    function woCBDatePick(){const el=$("cbDate");if(!el)return;el.scrollIntoView({block:"center",behavior:"smooth"});el.focus();try{el.showPicker()}catch(e){}}
     function woCBFocus(id){const el=$(id);if(el){el.scrollIntoView({block:"center",behavior:"smooth"});el.focus()}}
     async function woCBMove(k){if(!woCB)return;await woDrop(woCB.key,k,null);setTimeout(woRenderCard,80)}
     async function woCBBoard(id){if(!woCB)return;await woSetBoard(woCB.key,id);woRenderCard()}
     async function woCBNext(){const f=woCBRow();if(!f||f.isT||!WO_NEXT[f.r.status])return;await changeWorkOrderStatus(f.r.id,WO_NEXT[f.r.status]);woRenderCard()}
-    Object.assign(window,{woColorPicker,woColorClose,woColorPick,woColorSaveOwn,woOpenCard,woCloseCard,woRenderCard,woComplete,woCompose,woCollapse,woSetColor,woCLToggle,woCLDel,woCLFromItems,woCBFocus,woCBMove,woCBBoard,woCBNext});
+    Object.assign(window,{woColorPicker,woColorClose,woColorPick,woColorSaveOwn,woOpenCard,woCloseCard,woRenderCard,woComplete,woCompose,woCollapse,woSetColor,woCLToggle,woCLDel,woCLFromItems,woCBFocus,woCBMove,woCBBoard,woCBNext,woSetDate,woCBDatePick});
     // V9.57: historial de movimientos del tablero
     let woAct=[];
     function woActSeen(){try{return localStorage.getItem("tecniWoActSeen")||""}catch(e){return ""}}
@@ -4319,6 +4331,7 @@
     function woOrderMenu(o){
       const can=hasPermission("work_orders.update"),f=hasPermission("payments.view")?orderFinancial(o):null;
       const menu=[`<button type="button" onclick="window.woOpenCard('${o.id}')">🗂 Abrir tarjeta</button>`,`<button type="button" onclick="window.openWorkOrder('${o.id}')">📄 Abrir pedido completo</button>`];
+      if(can&&!o.archived_at&&o.status!=="cancelled"&&o.status!=="delivered")menu.push(woDateMenu(o.id,o.promised_date));
       if(can&&!o.archived_at&&WO_NEXT[o.status])menu.push(`<button type="button" onclick="window.changeWorkOrderStatus('${o.id}','${WO_NEXT[o.status]}')">${WO_NEXT_TXT[o.status]}</button>`);
       if(can&&!o.archived_at&&WO_PREV[o.status])menu.push(`<button type="button" onclick="window.changeWorkOrderStatus('${o.id}','${WO_PREV[o.status]}')">← Volver un paso</button>`);
       if(can&&o.status==="in_production")menu.push(`<button type="button" onclick="window.changeWorkOrderStatus('${o.id}','finishing')">✂ Marcar: en acabados</button>`);
@@ -4337,6 +4350,7 @@
     function woTaskMenu(t){
       const can=hasPermission("work_orders.update"),key="t:"+t.id;
       const menu=[`<button type="button" onclick="window.woOpenCard('${key}')">🗂 Abrir tarjeta</button>`];
+      if(can&&!t.archived_at)menu.push(woDateMenu(key,t.due_date));
       if(can)menu.push(`<button type="button" onclick="window.woComplete('${t.id}')">${t.completed_at?"○ Quitar “lista”":"✓ Marcar como lista"}</button>`);
       if(can&&t.archived_at)menu.push(`<hr><button type="button" onclick="window.woArchive(['${key}'],false)">↩ Sacar del archivo (volver al tablero)</button>`);
       if(can&&!t.archived_at){menu.push('<hr><small class="wo-menu-label">Mover a:</small>'+WO_COLS.filter(c=>c.k!==t.col).map(c=>`<button type="button" onclick="window.woMoveTo('${key}','${c.k}')">${c.t}</button>`).join(''));menu.push(woBoardMenu(key,t.board_id));menu.push(`<hr><button type="button" onclick="window.woArchive(['${key}'],true)">📦 Archivar</button>`)}

@@ -1594,7 +1594,7 @@
   </form></div>
 
   <div class="modal-backdrop hidden" id="caModal"><div class="modal ca-modal">
-    <div class="modal-head"><div><h3 id="caTitle">Cuenta</h3><div class="subtle" id="caSubtitle"></div></div><button type="button" class="modal-close" data-close="caModal">×</button></div>
+    <div class="modal-head"><div><h3 id="caTitle" style="display:inline">Cuenta</h3> <button type="button" class="mini ca-write" id="caRenameBtn" title="Cambiar el nombre de esta cuenta" style="vertical-align:3px;margin-left:6px">✏️ Cambiar nombre</button><div class="subtle" id="caSubtitle"></div></div><button type="button" class="modal-close" data-close="caModal">×</button></div>
     <div class="ca-summary"><div><span>Total entregado</span><strong id="caTotal">$ 0</strong><small id="caTaxNote"></small></div><div><span>Abonado</span><strong id="caPaid">$ 0</strong></div><div class="due"><span>Saldo</span><strong id="caBalance">$ 0</strong></div></div>
     <div class="ca-cols">
       <section class="ca-box">
@@ -3073,13 +3073,21 @@
     async function caToggleClose(skipAsk){
       const a=ca.current,t=caTotals();if(!caCanWrite())return;
       if(a.status==="closed"){if(!confirm("¿Reabrir esta cuenta para seguir anotando?"))return;const {error}=await db.from("client_accounts").update({status:"open",closed_on:null,updated_at:new Date().toISOString()}).eq("id",a.id);if(error)return alert(error.message);showToast("Cuenta reabierta");await caOpen(a.id);return loadCartera()}
-      const owes=t.balance>.01,next=caNextLabel(a.client_name,a.label);
-      if(!skipAsk&&!confirm(owes?`📂 Pasar a cuenta nueva\n\n• ${a.label} se cierra para facturarla aparte. NO queda como pagada: sigue en Cartera debiendo ${formatCOP(t.balance)} y le puedes registrar abonos.\n• Se abre “${next}” para lo nuevo de ${a.client_name}.\n\n¿Seguimos?`:`✅ ${a.label} está al día. ¿Cerrarla como pagada? Queda en el historial del cliente.`))return;
+      const owes=t.balance>.01;let next=caNextLabel(a.client_name,a.label);
+      if(!skipAsk&&!confirm(owes?`📂 Pasar a cuenta nueva\n\n• ${a.label} se cierra para facturarla aparte. NO queda como pagada: sigue en Cartera debiendo ${formatCOP(t.balance)} y le puedes registrar abonos.\n• Se abre una cuenta nueva para lo nuevo de ${a.client_name} (te pregunto cómo llamarla).\n\n¿Seguimos?`:`✅ ${a.label} está al día. ¿Cerrarla como pagada? Queda en el historial del cliente.`))return;
       loading(true,"Cerrando cuenta…");try{const {error}=await db.from("client_accounts").update({status:"closed",closed_on:todayISO(),updated_at:new Date().toISOString()}).eq("id",a.id);if(error)throw error}catch(err){loading(false);return alert(err.message)}loading(false);
       const sinFac=ca.items.filter(i=>!i.invoiced).length;
       if(sinFac&&confirm(`🧾 ¿${a.label} ya se facturó?\n\nAceptar: marco ${sinFac===1?"el producto como facturado":`los ${sinFac} productos como facturados`}.\nCancelar: quedan sin facturar (lo puedes marcar después).`)){const {error}=await db.from("client_account_items").update({invoiced:true}).eq("account_id",a.id).eq("invoiced",false);if(error)alert("La cuenta se cerró, pero no pude marcar la facturación: "+error.message)}
-      if(!owes){showToast(`✓ ${a.label} cerrada como pagada`);await loadCartera();if(skipAsk||!confirm(`¿Abrir de una vez “${next}” para ${a.client_name}?`))return closeModal("caModal")}
+      if(!owes){showToast(`✓ ${a.label} cerrada como pagada`);await loadCartera();if(skipAsk||!confirm(`¿Abrir de una vez una cuenta nueva para ${a.client_name}?`))return closeModal("caModal")}
+      if(!skipAsk){const nv=prompt(`¿Cómo se llama la cuenta nueva de ${a.client_name}?\n(ej. Noviembre, nombre del evento…)`,next);if(nv&&nv.trim())next=nv.trim().replace(/\s+/g," ").slice(0,80);if(ca.rows.some(r=>caKey(r.client_name)===caKey(a.client_name)&&caKey(r.label)===caKey(next)))next=caNextLabel(a.client_name,next)}
       loading(true,"Abriendo cuenta nueva…");try{const {data,error}=await db.from("client_accounts").insert({client_id:a.client_id,client_name:a.client_name,label:next,tax_rate:a.tax_rate}).select("id").single();if(error)throw error;await loadCartera();loading(false);await caOpen(data.id);showToast(owes?`✓ ${a.label} queda por cobrar · ya puedes anotar en ${next}`:`✓ Cuenta ${next} abierta`)}catch(err){loading(false);await loadCartera();alert(`${a.label} se cerró, pero no pude abrir ${next}: ${err.message}\nÁbrela con + Abrir cuenta.`)}
+    }
+    async function caRename(){
+      const a=ca.current;if(!a||!caCanWrite())return;
+      const v=prompt(`Nombre de la cuenta de ${a.client_name}\n(ej. Octubre, Feria de las flores, Evento 15 años…)`,a.label);if(v===null)return;
+      const label=v.trim().replace(/\s+/g," ").slice(0,80);if(!label||label===a.label)return;
+      if(ca.rows.some(r=>r.client_account_id!==a.id&&caKey(r.client_name)===caKey(a.client_name)&&caKey(r.label)===caKey(label)))return alert(`${a.client_name} ya tiene una cuenta llamada “${label}”. Ponle otro nombre.`);
+      loading(true,"Guardando nombre…");try{const {error}=await db.from("client_accounts").update({label,updated_at:new Date().toISOString()}).eq("id",a.id);if(error)throw error;a.label=label;await loadCartera();loading(false);caRender();showToast("✓ Nombre cambiado")}catch(err){loading(false);alert("No pude cambiar el nombre: "+err.message)}
     }
     async function caSetTax(){const v=$("caTax").checked?19:0;const {error}=await db.from("client_accounts").update({tax_rate:v}).eq("id",ca.current.id);if(error){$("caTax").checked=!$("caTax").checked;return alert(error.message)}ca.current.tax_rate=v;caRender();loadCartera()}
     async function caDeleteAccount(){if(!confirm("¿Eliminar esta cuenta vacía?"))return;const {error}=await db.from("client_accounts").delete().eq("id",ca.current.id);if(error)return alert(error.message);closeModal("caModal");showToast("Cuenta eliminada");loadCartera()}
@@ -3168,7 +3176,7 @@
       $("caPayForm").addEventListener("submit",caSavePay);$("caPayKind").addEventListener("change",caPayKindSync);
       $("caPayAccounts").addEventListener("click",e=>{const b=e.target.closest("[data-ca-acc]");if(b){ca.payAcc=b.dataset.caAcc;caPayKindSync()}});
       $("caPays").addEventListener("click",e=>{const d=e.target.closest("[data-ca-paydel]"),s=e.target.closest("[data-ca-support]");if(d)caDeletePay(d.dataset.caPaydel);if(s)openSupport(s.dataset.caSupport)});
-      $("caTax").addEventListener("change",caSetTax);$("caCloseAccount").addEventListener("click",()=>caToggleClose(false));$("caDeleteAccount").addEventListener("click",caDeleteAccount);
+      $("caTax").addEventListener("change",caSetTax);$("caRenameBtn").addEventListener("click",caRename);$("caCloseAccount").addEventListener("click",()=>caToggleClose(false));$("caDeleteAccount").addEventListener("click",caDeleteAccount);
       $("caPricesButton").addEventListener("click",caShowPrices);$("caStPayChecks").addEventListener("change",e=>{const c=e.target.closest("[data-ca-paysel]");if(c)caTogglePaySel(c.dataset.caPaysel,c.checked);if(e.target.id==="caStIssuer")caSetIssuer(e.target.value)});$("caContractButton").addEventListener("click",caEditContract);$("caContractForm").addEventListener("submit",caSaveContract);$("caStatementButton").addEventListener("click",caOpenStatement);
       $("caStShare").addEventListener("click",caShareImage);$("caStImage").addEventListener("click",caDownloadImage);$("caStPdf").addEventListener("click",caDownloadPdf);
       $("caStCopy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(caShareText());showToast("✓ Mensaje copiado")}catch(e){prompt("Copia el mensaje:",caShareText())}});

@@ -665,6 +665,8 @@
     .cost-line-opts label{display:flex;align-items:center;gap:6px;margin:0;font-weight:600}.cost-line-opts select{width:auto;padding:4px 8px;min-height:0}.cost-line-opts input[type=checkbox]{width:18px;height:18px}
     .cost-line-tag{font-weight:600;color:#1d4ed8}
     @media(max-width:900px){#costingModal .cost-result{grid-template-columns:1fr 1fr}}
+    /* V9.53: menú sin desplegables */
+    .nav-label{cursor:default!important}.nav-label:hover{background:none!important;color:#8f97a8}.nav-label i{display:none!important}
     /* V9.50: columna Aprobado, Producción a todo el ancho y carpetas en varias filas */
     .wo-col.col-approved{border-top:4px solid #22a06b}#productionBody .wo-col.col-approved{background:#e3f5ec}
     .content:has(#view-production.active){max-width:none}
@@ -941,8 +943,8 @@
         <div class="nav-label" role="button" tabindex="0" data-group="Taller"><span>Taller</span><i>▾</i></div>
         <button data-group="Taller" data-view="production"><span class="icon">⚙</span>Producción</button>
         <button data-group="Taller" data-view="inventory"><span class="icon">◫</span>Inventario</button>
-        <button data-group="home" data-view="products"><span class="icon">▦</span>Productos</button>
-        <button data-group="home" data-view="calculators"><span class="icon">⚒</span>Herramientas</button>
+        <button data-group="Taller" data-view="products"><span class="icon">▦</span>Productos</button>
+        <button data-group="Taller" data-view="calculators"><span class="icon">⚒</span>Herramientas</button>
         <div class="nav-label" role="button" tabindex="0" data-group="Dinero"><span>Dinero</span><i>▾</i></div>
         <button data-group="Dinero" data-view="finance" id="financeNav"><span class="icon">◉</span>Finanzas</button>
         <button data-group="Dinero" data-view="payments"><span class="icon">$</span>Cartera</button>
@@ -3951,12 +3953,12 @@
         const g=l.dataset.group,btns=[...nav.querySelectorAll(`button[data-group="${g}"]`)],visible=btns.filter(b=>!b.classList.contains("hidden"));
         const hasActive=btns.some(b=>b.classList.contains("active"));
         l.style.display=visible.length?"":"none";
-        const open=st[g]===true;
+        const open=true; // V9.53: los grupos siempre se ven abiertos
         l.classList.toggle("folded",!open);l.classList.toggle("has-active",hasActive);
         btns.forEach(b=>b.classList.toggle("nav-folded",!open));
       });
     }
-    function toggleNavGroup(l){const st=navGroupState(),g=l.dataset.group;st[g]=l.classList.contains("folded");try{sessionStorage.setItem("tg-nav-open",JSON.stringify(st))}catch(e){}syncNavGroups()}
+    function toggleNavGroup(l){return;const st=navGroupState(),g=l.dataset.group;st[g]=l.classList.contains("folded");try{sessionStorage.setItem("tg-nav-open",JSON.stringify(st))}catch(e){}syncNavGroups()}
     document.addEventListener("click",e=>{const l=e.target.closest&&e.target.closest(".nav-label");if(l)toggleNavGroup(l)});
     document.addEventListener("keydown",e=>{const l=e.target.closest&&e.target.closest(".nav-label");if(l&&(e.key==="Enter"||e.key===" ")){e.preventDefault();toggleNavGroup(l)}});
     {const nav=document.getElementById("nav");if(nav){let t;new MutationObserver(()=>{clearTimeout(t);t=setTimeout(syncNavGroups,0)}).observe(nav,{subtree:true,attributes:true,attributeFilter:["class"]});syncNavGroups()}}

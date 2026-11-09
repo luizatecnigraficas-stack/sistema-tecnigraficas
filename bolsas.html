@@ -152,10 +152,10 @@ details .dims{margin-top:10px}
       <details>
         <summary>Ajustes del troquel</summary>
         <div class="dims">
-          <label class="f">Pestaña<input id="P" type="number" min="0.5" max="5" step="0.25" value="1"><span class="unit">cm</span></label>
-          <label class="f">Traslape fondo<input id="E" type="number" min="0.5" max="5" step="0.25" value="1"><span class="unit">cm</span></label>
-          <label class="f">Pliego ancho<input id="PW" type="number" min="20" max="120" step="1" value="50"><span class="unit">cm</span></label>
-          <label class="f">Pliego alto<input id="PH" type="number" min="20" max="120" step="1" value="35"><span class="unit">cm</span></label>
+          <label class="f">Pestaña<input id="P" type="number" min="0.5" max="5" step="0.25" value="2"><span class="unit">cm</span></label>
+          <label class="f">Traslape fondo<input id="E" type="number" min="0.5" max="5" step="0.25" value="1.5"><span class="unit">cm</span></label>
+          <label class="f">Pliego ancho<input id="PW" type="number" min="20" max="120" step="1" value="100"><span class="unit">cm</span></label>
+          <label class="f">Pliego alto<input id="PH" type="number" min="20" max="120" step="1" value="70"><span class="unit">cm</span></label>
         </div>
       </details>
     </section>
@@ -444,7 +444,7 @@ $('cat').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)r
   $('cSep').value=Math.min(8,Math.round(c[3]*0.45*2)/2);bumpFold();pressSync();update();});
 $('handle').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;state.handle=b.dataset.v;bumpFold();pressSync();update();});
 function renderWarn(lay){const w=$('hwarn');w.innerHTML=lay.warn.map(t=>'⚠ '+t).join('<br>');w.classList.toggle('hide',!lay.warn.length);}
-const KEY='tecniBolsa3d';
+const KEY='tecniBolsa3d.v2';
 function persist(){try{const o={mode:state.mode,paper:state.paper,handle:state.handle,preset:state.preset,phone:$('phone').checked,cotas:$('cotas').checked};NUMS.forEach(k=>o[k]=$(k).value);localStorage.setItem(KEY,JSON.stringify(o));}catch(e){}}
 function restore(){try{const o=JSON.parse(localStorage.getItem(KEY)||'null');if(!o)return;NUMS.forEach(k=>{if(o[k]!=null)$(k).value=o[k];});if(o.mode)state.mode=o.mode;if(o.paper)state.paper=o.paper;if(o.handle)state.handle=o.handle;if(o.preset!=null)state.preset=o.preset;$('phone').checked=o.phone!==false;$('cotas').checked=o.cotas!==false;[['mode','mode'],['paper','paper']].forEach(([id,k])=>[...$(id).children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===state[k])));}catch(e){}}
 function update(){persist();const lay=layout();renderStats(lay);renderWarn(lay);renderDie(lay);build3D(lay);}

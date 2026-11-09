@@ -2,46 +2,74 @@
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Tecni"><meta name="theme-color" content="#191b22">
 <script src="avisos.js"></script>
 <title>TecniBolsa · Tecnigráficas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Jost:wght@400;500;600&display=swap">
 <style>
-:root{--c:#09acd8;--m:#eb008b;--y:#ffc400;--i:#172033;--u:#667085;--l:#e4e7ec;--g:#067647;--r:#b42318;--corte:#e1001a;--doblez:#0077c8}
-*{box-sizing:border-box}html:not(.auth-ready) body{visibility:hidden}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--i);background:linear-gradient(145deg,#edfafe,#fff 43%,#fff1f8);min-height:100vh}
-header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--l)}
-.head{max-width:1300px;margin:auto;padding:10px 18px;display:flex;align-items:center;gap:14px}
-.logo{height:46px;max-width:220px;object-fit:contain}.htitle{flex:1;min-width:0}.htitle b{display:block;font-size:19px}.htitle span{font-size:12px;color:var(--u)}
-.back{background:#eef2f7;color:#344054;border:0;border-radius:12px;padding:11px 14px;font-weight:900;font-size:13px;cursor:pointer}
-main{max-width:1300px;margin:18px auto;padding:0 16px 60px;display:grid;grid-template-columns:440px 1fr;gap:18px;align-items:start}
-.card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 18px 50px rgba(23,32,51,.1)}
-h1{font-size:24px;margin:0 0 4px}.lead{margin:0 0 6px;color:var(--u);font-size:14px;line-height:1.45}
-.sec{border-top:1px solid var(--l);padding-top:16px;margin-top:16px}
-.ttl{font-weight:900;font-size:15px;margin-bottom:10px}
-label{display:block;font-size:13px;font-weight:800;color:#344054;margin-bottom:5px}
-input,select{width:100%;font-size:20px;font-weight:800;padding:11px 12px;border:2px solid var(--l);border-radius:14px;color:var(--i);background:#fff}
-input:focus,select:focus{outline:none;border-color:var(--c)}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.help{font-size:12px;color:var(--u);margin-top:4px;line-height:1.35}
-.presets{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;max-height:260px;overflow:auto;padding:2px}
-.presets button{text-align:left;background:#f8fafc;border:2px solid var(--l);border-radius:12px;padding:8px 10px;cursor:pointer;font-size:13px;color:var(--i)}
-.presets button b{display:block;font-size:14px}.presets button span{color:var(--u);font-size:12px}
-.presets button.on{border-color:var(--m);background:#fff1f8}
-.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.seg button{border:2px solid var(--l);background:#fff;border-radius:14px;padding:12px 6px;font-weight:900;font-size:14px;cursor:pointer;color:var(--i)}
-.seg button.on{border-color:var(--c);background:#edfafe}
-.hide{display:none!important}
-.warn{background:#fff8e1;border:1px solid #ffe08a;color:#7a5400;border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px;line-height:1.4}
-.view{position:sticky;top:84px}
-.stage{background:#f8fafc;border:1px solid var(--l);border-radius:16px;padding:14px;overflow:auto}
-.stage svg{display:block;width:100%;height:auto;max-height:68vh}
-.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;font-weight:800;margin:10px 0 0}
-.legend i{display:inline-block;width:28px;height:0;border-top:3px solid var(--corte);vertical-align:middle;margin-right:6px}
-.legend i.d{border-top:3px dashed var(--doblez)}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
-.stat{background:#f8fafc;border-radius:14px;padding:10px 12px}.stat span{display:block;font-size:12px;color:var(--u);font-weight:800}.stat b{font-size:20px}
-.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
-.btn{border:0;border-radius:16px;padding:16px;font-weight:900;font-size:16px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--c),var(--m))}
-.btn.alt{background:var(--i)}
-.chk{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;margin-top:10px}.chk input{width:22px;height:22px}
-@media(max-width:900px){main{grid-template-columns:1fr}.view{position:static}.stats{grid-template-columns:1fr 1fr}}
+html:not(.auth-ready) body{visibility:hidden}
+body{margin:0;min-height:100vh}
+.syshead{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #e4e7ec}
+.syshead .in{max-width:1300px;margin:auto;padding:10px 18px;display:flex;align-items:center;gap:14px}
+.syshead .logo{height:46px;max-width:220px;object-fit:contain}.syshead .t{flex:1;min-width:0}.syshead .t b{display:block;font-size:19px;font-family:var(--display);font-weight:600}.syshead .t span{font-size:12px;color:var(--muted)}
+.syshead .back{background:#eef2f7;color:#344054;border:0;border-radius:12px;padding:11px 14px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--body)}
+
+/* Layout: panel de medidas a la izquierda, bolsa 3D al centro, troquel debajo — como la mesa de trabajo del taller */
+:root{
+  --bg:#FBFAF8; --surface:#FFFFFF; --line:#E6E2DC; --fg:#1A1A1A; --muted:#6B6660;
+  --magenta:#EC008C; --cyan:#00AEEF; --yellow:#FFF200; --black:#1A1A1A;
+  --ok-bg:#E3F6EC; --ok-fg:#146C3C; --warn-bg:#FFF6CC; --warn-fg:#7A5B00; --bad-bg:#FDE3EF; --bad-fg:#A3005F;
+  --stage:#F2EFEA; --edge:#3B342D;
+  --display:"Fredoka","Tondu Beta","Arial Rounded MT Bold",system-ui,sans-serif;
+  --body:"Jost","Futura","Century Gothic",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1300px;margin:0 auto;padding-block:18px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:20px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--display);font-weight:600;font-size:2rem;line-height:1.1;margin:0;text-wrap:balance}
+h1 small{display:block;font-family:var(--body);font-weight:500;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.cmyk{display:flex;height:6px;width:120px;border-radius:3px;overflow:hidden}
+.cmyk i{flex:1}
+.main{display:grid;grid-template-columns:290px minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:820px){.main{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:16px}
+h2{font-family:var(--display);font-weight:600;font-size:1.05rem;margin:0}
+.dims{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+label.f{display:grid;gap:4px;font-size:.78rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:500}
+input[type=number]{width:100%;font:inherit;font-size:1.1rem;font-variant-numeric:tabular-nums;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+input[type=number]:focus-visible,button:focus-visible{outline:2px solid var(--magenta);outline-offset:2px}
+.unit{font-size:.75rem;color:var(--muted);text-transform:none;letter-spacing:0}
+.seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+.seg button{flex:1;font:inherit;font-size:.85rem;border:0;background:transparent;color:var(--muted);padding:6px 8px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--fg);color:var(--bg);font-weight:500}
+.grp{display:grid;gap:6px}
+.grp>span{font-size:.78rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-weight:500}
+.chk{display:flex;align-items:center;gap:8px;font-size:.9rem;cursor:pointer}
+.chk input{accent-color:var(--magenta);width:16px;height:16px}
+details{border-top:1px solid var(--line);padding-top:12px}
+summary{cursor:pointer;font-size:.85rem;color:var(--muted)}
+details .dims{margin-top:10px}
+.stage{position:relative;background:var(--stage);border-radius:16px;overflow:hidden;aspect-ratio:4/3;max-width:100%;min-height:320px}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.tag{position:absolute;transform:translate(-50%,-50%);font-family:var(--display);font-weight:500;font-size:.85rem;padding:2px 8px;border-radius:999px;color:#fff;pointer-events:none;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tag.ref{background:var(--surface);color:var(--muted);border:1px solid var(--line);font-family:var(--body);font-size:.75rem}
+.hint{position:absolute;left:12px;bottom:10px;font-size:.75rem;color:var(--muted);pointer-events:none}
+.stats{display:grid;gap:8px;font-size:.9rem}
+.row{display:flex;justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums}
+.row b{font-weight:600}
+.pill{display:inline-block;font-size:.8rem;font-weight:500;padding:3px 10px;border-radius:999px}
+.pill.ok{background:var(--ok-bg);color:var(--ok-fg)} .pill.warn{background:var(--warn-bg);color:var(--warn-fg)} .pill.bad{background:var(--bad-bg);color:var(--bad-fg)}
+.die{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:14px}
+.diehead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:500;font-size:.9rem;border-radius:999px;padding:8px 16px;cursor:pointer;border:1px solid var(--line);background:var(--bg);color:var(--fg)}
+.btn.pri{background:var(--magenta);border-color:var(--magenta);color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.dieview{overflow-x:auto;background:var(--bg);border-radius:12px;padding:10px}
+.dieview svg{display:block;width:100%;min-width:520px;height:auto}
+.note{font-size:.82rem;color:var(--muted);margin:0}
+#msg{min-height:1.2em}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script>
 <script>
@@ -54,193 +82,288 @@ input:focus,select:focus{outline:none;border-color:var(--c)}
   }catch(error){console.error(error);location.replace("index.html#design")}
 })();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head><body>
-<header><div class="head"><a href="index.html"><img class="logo" src="logo.png" alt="Tecnigráficas"></a><div class="htitle"><b>🛍️ TecniBolsa</b><span>Troquel de bolsas de papel · corte y doblez · SVG y PDF a escala</span></div><button class="back" id="backToSystem" type="button">← Herramientas</button></div></header>
-<main>
-<section class="card">
-  <h1>Troquel de bolsa</h1>
-  <p class="lead">Escoge una bolsa del catálogo o escribe las medidas. Te dibujo el troquel listo para mandar a troquelar.</p>
+<header class="syshead"><div class="in"><a href="index.html"><img class="logo" src="logo.png" alt="Tecnigráficas"></a><div class="t"><b>🛍️ TecniBolsa</b><span>Bolsa en 3D para mostrar al cliente · troquel en formato Tecnigráficas</span></div><button class="back" id="backToSystem" type="button">← Herramientas</button></div></header>
+<div class="wrap">
 
-  <div class="sec"><div class="ttl">Bolsas del catálogo</div><div class="presets" id="presets"></div></div>
+  <div class="main">
+    <section class="panel" aria-label="Medidas">
+      <h2>Medidas de la bolsa</h2>
+      <div class="dims">
+        <label class="f">Ancho<input id="A" type="number" min="4" max="60" step="0.5" value="12"><span class="unit">cm</span></label>
+        <label class="f">Alto<input id="H" type="number" min="4" max="60" step="0.5" value="18.5"><span class="unit">cm</span></label>
+        <label class="f">Fuelle<input id="F" type="number" min="2" max="30" step="0.5" value="7"><span class="unit">cm</span></label>
+      </div>
 
-  <div class="sec"><div class="ttl">Medidas de la bolsa armada (cm)</div>
-    <div class="g3">
-      <div><label for="alto">Alto</label><input id="alto" inputmode="decimal"></div>
-      <div><label for="ancho">Ancho</label><input id="ancho" inputmode="decimal"></div>
-      <div><label for="fuelle">Fuelle</label><input id="fuelle" inputmode="decimal"></div>
+      <div class="grp"><span>Troquel</span>
+        <div class="seg" id="mode" role="group" aria-label="Modo de troquel">
+          <button type="button" data-v="auto" aria-pressed="true">Automático</button>
+          <button type="button" data-v="1" aria-pressed="false">1 pieza</button>
+          <button type="button" data-v="2" aria-pressed="false">2 mitades</button>
+        </div>
+      </div>
+
+      <div class="grp"><span>Papel</span>
+        <div class="seg" id="paper" role="group" aria-label="Color del papel">
+          <button type="button" data-v="kraft" aria-pressed="true">Kraft</button>
+          <button type="button" data-v="blanco" aria-pressed="false">Blanco</button>
+          <button type="button" data-v="negro" aria-pressed="false">Negro</button>
+        </div>
+      </div>
+
+      <label class="chk"><input id="phone" type="checkbox" checked> Mostrar celular de referencia</label>
+      <label class="chk"><input id="cotas" type="checkbox" checked> Mostrar cotas</label>
+
+      <div class="stats" id="stats"></div>
+
+      <details>
+        <summary>Ajustes del troquel</summary>
+        <div class="dims">
+          <label class="f">Pestaña<input id="P" type="number" min="0.5" max="5" step="0.25" value="1"><span class="unit">cm</span></label>
+          <label class="f">Traslape fondo<input id="E" type="number" min="0.5" max="5" step="0.25" value="1"><span class="unit">cm</span></label>
+          <label class="f">Pliego ancho<input id="PW" type="number" min="20" max="120" step="1" value="50"><span class="unit">cm</span></label>
+          <label class="f">Pliego alto<input id="PH" type="number" min="20" max="120" step="1" value="35"><span class="unit">cm</span></label>
+        </div>
+      </details>
+    </section>
+
+    <section class="stage" id="stage" aria-label="Vista 3D de la bolsa">
+      <canvas id="cv" aria-label="Bolsa en 3D; arrastra para girar"></canvas>
+      <div id="tags"></div>
+      <div class="hint">Arrastra para girar · rueda o pellizca para acercar</div>
+    </section>
+  </div>
+
+  <section class="die" aria-label="Troquel">
+    <div class="diehead">
+      <h2 id="dietitle">Troquel</h2>
+      <div class="actions">
+        <button class="btn pri" id="dlpdf" type="button">Descargar PDF</button>
+        <button class="btn" id="dlsvg" type="button">Descargar SVG</button>
+      </div>
     </div>
-    <div class="help">Igual que en el catálogo: alto × ancho × fuelle. El fuelle es el costado.</div>
-  </div>
-
-  <div class="sec"><div class="ttl">Manija</div>
-    <div class="seg" id="handleSeg"><button data-h="none" type="button">Sin manija</button><button data-h="cord" type="button">Cordón</button><button data-h="die" type="button">Troquelada</button></div>
-    <div id="cordBox" class="hide" style="margin-top:12px"><div class="g3">
-      <div><label for="cSep">Entre huecos</label><input id="cSep" inputmode="decimal"></div>
-      <div><label for="cTop">Desde arriba</label><input id="cTop" inputmode="decimal"></div>
-      <div><label for="cDia">Diámetro</label><input id="cDia" inputmode="decimal"></div>
-    </div><div class="help">2 huecos en el frente y 2 en la espalda. Si el doblez de arriba alcanza, también se marcan en el doblez para que el cordón pase por las dos capas.</div></div>
-    <div id="dieBox" class="hide" style="margin-top:12px"><div class="g3">
-      <div><label for="dW">Largo del hueco</label><input id="dW" inputmode="decimal"></div>
-      <div><label for="dH">Alto del hueco</label><input id="dH" inputmode="decimal"></div>
-      <div><label for="dTop">Desde arriba</label><input id="dTop" inputmode="decimal"></div>
-    </div><div class="help">El hueco para meter la mano, en el frente y en la espalda.</div></div>
-    <div class="warn hide" id="handleWarn"></div>
-  </div>
-
-  <div class="sec"><div class="ttl">Pestañas (cm)</div>
-    <div class="g3">
-      <div><label for="top">Doblez arriba</label><input id="top" inputmode="decimal"></div>
-      <div><label for="glue">Pegue lateral</label><input id="glue" inputmode="decimal"></div>
-      <div><label for="lap">Pegue del fondo</label><input id="lap" inputmode="decimal"></div>
-    </div>
-    <div class="help"><b>Doblez arriba:</b> refuerzo que se dobla hacia adentro (0 = sin doblez). <b>Pegue del fondo:</b> cuánto se montan las tapas del fondo para pegarlas.</div>
-  </div>
-
-  <div class="sec"><div class="ttl">¿En qué papel?</div>
-    <div class="g2">
-      <div><label for="paper">Hoja</label><select id="paper"></select></div>
-      <div><label for="sepPaper">Separación (cm)</label><input id="sepPaper" inputmode="decimal"></div>
-    </div>
-    <div class="g2 hide" id="customPaper" style="margin-top:10px"><div><label for="pW">Ancho (cm)</label><input id="pW" inputmode="decimal"></div><div><label for="pH">Alto (cm)</label><input id="pH" inputmode="decimal"></div></div>
-  </div>
-</section>
-
-<section class="card view">
-  <div class="stats">
-    <div class="stat"><span>Troquel abierto</span><b id="sSize">–</b></div>
-    <div class="stat"><span id="sPaperLbl">Caben por hoja</span><b id="sFit">–</b></div>
-    <div class="stat"><span>Fondo</span><b id="sBottom">–</b></div>
-  </div>
-  <div class="stage" id="stage"></div>
-  <div class="legend"><span><i></i>Corte</span><span><i class="d"></i>Doblez</span></div>
-  <div class="warn hide" id="fitWarn"></div>
-  <label class="chk"><input type="checkbox" id="withText"> Poner nombres y medidas en el archivo</label>
-  <div class="btns" style="margin-top:12px"><button class="btn" id="dlPdf" type="button">⬇ PDF a escala</button><button class="btn alt" id="dlSvg" type="button">⬇ SVG (Illustrator / Corel)</button></div>
-  <div class="help" style="margin-top:8px">Al imprimir el PDF, escoge "Tamaño real" (100 %). En el SVG, el corte y el doblez van en capas separadas.</div>
-</section>
-</main>
+    <div class="dieview" id="dieview"></div>
+    <p class="note">Hendidos en magenta, sin línea de corte (el contorno va a guillotina). El archivo descargado trae solo las líneas, centrado en el pliego. <span id="msg"></span></p>
+  </section>
+</div>
 
 <script>
+(function(){
 const $=id=>document.getElementById(id);
-const CATALOG=[
- ['01','Dulce',26.5,12,10],['02','Antojo',27.2,12,10],['03','Esencia',26.6,13,8],['04','Detalle',26,16,6.2],['05','Festiva',26,16,6.3],
- ['06','Eco',26,16,6.5],['07','Boutique',27,16.4,6.5],['08','Práctica',24.5,19,8,'die'],['09','Viajera',32.3,21,11],['10','Moda',32,26,8],
- ['11','Ejecutiva',35.2,25.5,8],['12','Glamour',35.3,26,8],['13','Panorámica',25.5,32.7,11],['14','Torre',42,26,8],['15','Familiar',31.2,28.5,19.8],
- ['E1','Especial',42,28.5,19.8],['E2','Especial',22,30,11],['E3','Especial',34,24,11]];
-const PAPERS=[['Pliego',100,70],['½ pliego',70,50],['¼ pliego',50,35],['Tabloide',43.2,27.9],['Oficio',33,21.6],['Carta',27.9,21.6],['Otra medida',0,0]];
-const DEF={alto:26.5,ancho:12,fuelle:10,top:3,glue:2,lap:3,handle:'none',cSep:6,cTop:2.5,cDia:0.5,dW:9,dH:2.5,dTop:2.5,paper:0,sepPaper:0.5,pW:100,pH:70,withText:false,preset:'01'};
-const NUMS=['alto','ancho','fuelle','top','glue','lap','cSep','cTop','cDia','dW','dH','dTop','sepPaper','pW','pH'];
-let S={...DEF};try{Object.assign(S,JSON.parse(localStorage.getItem('tecniBolsa')||'{}'))}catch(e){}
-const num=v=>{const n=parseFloat(String(v).replace(',','.'));return isFinite(n)?n:0};
-const f=n=>(Math.round(n*10)/10).toLocaleString('es-CO',{maximumFractionDigits:1});
-const save=()=>{try{localStorage.setItem('tecniBolsa',JSON.stringify(S))}catch(e){}};
+const state={mode:'auto',paper:'kraft'};
+const fmt=n=>(Math.round(n*100)/100).toString().replace('.',',');
 
-// Geometría en cm. x hacia la derecha, y hacia abajo. Paneles: pegue | frente | fuelle | espalda | fuelle
-function geom(){
-  const A=num(S.ancho),F=num(S.fuelle),H=num(S.alto),T=Math.max(0,num(S.top)),G=Math.max(0,num(S.glue)),O=Math.max(0,num(S.lap));
-  if(A<=0||F<=0||H<=0)return null;
-  const B=(F+O)/2,x1=G,x2=G+A,x3=x2+F,x4=x3+A,x5=x4+F,yb=T+H,Ht=yb+B,c=Math.min(G,1);
-  const cut=[],fold=[],holes=[],notes=[];
-  // contorno exterior
-  const poly=G>0?[[x1,0],[x5,0],[x5,Ht],[x1,Ht],[x1,yb],[0,yb-c],[0,c],[x1,0]]:[[0,0],[x5,0],[x5,Ht],[0,Ht],[0,0]];
-  cut.push({t:'poly',p:poly});
-  const L=(a,b,c2,d)=>fold.push([a,b,c2,d]);
-  if(G>0)L(x1,0,x1,yb);
-  [x2,x3,x4].forEach(x=>L(x,0,x,Ht));
-  if(T>0)L(x1,T,x5,T);
-  L(x1,yb,x5,yb);
-  // fuelles: doblez central, diagonales arriba y abajo del pliegue del fondo
-  [[x2,x3],[x4,x5]].forEach(([a,b])=>{const m=(a+b)/2,h=F/2;
-    L(m,0,m,yb-h);L(m,yb-h,a,yb);L(m,yb-h,b,yb);L(a,yb,m,yb+h);L(b,yb,m,yb+h);});
-  // manijas
-  const panels=[[x1,x2],[x3,x4]];
-  if(S.handle==='cord'){const s=num(S.cSep),d=num(S.cTop),r=num(S.cDia)/2;
-    if(s>=A-1)notes.push('Los huecos quedan muy cerca del borde: baja la distancia entre huecos.');
-    panels.forEach(([a,b])=>{const m=(a+b)/2;[m-s/2,m+s/2].forEach(cx=>{holes.push({t:'c',x:cx,y:T+d,r});if(T>=d+r)holes.push({t:'c',x:cx,y:T-d,r});});});
-    if(T>0&&T<d+r)notes.push('El doblez de arriba es más corto que la distancia de los huecos: el cordón queda sin refuerzo.');
-  }else if(S.handle==='die'){const w=num(S.dW),h=num(S.dH),d=num(S.dTop);
-    if(w>=A-1)notes.push('El hueco es casi tan ancho como la bolsa: hazlo más corto.');
-    panels.forEach(([a,b])=>{const m=(a+b)/2;holes.push({t:'s',x:m-w/2,y:T+d,w,h});if(T>=d+h)holes.push({t:'s',x:m-w/2,y:T-d-h,w,h});});
-    if(T>0&&T<d+h)notes.push('El doblez de arriba no alcanza a cubrir el hueco: la manija queda sin refuerzo.');
+/* ---------- Geometría del troquel (mm) ---------- */
+function piece(A,H,F,P,E,halves){
+  const g=F/2, fondo=g+E, T=H+fondo, yb=H, ya=H-g, d=fondo, L=[], zones=[];
+  const dd=Math.min(d,A/2);
+  const V=x=>L.push([[x,0],[x,T]]);
+  function gusset(x0,first){ // x0 = borde izquierdo del fuelle
+    const c=x0+g, x1=x0+F;
+    V(x0);V(c);V(x1);
+    L.push([[c,ya],[x0,yb]]); L.push([[c,ya],[x1,yb],[x1+dd,yb+dd]]);
+    L.push([[x0,yb],[c,yb+g],[x1,yb]]);
+    zones.push(['Fuelle',x0,x1]);
   }
-  if(S.handle!=='none'&&T===0)notes.push('Sin doblez arriba la manija queda débil. Lo normal es 3 a 4 cm.');
-  return {A,F,H,T,G,O,B,W:x5,Ht,x:[0,x1,x2,x3,x4,x5],yb,cut,fold,holes,notes};
+  let W;
+  if(!halves){
+    W=P+2*F+2*A;
+    zones.push(['Pestaña',0,P]);
+    gusset(P,true);
+    const k=Math.min(P,d); L.push([[P,yb],[P-k,yb+k]]);
+    zones.push(['Cara',P+F,P+F+A]);
+    // segundo fuelle
+    const x0=P+F+A, c=x0+g, x1=x0+F;
+    V(x0);V(c);V(x1);
+    L.push([[c,ya],[x0,yb],[x0-dd,yb+dd]]); L.push([[c,ya],[x1,yb],[x1+dd,yb+dd]]);
+    L.push([[x0,yb],[c,yb+g],[x1,yb]]);
+    zones.push(['Fuelle',x0,x1]); zones.push(['Respaldo',x1,W]);
+    L.push([[W,yb],[W-dd,yb+dd]]);
+  }else{
+    W=P+F+A;
+    zones.push(['Pestaña',0,P]);
+    gusset(P,true);
+    const k=Math.min(P,d); L.push([[P,yb],[P-k,yb+k]]);
+    zones.push(['Cara',P+F,W]);
+    L.push([[W,yb],[W-dd,yb+dd]]);
+  }
+  L.push([[0,ya],[W,ya]]); L.push([[0,yb],[W,yb]]);
+  return {W,T,L,zones,yb,ya};
+}
+function fits(W,T,PW,PH){ const m=10; if(W<=PW-m&&T<=PH-m) return 'n'; if(T<=PW-m&&W<=PH-m) return 'r'; return null; }
+function layout(){
+  const v=id=>Math.max(0,parseFloat(($(id).value||'').replace(',','.'))||0);
+  const A=v('A')*10,H=v('H')*10,F=v('F')*10,P=v('P')*10,E=v('E')*10,PW=v('PW')*10,PH=v('PH')*10;
+  let halves = state.mode==='2';
+  let one=piece(A,H,F,P,E,false), fit1=fits(one.W,one.T,PW,PH);
+  if(state.mode==='auto') halves = !fit1;
+  const pc = halves? piece(A,H,F,P,E,true) : one;
+  const fit = halves? fits(pc.W,pc.T,PW,PH) : fit1;
+  return {A,H,F,P,E,PW,PH,halves,pc,fit,autoSwitched: state.mode==='auto'&&halves};
+}
+// lineas ya ubicadas en el pliego (mm, origen arriba-izquierda)
+function placed(lay){
+  const {pc,fit}=lay, rot=fit==='r', PW=lay.fit?lay.PW:pc.W+10, PH=lay.fit?lay.PH:pc.T+10;
+  const w=rot?pc.T:pc.W, h=rot?pc.W:pc.T, ox=(PW-w)/2, oy=(PH-h)/2;
+  const tf=([x,y])=>rot?[ox+y, oy+(pc.W-x)]:[ox+x, oy+y];
+  return {lines:pc.L.map(l=>l.map(tf)), ox,oy,w,h,rot,PW,PH};
+}
+const r2=n=>Math.round(n*100)/100;
+function fileBase(lay){ return `Troquel Bolsa ${fmt(lay.A/10)}x${fmt(lay.H/10)}x${fmt(lay.F/10)}`+(lay.halves?' (mitad, x2)':''); }
+function svgExport(lay){
+  const p=placed(lay);
+  const PW=p.PW, PH=p.PH;
+  const body=p.lines.map(l=>`<polyline points="${l.map(([x,y])=>r2(x)+','+r2(y)).join(' ')}"/>`).join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${PW}mm" height="${PH}mm" viewBox="0 0 ${PW} ${PH}">\n<title>${fileBase(lay)}</title>\n<g id="troquel" fill="none" stroke="#EC008C" stroke-width="0.2">\n${body}\n</g>\n</svg>\n`;
+}
+function pdfExport(lay){
+  const {jsPDF}=window.jspdf;
+  const p=placed(lay);
+  const doc=new jsPDF({orientation:p.PW>=p.PH?'landscape':'portrait',unit:'mm',format:[p.PW,p.PH]});
+  doc.setDrawColor(0,1,0,0); doc.setLineWidth(0.2);
+  p.lines.forEach(l=>{for(let i=1;i<l.length;i++) doc.line(l[i-1][0],l[i-1][1],l[i][0],l[i][1]);});
+  doc.setProperties({title:fileBase(lay),author:'Tecnigráficas'});
+  return doc.output('blob');
+}
+function renderDie(lay){
+  const {pc}=lay, pad=40, W=pc.W, T=pc.T;
+  const lines=pc.L.map(l=>`<polyline points="${l.map(([x,y])=>(x+pad)+','+(y+pad)).join(' ')}"/>`).join('');
+  const zones=pc.zones.map(([n,a,b])=>{const w=b-a; return w>18?`<text x="${pad+(a+b)/2}" y="${pad+pc.ya/2}" text-anchor="middle" font-size="${Math.min(14,Math.max(8,w/5))}">${n}</text>`:'';}).join('')
+    +`<text x="${pad+pc.W/2}" y="${pad+(pc.yb+pc.T)/2+4}" text-anchor="middle" font-size="11">Fondo</text>`;
+  const dimW=`<line x1="${pad}" y1="${pad-14}" x2="${pad+W}" y2="${pad-14}"/><text x="${pad+W/2}" y="${pad-20}" text-anchor="middle" class="dt">${fmt(W/10)} cm</text>`;
+  const dimH=`<line x1="${pad-14}" y1="${pad}" x2="${pad-14}" y2="${pad+T}"/><text x="${pad-20}" y="${pad+T/2}" text-anchor="middle" class="dt" transform="rotate(-90 ${pad-20} ${pad+T/2})">${fmt(T/10)} cm</text>`;
+  $('dieview').innerHTML=`<svg viewBox="0 0 ${W+pad*2} ${T+pad*2}" role="img" aria-label="Troquel de ${fmt(W/10)} por ${fmt(T/10)} cm">
+    <rect x="${pad}" y="${pad}" width="${W}" height="${T}" fill="var(--surface)" stroke="var(--line)" stroke-dasharray="4 3"/>
+    <g fill="var(--muted)" font-family="Jost,system-ui,sans-serif" opacity=".8">${zones}</g>
+    <g fill="none" stroke="#EC008C" stroke-width="1.1" stroke-linejoin="round">${lines}</g>
+    <g stroke="var(--muted)" stroke-width=".8" fill="var(--muted)" font-family="Jost,system-ui,sans-serif" font-size="12">${dimW}${dimH}</g></svg>`;
+  $('dietitle').textContent = lay.halves? 'Troquel · mitad (se troquelan 2 iguales)' : 'Troquel · una pieza';
+}
+function renderStats(lay){
+  const {pc,fit,halves,PW,PH}=lay;
+  let pill;
+  if(!fit) pill=`<span class="pill bad">No cabe en ${fmt(PW/10)}×${fmt(PH/10)}</span>`;
+  else if(fit==='r') pill=`<span class="pill warn">Cabe girada</span>`;
+  else pill=`<span class="pill ok">Cabe en el pliego</span>`;
+  $('stats').innerHTML=`
+    <div class="row"><span>Pieza</span><b>${fmt(pc.W/10)} × ${fmt(pc.T/10)} cm</b></div>
+    <div class="row"><span>Piezas por bolsa</span><b>${halves?2:1}</b></div>
+    <div class="row"><span>Fondo</span><b>${fmt((lay.F/2+lay.E)/10)} cm</b></div>
+    <div class="row"><span>Pliego ${fmt(PW/10)}×${fmt(PH/10)}</span>${pill}</div>
+    ${!fit?'<p class="note">Igual puedes descargarla: el archivo sale del tamaño de la pieza. Cambia el pliego en Ajustes si usan uno más grande.</p>':''}
+    ${lay.autoSwitched?'<p class="note">En una pieza no cabe, así que la partí en dos mitades.</p>':''}`;
 }
 
-function fit(W,H){const p=PAPERS[S.paper]||PAPERS[0];let pw=p[1],ph=p[2];if(!pw){pw=num(S.pW);ph=num(S.pH)}
-  const sp=num(S.sepPaper),n=(a,b)=>a<=0?0:Math.max(0,Math.floor((a+sp)/(b+sp)));
-  const a=n(pw,W)*n(ph,H),b=n(pw,H)*n(ph,W);return {pw,ph,count:Math.max(a,b),name:p[0]};}
-
-function svgString(g,forFile){
-  const mm=10,pad=forFile?10:14,W=g.W*mm,H=g.Ht*mm,vb=`${-pad} ${-pad} ${W+pad*2} ${H+pad*2}`;
-  const sw=forFile?0.25:Math.max(1.2,W/600);
-  const P=p=>p.map(q=>`${(q[0]*mm).toFixed(2)},${(q[1]*mm).toFixed(2)}`).join(' ');
-  let cut=g.cut.map(c=>`<polyline points="${P(c.p)}"/>`).join('');
-  cut+=g.holes.map(h=>h.t==='c'?`<circle cx="${(h.x*mm).toFixed(2)}" cy="${(h.y*mm).toFixed(2)}" r="${(h.r*mm).toFixed(2)}"/>`
-    :`<rect x="${(h.x*mm).toFixed(2)}" y="${(h.y*mm).toFixed(2)}" width="${(h.w*mm).toFixed(2)}" height="${(h.h*mm).toFixed(2)}" rx="${(h.h*mm/2).toFixed(2)}"/>`).join('');
-  const fold=g.fold.map(l=>`<line x1="${(l[0]*mm).toFixed(2)}" y1="${(l[1]*mm).toFixed(2)}" x2="${(l[2]*mm).toFixed(2)}" y2="${(l[3]*mm).toFixed(2)}"/>`).join('');
-  let txt='';
-  if(!forFile||S.withText){const fs=forFile?4:Math.max(9,W/90),x=g.x,mid=g.T+g.H/2;
-    const lab=(t,cx,cy,sub)=>`<text x="${(cx*mm).toFixed(1)}" y="${(cy*mm).toFixed(1)}" font-size="${(fs*1.15).toFixed(1)}" font-weight="700" text-anchor="middle">${t}${sub?`<tspan x="${(cx*mm).toFixed(1)}" dy="${(fs*1.4).toFixed(1)}" font-size="${fs.toFixed(1)}" font-weight="400">${sub}</tspan>`:''}</text>`;
-    if(g.G>0)txt+=`<text transform="translate(${(g.G*mm/2+fs*0.4).toFixed(1)},${(mid*mm).toFixed(1)}) rotate(-90)" font-size="${fs.toFixed(1)}" text-anchor="middle">Pegue ${f(g.G)}</text>`;
-    txt+=lab('Frente',(x[1]+x[2])/2,mid,`${f(g.A)} × ${f(g.H)} cm`)+lab('Fuelle',(x[2]+x[3])/2,mid+g.F/4,f(g.F)+' cm')+lab('Espalda',(x[3]+x[4])/2,mid,`${f(g.A)} × ${f(g.H)} cm`)+lab('Fuelle',(x[4]+x[5])/2,mid+g.F/4,f(g.F)+' cm');
-    txt+=lab('Fondo',(x[1]+x[2])/2,g.yb+g.B/2+fs*0.03,f(g.B)+' cm')+lab('Fondo',(x[3]+x[4])/2,g.yb+g.B/2+fs*0.03,f(g.B)+' cm');
-    if(g.T>0)txt+=lab('Doblez',(x[2]+x[3])/2,g.T/2+fs*0.4,'');
-    txt=`<g id="TEXTOS" fill="${forFile?'#000':'#344054'}" font-family="Arial,sans-serif">${txt}</g>`;}
-  const size=forFile?` width="${(W+pad*2)/10}cm" height="${(H+pad*2)/10}cm"`:'';
-  return `<svg xmlns="http://www.w3.org/2000/svg"${size} viewBox="${vb}" role="img" aria-label="Troquel de la bolsa">`+
-   `<g id="CORTE" fill="none" stroke="#e1001a" stroke-width="${sw}" stroke-linejoin="round">${cut}</g>`+
-   `<g id="DOBLEZ" fill="none" stroke="#0077c8" stroke-width="${sw}" stroke-dasharray="${forFile?'3 1.5':(sw*4)+' '+(sw*2.5)}">${fold}</g>${txt}</svg>`;
+/* ---------- 3D ---------- */
+const cv=$('cv'), stage=$('stage'), tagsEl=$('tags');
+let renderer,scene,camera,bagGroup,dirty=true,labels=[];
+const view={theta:-0.5,phi:0.38,dist:60,target:new THREE.Vector3()};
+const PAPER={kraft:0xC9A47E,blanco:0xF4F2EE,negro:0x2B2927};
+function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function init3D(){
+  renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true,preserveDrawingBuffer:true});
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  scene=new THREE.Scene();
+  camera=new THREE.PerspectiveCamera(30,1,0.5,2000);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x9a8f84,0.75));
+  const d=new THREE.DirectionalLight(0xffffff,0.75); d.position.set(-30,60,50); scene.add(d);
+  const d2=new THREE.DirectionalLight(0xffffff,0.25); d2.position.set(40,20,-30); scene.add(d2);
+  new ResizeObserver(resize).observe(stage); resize();
+  // controles
+  const pts=new Map(); let pinch0=0,dist0=0;
+  cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2){const [a,b]=[...pts.values()];pinch0=Math.hypot(a.x-b.x,a.y-b.y);dist0=view.dist;}});
+  cv.addEventListener('pointermove',e=>{const p=pts.get(e.pointerId);if(!p)return;
+    if(pts.size===1){view.theta-=(e.clientX-p.x)*0.008;view.phi=Math.max(-0.15,Math.min(1.45,view.phi+(e.clientY-p.y)*0.006));dirty=true;}
+    p.x=e.clientX;p.y=e.clientY;
+    if(pts.size===2){const [a,b]=[...pts.values()];const dd=Math.hypot(a.x-b.x,a.y-b.y);if(pinch0>0){view.dist=Math.max(view.min,Math.min(view.max,dist0*pinch0/dd));dirty=true;}}});
+  const up=e=>{pts.delete(e.pointerId);if(pts.size<2)pinch0=0;};
+  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  cv.addEventListener('wheel',e=>{e.preventDefault();view.dist=Math.max(view.min,Math.min(view.max,view.dist*(1+Math.sign(e.deltaY)*0.08)));dirty=true;},{passive:false});
+  const loop=()=>{if(dirty){draw();dirty=false;}requestAnimationFrame(loop);};loop();
+}
+function resize(){const r=stage.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/Math.max(1,r.height);camera.updateProjectionMatrix();dirty=true;}
+function shadowTex(){const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');const gr=g.createRadialGradient(64,64,10,64,64,64);gr.addColorStop(0,'rgba(0,0,0,.28)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);return new THREE.CanvasTexture(c);}
+const shTex=shadowTex();
+function build3D(lay){
+  if(bagGroup){scene.remove(bagGroup);bagGroup.traverse(o=>{o.geometry&&o.geometry.dispose();o.material&&o.material.dispose&&o.material.dispose();});}
+  bagGroup=new THREE.Group(); labels=[];
+  const A=lay.A/10,H=lay.H/10,F=lay.F/10,a=A/2,f=F/2,k=Math.min(F*0.07,A*0.06);
+  const pos=[],ctr=new THREE.Vector3(0,H/2,0);
+  function tri(p,q,r){const v=[p,q,r].map(x=>new THREE.Vector3(...x));const n=new THREE.Vector3().subVectors(v[1],v[0]).cross(new THREE.Vector3().subVectors(v[2],v[0]));const c=v[0].clone().add(v[1]).add(v[2]).divideScalar(3).sub(ctr);if(n.dot(c)<0)v.reverse();v.forEach(x=>pos.push(x.x,x.y,x.z));}
+  const quad=(p,q,r,s)=>{tri(p,q,r);tri(p,r,s);};
+  quad([-a,0,f],[a,0,f],[a,H,f],[-a,H,f]);
+  quad([-a,0,-f],[a,0,-f],[a,H,-f],[-a,H,-f]);
+  for(const s of [1,-1]){const x=s*a,xc=s*(a-k);
+    quad([x,0,f],[x,0,0],[xc,H,0],[x,H,f]); quad([x,0,0],[x,0,-f],[x,H,-f],[xc,H,0]);}
+  tri([-a,0,-f],[a,0,-f],[a,0,f]);tri([-a,0,-f],[a,0,f],[-a,0,f]);
+  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.computeVertexNormals();
+  const col=new THREE.Color(PAPER[state.paper]);
+  const outer=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({color:col,side:THREE.FrontSide}));
+  const inner=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({color:col.clone().multiplyScalar(state.paper==='negro'?0.7:0.62),side:THREE.BackSide}));
+  bagGroup.add(outer,inner);
+  const edgeCol=state.paper==='negro'?0x8a837c:0x5a4a3a;
+  bagGroup.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo,8),new THREE.LineBasicMaterial({color:edgeCol,transparent:true,opacity:.55})));
+  const sh=new THREE.Mesh(new THREE.PlaneGeometry(A*1.9+6,F*1.9+6),new THREE.MeshBasicMaterial({map:shTex,transparent:true,depthWrite:false}));sh.rotation.x=-Math.PI/2;sh.position.y=0.02;bagGroup.add(sh);
+  // cotas
+  if($('cotas').checked){
+    const off=Math.max(1.2,Math.min(A,H)*0.08);
+    dim([-a,0,f+off],[a,0,f+off],'#00AEEF',`${fmt(A)} cm`);
+    dim([-a-off,0,f],[-a-off,H,f],'#EC008C',`${fmt(H)} cm`);
+    dim([a+off,0,f],[a+off,0,-f],'#1A1A1A',`${fmt(F)} cm`);
+  }
+  if($('phone').checked){
+    const pw=7.1,ph=14.7,pd=0.8,px=-a-Math.max(4,A*0.25)-pw/2-($('cotas').checked?Math.max(1.2,Math.min(A,H)*0.08)+1:0);
+    const body=new THREE.Mesh(new THREE.BoxGeometry(pw,ph,pd),new THREE.MeshLambertMaterial({color:0x2a2c33}));body.position.set(px,ph/2,f-pd/2);bagGroup.add(body);
+    const scr=new THREE.Mesh(new THREE.PlaneGeometry(pw-0.6,ph-0.9),new THREE.MeshBasicMaterial({color:0x5c6b80}));scr.position.set(px,ph/2,f+0.01);bagGroup.add(scr);
+    labels.push({p:new THREE.Vector3(px,ph+1.6,f),text:'celular ≈ 15 cm',cls:'ref'});
+  }
+  scene.add(bagGroup);
+  // cámara
+  const span=Math.max(H,A+F+($('phone').checked?A*0.5+14:0),F*1.5);
+  view.target.set($('phone').checked?-(A*0.2+3):0,H*0.45,0);
+  view.dist=span*2.5;view.min=span*1.1;view.max=span*6;
+  dirty=true;
+  function dim(p,q,color,text){
+    const P=new THREE.Vector3(...p),Q=new THREE.Vector3(...q),g=new THREE.BufferGeometry().setFromPoints([P,Q]);
+    bagGroup.add(new THREE.Line(g,new THREE.LineBasicMaterial({color:new THREE.Color(color==='#1A1A1A'?(state.paper==='negro'?'#f0ece6':'#1A1A1A'):color)})));
+    const dir=Q.clone().sub(P).normalize(),perp=Math.abs(dir.y)>0.9?new THREE.Vector3(1,0,0):new THREE.Vector3(0,1,0),t=0.6;
+    for(const e of [P,Q]){const g2=new THREE.BufferGeometry().setFromPoints([e.clone().addScaledVector(perp,-t),e.clone().addScaledVector(perp,t)]);bagGroup.add(new THREE.Line(g2,new THREE.LineBasicMaterial({color:new THREE.Color(color)})));}
+    labels.push({p:P.clone().add(Q).multiplyScalar(0.5),text,color});
+  }
+}
+function draw(){
+  const {theta,phi,dist,target}=view;
+  camera.position.set(target.x+dist*Math.cos(phi)*Math.sin(theta),target.y+dist*Math.sin(phi),target.z+dist*Math.cos(phi)*Math.cos(theta));
+  camera.lookAt(target);renderer.render(scene,camera);
+  const r=stage.getBoundingClientRect();
+  tagsEl.innerHTML='';
+  labels.forEach(l=>{const v=l.p.clone().project(camera);if(v.z>1)return;const el=document.createElement('div');el.className='tag'+(l.cls?' '+l.cls:'');el.textContent=l.text;if(l.color)el.style.background=l.color;el.style.left=((v.x+1)/2*r.width)+'px';el.style.top=((1-v.y)/2*r.height)+'px';tagsEl.appendChild(el);});
 }
 
-function render(){
-  const g=geom();save();
-  if(!g){$('stage').innerHTML='<p class="lead">Escribe alto, ancho y fuelle.</p>';['sSize','sFit','sBottom'].forEach(i=>$(i).textContent='–');return}
-  $('stage').innerHTML=svgString(g,false);
-  $('sSize').textContent=`${f(g.W)} × ${f(g.Ht)} cm`;
-  $('sBottom').textContent=`${f(g.B)} cm`;
-  const ft=fit(g.W,g.Ht);$('sPaperLbl').textContent=`Caben en ${ft.name.toLowerCase()}`;$('sFit').textContent=ft.count;
-  const fw=$('fitWarn');if(!ft.count){fw.textContent=`El troquel abierto (${f(g.W)} × ${f(g.Ht)} cm) no cabe en ${ft.name.toLowerCase()} (${f(ft.pw)} × ${f(ft.ph)} cm). Escoge una hoja más grande o hazla en dos piezas.`;fw.classList.remove('hide')}else fw.classList.add('hide');
-  const hw=$('handleWarn');if(g.notes.length){hw.innerHTML=g.notes.map(n=>'⚠ '+n).join('<br>');hw.classList.remove('hide')}else hw.classList.add('hide');
-  document.querySelectorAll('#handleSeg button').forEach(b=>b.classList.toggle('on',b.dataset.h===S.handle));
-  $('cordBox').classList.toggle('hide',S.handle!=='cord');$('dieBox').classList.toggle('hide',S.handle!=='die');
-  document.querySelectorAll('#presets button').forEach(b=>b.classList.toggle('on',b.dataset.k===S.preset));
-  $('customPaper').classList.toggle('hide',!!(PAPERS[S.paper]||PAPERS[0])[1]);
+/* ---------- Descargas ---------- */
+function save(ext){
+  const lay=layout(), msg=$('msg'); msg.textContent='';
+  if(ext==='pdf'&&!window.jspdf){msg.textContent='No cargó el generador de PDF. Recarga la página.';return;}
+  const blob= ext==='svg'? new Blob([svgExport(lay)],{type:'image/svg+xml'}) : pdfExport(lay);
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileBase(lay)+'.'+ext;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
 }
-const fileName=()=>{const p=CATALOG.find(c=>c[0]===S.preset);return `troquel-bolsa-${p?p[0]+'-'+p[1].toLowerCase()+'-':''}${f(num(S.alto))}x${f(num(S.ancho))}x${f(num(S.fuelle))}`.replace(/,/g,'.').normalize('NFD').replace(/[̀-ͯ]/g,'')};
-function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+$('dlpdf').addEventListener('click',()=>save('pdf'));
+$('dlsvg').addEventListener('click',()=>save('svg'));
 
-$('dlSvg').onclick=()=>{const g=geom();if(!g)return;download(new Blob([svgString(g,true)],{type:'image/svg+xml'}),fileName()+'.svg')};
-$('dlPdf').onclick=()=>{const g=geom();if(!g)return;if(!window.jspdf)return alert('No cargó el generador de PDF. Recarga la página.');
-  const m=10,W=g.W*10+m*2,H=g.Ht*10+m*2,{jsPDF}=window.jspdf,doc=new jsPDF({unit:'mm',format:[W,H],orientation:W>H?'landscape':'portrait',compress:true});
-  const X=v=>v*10+m;doc.setLineWidth(0.25);
-  doc.setDrawColor(225,0,26);doc.setLineDashPattern([],0);
-  g.cut.forEach(c=>{for(let i=1;i<c.p.length;i++)doc.line(X(c.p[i-1][0]),X(c.p[i-1][1]),X(c.p[i][0]),X(c.p[i][1]))});
-  g.holes.forEach(h=>h.t==='c'?doc.circle(X(h.x),X(h.y),h.r*10,'S'):doc.roundedRect(X(h.x),X(h.y),h.w*10,h.h*10,h.h*5,h.h*5,'S'));
-  doc.setDrawColor(0,119,200);doc.setLineDashPattern([3,1.5],0);
-  g.fold.forEach(l=>doc.line(X(l[0]),X(l[1]),X(l[2]),X(l[3])));
-  doc.setLineDashPattern([],0);doc.setFontSize(8);doc.setTextColor(102,112,133);
-  doc.text(`TecniBolsa · ${f(num(S.alto))} × ${f(num(S.ancho))} × ${f(num(S.fuelle))} cm (alto × ancho × fuelle) · troquel ${f(g.W)} × ${f(g.Ht)} cm · rojo = corte, azul = doblez`,m,m-3);
-  if(S.withText){doc.setTextColor(52,64,84);doc.setFontSize(10);const mid=g.T+g.H/2,c=(a,b)=>X((a+b)/2);
-    [['Frente',1,2],['Espalda',3,4]].forEach(([t,a,b])=>doc.text(`${t} ${f(g.A)} × ${f(g.H)} cm`,c(g.x[a],g.x[b]),X(mid),{align:'center'}));
-    [[2,3],[4,5]].forEach(([a,b])=>doc.text(`Fuelle ${f(g.F)}`,c(g.x[a],g.x[b]),X(mid),{align:'center'}));
-    [[1,2],[3,4]].forEach(([a,b])=>doc.text(`Fondo ${f(g.B)}`,c(g.x[a],g.x[b]),X(g.yb+g.B/2),{align:'center'}));}
-  doc.save(fileName()+'.pdf')};
-
-// armar controles
-$('presets').innerHTML=CATALOG.map(c=>`<button type="button" data-k="${c[0]}"><b>${c[0]} ${c[1]}</b><span>${f(c[2])} × ${f(c[3])} × ${f(c[4])}</span></button>`).join('');
-$('presets').onclick=e=>{const b=e.target.closest('button');if(!b)return;const c=CATALOG.find(x=>x[0]===b.dataset.k);
-  S.preset=c[0];S.alto=c[2];S.ancho=c[3];S.fuelle=c[4];if(c[5])S.handle=c[5];else if(S.handle==='die')S.handle='none';
-  S.cSep=Math.min(8,Math.round(c[3]*0.45*2)/2);dieTop();fill();render()};
-$('paper').innerHTML=PAPERS.map((p,i)=>`<option value="${i}">${p[0]}${p[1]?` (${f(p[1])} × ${f(p[2])})`:''}</option>`).join('');
-function dieTop(){if(S.handle==='die'){const need=num(S.dTop)+num(S.dH)+0.5;if(num(S.top)<need)S.top=need}}
-$('handleSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.handle=b.dataset.h;dieTop();fill();render()};
-function fill(){NUMS.forEach(k=>$(k).value=f(num(S[k])).replace(/\./g,''));$('paper').value=S.paper;$('withText').checked=!!S.withText}
-NUMS.forEach(k=>$(k).addEventListener('input',()=>{S[k]=num($(k).value);if(['alto','ancho','fuelle'].includes(k))S.preset='';render()}));
-$('paper').onchange=()=>{S.paper=+$('paper').value;render()};
-$('withText').onchange=()=>{S.withText=$('withText').checked;save()};
+/* ---------- Wiring ---------- */
+const KEY='tecniBolsa3d';
+function persist(){try{const o={mode:state.mode,paper:state.paper,phone:$('phone').checked,cotas:$('cotas').checked};['A','H','F','P','E','PW','PH'].forEach(k=>o[k]=$(k).value);localStorage.setItem(KEY,JSON.stringify(o));}catch(e){}}
+function restore(){try{const o=JSON.parse(localStorage.getItem(KEY)||'null');if(!o)return;['A','H','F','P','E','PW','PH'].forEach(k=>{if(o[k]!=null)$(k).value=o[k];});if(o.mode)state.mode=o.mode;if(o.paper)state.paper=o.paper;$('phone').checked=o.phone!==false;$('cotas').checked=o.cotas!==false;[['mode','mode'],['paper','paper']].forEach(([id,k])=>[...$(id).children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===state[k])));}catch(e){}}
+function update(){persist();const lay=layout();renderStats(lay);renderDie(lay);build3D(lay);}
+function seg(id,key){$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;state[key]=b.dataset.v;[...$(id).children].forEach(x=>x.setAttribute('aria-pressed',x===b));update();});}
+seg('mode','mode');seg('paper','paper');
+['A','H','F','P','E','PW','PH'].forEach(id=>$(id).addEventListener('input',update));
+['phone','cotas'].forEach(id=>$(id).addEventListener('change',update));
 $('backToSystem').onclick=()=>location.href='index.html#design';
-fill();render();
+restore();init3D();update();
+})();
 </script>
 </body></html>

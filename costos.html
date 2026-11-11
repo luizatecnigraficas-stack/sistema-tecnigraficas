@@ -82,6 +82,7 @@ input:focus,select:focus{outline:2px solid var(--cyan);border-color:var(--cyan)}
     <button type="button" data-t="acr">🪧 Acrílico y letreros</button>
     <button type="button" data-t="lla">🔑 Llaveros</button>
     <button type="button" data-t="bol">🛍 Bolsas</button>
+    <button type="button" data-t="lib">📒 Libretas y agendas</button>
     <button type="button" data-t="list">📋 Lista de costos</button>
   </nav>
 
@@ -149,6 +150,54 @@ input:focus,select:focus{outline:2px solid var(--cyan);border-color:var(--cyan)}
       <div class="f"><label for="bF">Multiplicar costo por</label><input id="bF" type="number" step="0.1" min="1" inputmode="decimal"></div>
     </div>
     <div class="card res" id="bRes"></div>
+  </div></section>
+
+  <!-- LIBRETAS Y AGENDAS -->
+  <section class="tab" id="t-lib"><div class="calc">
+    <div class="card">
+      <div class="sec">1 · Producto y tamaño</div>
+      <div class="pills" id="kProd"><button type="button" data-v="lib" class="on">📓 Libreta tapa blanda</button><button type="button" data-v="age">📘 Agenda pasta dura</button></div>
+      <div class="pills" id="kSize" style="margin-top:10px"><button type="button" data-v="q">¼ carta</button><button type="button" data-v="m" class="on">½ carta</button><button type="button" data-v="g">Grande 17 × 24,5</button></div>
+      <div class="row" style="margin-top:14px">
+        <div class="f"><label for="kQ">¿Cuántas?</label><input id="kQ" type="number" inputmode="numeric" min="1" value="20"></div>
+        <div class="f"><label for="kLeaves">Hojas internas</label><input id="kLeaves" type="number" inputmode="numeric" min="1" value="60"></div>
+        <div class="f"><label for="kRing">Anillo</label><select id="kRing"><option value="16">16 mm</option><option value="18">18 mm</option><option value="22">22 mm</option></select></div>
+      </div>
+      <div class="hint" id="kRingHint"></div>
+      <div class="sec">2 · Interior</div>
+      <div class="pills" id="kInt"><button type="button" data-v="stock" class="on">Cuadriculado de stock</button><button type="button" data-v="pers">Personalizado</button></div>
+      <div id="kIntWrap" style="display:none;margin-top:12px">
+        <div class="row2">
+          <div class="f"><label for="kIntInk">Impresión</label><select id="kIntInk"><option value="1">Una tinta</option><option value="4">Full color</option></select></div>
+          <div class="f"><label for="kIntSides">Caras</label><select id="kIntSides"><option value="2">Dos caras</option><option value="1">Una cara</option></select></div>
+        </div>
+        <label class="chk"><input type="checkbox" id="kDesign" checked><span>Diseño de la hoja interna</span><b id="kDesignP"></b></label>
+      </div>
+      <div class="hint" id="kIntHint"></div>
+      <div class="sec">3 · Tapas</div>
+      <div id="kLibCover">
+        <div class="checks"><label class="chk"><input type="checkbox" id="kBack"><span>Contratapa impresa</span><b>la de atrás también</b></label></div>
+        <div class="f" style="margin-top:12px"><label>Plastificado</label><div class="pills" id="kLam"><button type="button" data-v="0" class="on">Sin plastificar</button><button type="button" data-v="1">Solo adelante</button><button type="button" data-v="2">Las dos tapas</button></div></div>
+      </div>
+      <div id="kAgeCover" style="display:none">
+        <div class="hint" style="margin-top:0">Cartón, vinilo laminado impreso adelante y atrás (+2 cm por lado para el doblez) y 2 guardas.</div>
+        <div class="checks" style="margin-top:10px"><label class="chk"><input type="checkbox" id="kGuard"><span>Guardas impresas</span><b>láser full color</b></label></div>
+      </div>
+      <div class="sec">4 · Separadores</div>
+      <div class="row2">
+        <div class="f"><label for="kSepN">¿Cuántos por unidad?</label><input id="kSepN" type="number" inputmode="numeric" min="0" value="0"></div>
+        <div class="f"><label for="kSepPaper">Papel</label><select id="kSepPaper"><option value="bond">Bond</option><option value="prop">Propalcote</option></select></div>
+      </div>
+      <div class="row2" id="kSepMore">
+        <div class="f"><label for="kSepInk">Impresión</label><select id="kSepInk"><option value="4">Full color</option><option value="1">Una tinta</option><option value="0">Sin imprimir</option></select></div>
+        <div class="f"><label for="kSepSides">Caras</label><select id="kSepSides"><option value="1">Una cara</option><option value="2">Dos caras</option></select></div>
+      </div>
+      <div class="sec">Margen</div>
+      <div class="f"><label for="kF">Multiplicar costo por</label><input id="kF" type="number" step="0.1" min="1" inputmode="decimal"></div>
+      <div class="hint" id="kFHint"></div>
+      <div class="hint">Los costos (papel, máster, tiraje, cartón, vinilo, anillos, mano de obra…) se cambian en 📋 Lista de costos → <b>Libretas y agendas</b>.</div>
+    </div>
+    <div class="card res" id="kRes"></div>
   </div></section>
 
   <!-- LISTA -->
@@ -303,7 +352,122 @@ function calcB(){
   const cost=lines.reduce((s,l)=>s+l.v,0);
   result("b",{lines,cost,factor:num($("bF").value)||1,services:[],qty:q,warn:"",productName:`${b.name} ${b.detail||""}`.trim(),desc:pr?pr.name.toLowerCase():"sin estampar"});
 }
-function renderCalcs(){if(!S.ready)return;calcA();calcL();calcB()}
+/* ---------- Libretas y agendas ---------- */
+const KCAT="Libretas y agendas";
+const KDEF={ // [nombre, detalle, tipo, precio, paquete, ancho, alto, nota]
+  resma:["Resma bond carta","500 hojas","paquete",15000,500],
+  master:["Máster litografía","Por trabajo","fijo",5000,null,null,null,"Sirve para todos los tirajes del trabajo"],
+  tiraje:["Tiraje litografía","Por millar de pasadas","unidad",8000,null,null,null,"Se cobra el millar completo aunque sean menos"],
+  clickc:["Click láser full color","Por cara carta","unidad",200,null,null,null,"Estimado: confirmar con el tóner o el contrato de la Ricoh"],
+  clickb:["Click láser una tinta","Por cara carta","unidad",50,null,null,null,"Estimado: confirmar con el tóner o el contrato de la Ricoh"],
+  tabimp:["Tabloide 32×50 impreso en láser","Propalcote grueso","unidad",2500,null,null,null,"Incluye papel, tóner y desperdicio. Imprimible 31×49"],
+  tabbl:["Tabloide 32×50 sin imprimir","Propalcote grueso","unidad",800,null,null,null,"Estimado"],
+  plast:["Plastificado","Por tabloide","unidad",300,null,null,null,"Estimado, con desperdicio"],
+  carton:["Cartón pasta dura","Pliego","lamina",5000,null,100,70],
+  adh:["Adhesivo para guardas","Pliego","lamina",2600,null,100,70],
+  vinilo:["Vinilo laminado para tapas","Por m² (lámina de 100 × 100)","lamina",28000,null,100,100,"A cada tapa se le suman 2 cm por lado para el doblez"],
+  a16:["Anillo 16 mm","Caja x 50 tiras (23 loops)","paquete",31606,50],
+  a18:["Anillo 18 mm","Caja x 50 tiras (23 loops)","paquete",39604,50],
+  a22:["Anillo 22 mm","Caja x 50 tiras (23 loops)","paquete",44473,50],
+  molA:["Mano de obra libreta","Alistamiento por pedido","fijo",3000],
+  molU:["Mano de obra libreta","Por unidad","unidad",1200],
+  moaA:["Mano de obra agenda pasta dura","Alistamiento por pedido","fijo",5000],
+  moaU:["Mano de obra agenda pasta dura","Por unidad","unidad",4000]
+};
+const KSZ={q:{n:"¼ carta",cab:4,w:10.8,h:14,tw:11.4,th:14.6},m:{n:"½ carta",cab:2,w:14,h:21.6,tw:14.6,th:22.2},g:{n:"grande 17 × 24,5",cab:1,w:17,h:24.5,tw:17,th:24.5}};
+const KTIER={lib:[[1,2.2],[6,2.8],[12,2.7],[20,2.5],[50,2.1],[100,1.75]],age:[[1,3],[10,2.6],[20,2.3],[50,2],[100,1.8]]};
+const KRITMO=0.9; // desde 50 unidades la mano de obra por unidad baja 10 %
+const K={prod:"lib",size:"m",int:"stock",lam:0};
+function kItem(k){const d=KDEF[k],it=S.items.find(i=>i.active&&i.category===KCAT&&i.name===d[0]&&(i.detail||"")===d[1]);
+  return it||{name:d[0],detail:d[1],unit_kind:d[2],price:d[3],pack_qty:d[4],width_cm:d[5],height_cm:d[6],_def:true}}
+const kP=k=>unitPrice(kItem(k));
+function kTier(prod,q){let f=KTIER[prod][0][1];KTIER[prod].forEach(([n,v])=>{if(q>=n)f=v});return f}
+const kRingFor=l=>l<=60?16:l<=80?18:22;
+const fmtN=v=>(Math.round(v*10)/10).toLocaleString("es-CO");
+// Impresión de hojas tamaño carta: compara láser contra litografía (una tinta) y escoge la más barata
+function kPrint(sheets,sides,ink,cab){
+  const paper=kP("resma"),laser=sheets*paper+sheets*sides*kP(ink===4?"clickc":"clickb");
+  if(ink!==1)return{v:laser,how:"láser",alt:null};
+  const sw=Math.ceil(sheets*1.05),masters=cab===1&&sides===2?2:1,passes=sw*sides;
+  const litho=masters*kP("master")+Math.ceil(passes/1000)*kP("tiraje")+sw*paper;
+  return litho<laser?{v:litho,how:"tiraje",alt:laser,m:masters,t:Math.ceil(passes/1000)}:{v:laser,how:"láser",alt:litho,m:masters,t:Math.ceil(passes/1000)};
+}
+function kSync(){
+  const age=K.prod==="age";
+  $("kSize").querySelector('[data-v="g"]').style.display=age?"":"none";
+  if(!age&&K.size==="g")K.size="m";
+  paintPills("kProd",K.prod);paintPills("kSize",K.size);paintPills("kInt",K.int);paintPills("kLam",String(K.lam));
+  $("kLibCover").style.display=age?"none":"";$("kAgeCover").style.display=age?"":"none";
+  $("kIntWrap").style.display=K.int==="pers"?"":"none";
+  $("kSepMore").style.display=num($("kSepN").value)>0?"":"none";
+  if(!$("kLeaves").dataset.touched)$("kLeaves").value=age?80:60;
+  if(!$("kRing").dataset.touched)$("kRing").value=String(kRingFor(num($("kLeaves").value)));
+  const q=Math.max(1,Math.round(num($("kQ").value)));
+  if(!$("kF").dataset.touched)$("kF").value=kTier(K.prod,q);
+}
+function calcK(){
+  kSync();
+  const age=K.prod==="age",z=KSZ[K.size],q=Math.max(0,Math.round(num($("kQ").value))),L=Math.max(0,Math.round(num($("kLeaves").value)));
+  if(!q||!L)return emptyRes("k","Escribe la cantidad y las hojas internas.");
+  const lines=[],cab=z.cab,warns=[];
+  // Interior
+  if(K.int==="stock"){const carta=q*L/cab;
+    lines.push({t:"Interior cuadriculado de stock",s:`${L} hojas · ${fmtN(carta)} hojas carta + 5 % sobrante`,v:carta*1.05*(kP("resma")+2*kP("tiraje")/1000)});
+    $("kIntHint").textContent="Hojas que ya están impresas: se cuenta el papel y lo que costó el tiraje por hoja.";
+  }else{const sides=+$("kIntSides").value,ink=+$("kIntInk").value,sheets=Math.ceil(q*L/cab),p=kPrint(sheets,sides,ink,cab);
+    lines.push({t:`Interior personalizado (${p.how})`,s:`${L} hojas · ${sheets.toLocaleString("es-CO")} hojas carta · ${ink===4?"full color":"una tinta"} ${sides===2?"dos caras":"una cara"}`,v:p.v});
+    $("kIntHint").innerHTML=ink===4?"Full color solo se puede en láser."
+      :`💡 Conviene <b>${p.how}</b>: ${p.how==="tiraje"?`${p.m} máster${p.m>1?"es":""} + ${p.t} tiraje${p.t>1?"s":""} = ${money(p.v)} (en láser serían ${money(p.alt)})`:`${money(p.v)} (por tiraje serían ${money(p.alt)})`}.`;
+    const d=find(/^dise[ñn]o$/i);$("kDesignP").textContent=money(d?d.price:15000);
+  }
+  // Hoja de datos y calendario: 2 hojas bond full color a dos caras
+  lines.push({t:"Hoja de datos y calendario",s:"2 hojas en láser full color",v:q*2/cab*(kP("resma")+2*kP("clickc"))});
+  // Tapas
+  if(!age){const per=fitCount(31,49,z.w,z.h,0),tab=q/per,back=$("kBack").checked;
+    lines.push({t:back?"Tapa y contratapa impresas":"Tapa impresa + contratapa blanca",s:`${per} tapas por tabloide`,v:tab*kP("tabimp")+tab*(back?kP("tabimp"):kP("tabbl"))});
+    if(K.lam)lines.push({t:`Plastificado ${K.lam===2?"de las dos tapas":"de la tapa"}`,s:`${fmtN(tab*K.lam)} tabloides`,v:tab*K.lam*kP("plast")});
+  }else{const c=kItem("carton"),a=kItem("adh"),pc=fitCount(+c.width_cm||100,+c.height_cm||70,z.tw,z.th,0.3),pa=fitCount(+a.width_cm||100,+a.height_cm||70,z.tw,z.th,0.3);
+    lines.push({t:"Cartón pasta dura",s:`${pc} tapas por pliego · ${fmtN(2*q/pc)} pliegos`,v:2*q/pc*num(c.price)});
+    const m2=(z.tw+4)*(z.th+4)*2*q/10000;
+    lines.push({t:"Vinilo laminado (2 tapas)",s:`${fmtN(z.tw+4)} × ${fmtN(z.th+4)} cm c/u · ${fmtN(m2)} m²`,v:m2*10000*perCm2(kItem("vinilo"))});
+    lines.push({t:"Guardas (2 por agenda)",s:`${pa} por pliego de adhesivo`,v:2*q/pa*num(a.price)});
+    if($("kGuard").checked){const pc2=fitCount(21.6,27.9,z.tw,z.th,0);lines.push({t:"Impresión de guardas",s:`${pc2} por carta · láser full color`,v:2*q/pc2*kP("clickc")})}
+  }
+  // Anillo
+  const ring=+$("kRing").value,tiras=q*(K.size==="q"?0.5:1);
+  $("kRingHint").textContent=`Sugerido para ${L} hojas: ${kRingFor(L)} mm. ${K.size==="q"?"De una tira salen 2.":"Una tira entera por unidad."}`;
+  lines.push({t:`Anillo ${ring} mm`,s:`${fmtN(tiras)} tira${tiras===1?"":"s"}`,v:tiras*kP("a"+ring)});
+  // Separadores
+  const sn=Math.max(0,Math.round(num($("kSepN").value)));
+  if(sn){const n=q*sn,ink=+$("kSepInk").value,sides=+$("kSepSides").value;let v,s;
+    if($("kSepPaper").value==="bond"){const sheets=Math.ceil(n/cab);
+      if(ink){const p=kPrint(sheets,sides,ink,cab);v=p.v;s=`${n} separadores · bond ${ink===4?"full color":"una tinta"} ${sides===2?"dos caras":"una cara"} (${p.how})`}
+      else{v=sheets*kP("resma");s=`${n} separadores · bond sin imprimir`}}
+    else{const per=fitCount(31,49,z.w,z.h,0),tab=n/per;v=ink?tab*kP("tabimp")*sides:tab*kP("tabbl");s=`${n} separadores · propalcote ${ink?(sides===2?"impreso dos caras":"impreso una cara"):"sin imprimir"} · ${per} por tabloide`}
+    lines.push({t:"Separadores",s,v});
+  }
+  // Mano de obra
+  const fx=kP(age?"moaA":"molA"),un=kP(age?"moaU":"molU")*(q>=50?KRITMO:1);
+  lines.push({t:"Mano de obra",s:`Alistamiento ${money(fx)} + ${money(un)} c/u${q>=50?" (ritmo −10 %)":""}`,v:fx+q*un});
+  if(Object.keys(KDEF).some(k=>kItem(k)._def))warns.push("Algunos costos todavía no están en la Lista de costos: se usan los valores por defecto.");
+  const services=K.int==="pers"&&$("kDesign").checked?[{t:"Diseño de la hoja interna",v:num((find(/^dise[ñn]o$/i)||{price:15000}).price)}]:[];
+  const cost=lines.reduce((s,l)=>s+l.v,0),f=num($("kF").value)||1,tf=kTier(K.prod,q);
+  $("kFHint").textContent=`Sugerido para ${q} unidad${q===1?"":"es"}: × ${String(tf).replace(".",",")}${Math.abs(f-tf)>0.001?" (lo cambiaste a mano)":""}. Baja a medida que suben las cantidades.`;
+  const prodName=`${age?"Agenda pasta dura":"Libreta tapa blanda"} ${z.n}`;
+  result("k",{lines,cost,factor:f,services,qty:q,warn:warns.join(" "),productName:prodName,
+    desc:[`${L} hojas ${K.int==="stock"?"cuadriculadas":"personalizadas"}`,"hoja de datos y calendario",`anillo ${ring} mm`,
+      !age&&$("kBack").checked?"contratapa impresa":"",!age&&K.lam?(K.lam===2?"plastificada adelante y atrás":"plastificada adelante"):"",
+      age&&$("kGuard").checked?"guardas impresas":"",sn?`${sn} separador${sn===1?"":"es"}`:""].filter(Boolean).join(" · ")});
+}
+[["kProd","prod"],["kSize","size"],["kInt","int"],["kLam","lam"]].forEach(([h,key])=>$(h).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  K[key]=key==="lam"?+b.dataset.v:b.dataset.v;if(key==="prod"){delete $("kLeaves").dataset.touched;delete $("kRing").dataset.touched;delete $("kF").dataset.touched}renderCalcs()}));
+$("kLeaves").addEventListener("input",()=>{$("kLeaves").dataset.touched="1"});
+$("kRing").addEventListener("change",()=>{$("kRing").dataset.touched="1"});
+$("kF").addEventListener("input",()=>{$("kF").dataset.touched="1"});
+$("kQ").addEventListener("input",()=>{delete $("kF").dataset.touched});
+document.querySelectorAll("#t-lib input,#t-lib select").forEach(el=>{el.addEventListener("input",renderCalcs);el.addEventListener("change",renderCalcs)});
+
+function renderCalcs(){if(!S.ready)return;calcA();calcL();calcB();calcK()}
 
 /* ---------- Lista de costos ---------- */
 function renderRules(){
@@ -369,7 +533,7 @@ function renderAll(){renderRules();renderList();renderCalcs()}
 /* ---------- Pestañas ---------- */
 function tab(t){document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));document.querySelectorAll(".tab").forEach(s=>s.classList.toggle("on",s.id==="t-"+t));try{localStorage.setItem("tg-costos-tab",t)}catch(e){}}
 $("tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(b)tab(b.dataset.t)});
-let first="acr";try{first=localStorage.getItem("tg-costos-tab")||"acr"}catch(e){}const hashT=(location.hash||"").slice(1);tab(["acr","lla","bol","list"].includes(hashT)?hashT:first);
+let first="acr";try{first=localStorage.getItem("tg-costos-tab")||"acr"}catch(e){}const hashT=(location.hash||"").slice(1);tab(["acr","lla","bol","lib","list"].includes(hashT)?hashT:first);
 $("back").onclick=()=>location.href="index.html#calculators";
 
 (async()=>{const {data:{session}}=await db.auth.getSession();if(!session){location.replace("index.html");return}document.body.classList.remove("auth-pending");try{await load()}catch(e){alert("No se pudo cargar: "+e.message)}})();

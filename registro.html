@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tus datos · Tecnigráficas</title>
+<meta name="description" content="Déjanos tus datos para armar tu cotización. Toma 1 minuto.">
+<meta property="og:title" content="Déjanos tus datos para tu cotización 💛">
+<meta property="og:description" content="Toma 1 minuto. Así armamos tu cotización más rápido.">
+<meta property="og:image" content="https://sistema.sastecnigraficas.com/donfer-salta.webp">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#E6007E">
+<link rel="icon" href="favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--m:#E6007E;--m2:#c4006b;--c:#00A0E3;--y:#FFD400;--k:#1d1d1f;--bg:#fff7fb;--line:#f1d4e4;--soft:#fde9f3;--mut:#6b6170}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Montserrat,system-ui,sans-serif;background:var(--bg);color:var(--k);font-size:17px;line-height:1.45;min-height:100vh}
+.top{height:8px;background:linear-gradient(90deg,var(--c) 0 33%,var(--m) 33% 66%,var(--y) 66%)}
+.wrap{max-width:560px;margin:0 auto;padding:18px 16px 110px}
+.brand{display:flex;justify-content:center;margin:6px 0 10px}
+.brand img{height:44px}
+h1{font-size:1.6rem;line-height:1.15;margin:.2em 0 .4em;font-weight:800}
+.sub{color:var(--mut);margin:0 0 18px}
+.hero{text-align:center;margin-bottom:6px}
+.hero img{width:150px;max-width:50%;margin:4px auto 0;display:block;filter:drop-shadow(0 8px 14px rgba(230,0,126,.18))}
+.pill{display:inline-block;background:#fff;border:1px solid var(--line);padding:6px 14px;border-radius:99px;font-weight:600;font-size:.9rem;margin:4px 3px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin:0 0 14px}
+label.q{display:block;font-weight:700;margin:0 0 8px}
+label.q small{font-weight:500;color:var(--mut)}
+.field{margin:0 0 14px}
+input[type=text],input[type=tel],input[type=email],select{width:100%;font:inherit;font-size:17px;padding:13px 14px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--k);outline:none}
+input:focus,select:focus{border-color:var(--m)}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+.choice{display:flex;flex-wrap:wrap;gap:8px}
+.choice button,.chip{font:inherit;font-weight:600;border:2px solid var(--line);background:#fff;color:var(--k);border-radius:12px;padding:12px 14px;cursor:pointer;flex:1 1 auto;min-height:50px}
+.choice button.sel,.chip.sel{border-color:var(--m);background:var(--m);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{flex:0 1 auto;border-radius:99px;padding:10px 16px;min-height:44px}
+.check{display:flex;gap:12px;align-items:flex-start;padding:12px;border:2px solid var(--line);border-radius:12px;background:#fff;margin-bottom:10px;cursor:pointer}
+.check input{width:24px;height:24px;flex:0 0 24px;accent-color:var(--m);margin:1px 0 0}
+.check span{font-size:.92rem}
+.check small{display:block;color:var(--mut);font-size:.8rem;margin-top:4px}
+.nav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,247,251,.95);backdrop-filter:blur(6px);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.nav .in{max-width:560px;margin:0 auto;display:flex}
+.btn{font:inherit;font-weight:800;font-size:1.05rem;border:0;border-radius:14px;padding:16px 18px;cursor:pointer;background:var(--m);color:#fff;flex:1}
+.btn:active{background:var(--m2)}
+.btn[disabled]{opacity:.6}
+.err{background:#fff0f0;color:#b00020;border:1px solid #ffc9cf;border-radius:12px;padding:10px 12px;font-weight:600;font-size:.92rem;margin:0 0 12px;display:none}
+.err.on{display:block}
+.hide{display:none!important}
+.done{text-align:center;padding-top:10px}
+.done img{width:200px;max-width:62%}
+.foot{text-align:center;color:var(--mut);font-size:.8rem;margin-top:20px}
+.foot a{color:var(--m)}
+</style>
+</head>
+<body>
+<div class="top"></div>
+<div class="wrap">
+  <div class="brand"><img src="logo-web.webp" alt="Tecnigráficas"></div>
+
+  <div id="formBox">
+    <div class="hero">
+      <img src="donfer-salta.webp" alt="Don Fer">
+      <h1>¡Hola! Cuéntanos de ti 💛</h1>
+      <p class="sub">Con estos datos armamos tu cotización más rápido.</p>
+      <div><span class="pill">⏱️ 1 minuto</span><span class="pill">🔒 Tus datos están seguros</span></div>
+    </div>
+    <div class="err" id="err"></div>
+
+    <div class="field" style="margin-top:18px"><label class="q">¿Nos compras para ti o para una empresa?</label>
+      <div class="choice" id="kind"><button type="button" data-v="person" class="sel">Para mí</button><button type="button" data-v="company">Para una empresa</button></div></div>
+
+    <div class="card hide" id="companyBox">
+      <div class="field"><label class="q" for="cName">Nombre de la empresa *</label><input type="text" id="cName" maxlength="120" autocomplete="organization"></div>
+      <div class="field"><label class="q" for="cNit">NIT <small>(para tu factura)</small></label><input type="text" id="cNit" inputmode="numeric" maxlength="20" placeholder="900123456-1"></div>
+      <div class="field" style="margin:0"><label class="q">Aniversario de la empresa <small>(opcional)</small></label>
+        <div class="row"><select id="aDay"></select><select id="aMonth"></select><select id="aYear"></select></div></div>
+    </div>
+
+    <div class="field"><label class="q" for="name"><span id="nameLbl">Tu nombre completo</span> *</label><input type="text" id="name" autocomplete="name" maxlength="120"></div>
+    <div class="field"><label class="q" for="phone">WhatsApp *</label><input type="tel" id="phone" autocomplete="tel" inputmode="tel" placeholder="300 123 4567" maxlength="20"></div>
+    <div class="field"><label class="q" for="email">Correo <small>(opcional · para enviarte la cotización)</small></label><input type="email" id="email" autocomplete="email" inputmode="email" maxlength="120"></div>
+    <div class="field" id="docBox"><label class="q" for="doc">Cédula <small>(opcional · para tu factura)</small></label><input type="text" id="doc" inputmode="numeric" maxlength="20"></div>
+    <div class="row">
+      <div class="field"><label class="q" for="city">Ciudad</label><input type="text" id="city" value="Popayán" maxlength="60" autocomplete="address-level2"></div>
+    </div>
+    <div class="field"><label class="q" for="address">Dirección <small>(opcional)</small></label><input type="text" id="address" maxlength="200" autocomplete="street-address"></div>
+    <div class="field"><label class="q">Tu cumpleaños <small>(opcional · para saludarte 🎂)</small></label>
+      <div class="row"><select id="bDay"></select><select id="bMonth"></select></div></div>
+    <div class="card">
+      <label class="q">¿Cómo nos conociste? <small>(opcional)</small></label>
+      <div class="chips" id="found"></div>
+    </div>
+
+    <label class="check"><input type="checkbox" id="consent"><span><b>Autorizo a Tecnigráficas</b> a guardar mis datos para atender mis pedidos y contactarme. *<small>Según la Ley 1581 de 2012. Puedes pedir que actualicemos o borremos tus datos cuando quieras escribiendo a contacto@sastecnigraficas.com.</small></span></label>
+    <label class="check"><input type="checkbox" id="marketing" checked><span>Quiero recibir promociones y novedades por WhatsApp 🎁</span></label>
+  </div>
+
+  <div class="done hide" id="doneBox">
+    <img src="donfer-pulgar.webp" alt="Don Fer">
+    <h1 id="thanks">¡Mil gracias! 💛</h1>
+    <p class="sub">Ya recibimos tus datos. En un momento te escribimos por WhatsApp con tu cotización. ¡Imprimimos la diferencia!</p>
+    <a class="btn" style="display:block;text-decoration:none;margin-top:10px" href="https://sastecnigraficas.com">Ver nuestros productos</a>
+  </div>
+
+  <div class="foot">Tecnigráficas · Popayán · <a href="https://sastecnigraficas.com">sastecnigraficas.com</a></div>
+</div>
+
+<nav class="nav" id="nav"><div class="in">
+  <button class="btn" id="send" type="button">Enviar mis datos ✨</button>
+</div></nav>
+
+<script>
+(()=>{
+const API="https://kqrfcdfygskzhsdzzcze.supabase.co/rest/v1/rpc/",KEY="sb_publishable_KfkIr6TlW6ivuT5cD0g9Kg_EuZwDKJ9";
+const $=id=>document.getElementById(id);
+const S={kind:"person",found:null};
+const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+async function rpc(fn,body){
+  const r=await fetch(API+fn,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>null);
+  if(!r.ok)throw new Error((j&&j.message)||"No se pudo enviar, revisa tu internet");
+  return j;
+}
+function fillSelect(el,ph,items){el.innerHTML=`<option value="">${ph}</option>`+items.map(([v,t])=>`<option value="${v}">${t}</option>`).join("")}
+const days=[...Array(31)].map((_,i)=>[String(i+1).padStart(2,"0"),i+1]),months=MONTHS.map((m,i)=>[String(i+1).padStart(2,"0"),m]);
+const y=new Date().getFullYear(),years=[...Array(y-1949)].map((_,i)=>[y-i,y-i]);
+fillSelect($("bDay"),"Día",days);fillSelect($("bMonth"),"Mes",months);
+fillSelect($("aDay"),"Día",days);fillSelect($("aMonth"),"Mes",months);fillSelect($("aYear"),"Año",years);
+
+$("kind").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  $("kind").querySelectorAll("button").forEach(x=>x.classList.toggle("sel",x===b));S.kind=b.dataset.v;
+  const co=S.kind==="company";$("companyBox").classList.toggle("hide",!co);
+  $("nameLbl").textContent=co?"Tu nombre (quien nos contacta)":"Tu nombre completo";
+  $("docBox").classList.toggle("hide",co)});
+const FOUND=["Me lo recomendaron","Instagram","Facebook","Google","Pasé por el local","Otro"];
+$("found").innerHTML=FOUND.map(t=>`<button type="button" class="chip" data-v="${t}">${t}</button>`).join("");
+$("found").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  const was=b.classList.contains("sel");$("found").querySelectorAll("button").forEach(x=>x.classList.remove("sel"));if(!was)b.classList.add("sel");S.found=was?null:b.dataset.v});
+
+function err(msg){const e=$("err");e.textContent=msg;e.classList.toggle("on",!!msg);if(msg)window.scrollTo({top:0,behavior:"smooth"})}
+function digits(v){return String(v||"").replace(/\D/g,"")}
+function validate(){
+  if($("name").value.trim().length<3)return"Escribe tu nombre completo";
+  const d=digits($("phone").value);if(d.length<7||d.length>13)return"Revisa tu número de WhatsApp";
+  const em=$("email").value.trim();if(em&&!/^\S+@\S+\.\S+$/.test(em))return"Revisa tu correo";
+  if(!!$("bDay").value!==!!$("bMonth").value)return"Completa el día y el mes de tu cumpleaños";
+  if(S.kind==="company"){
+    if($("cName").value.trim().length<2)return"Escribe el nombre de la empresa";
+    if(!!$("aDay").value!==!!$("aMonth").value)return"Completa el día y el mes del aniversario";
+  }
+  if(!$("consent").checked)return"Necesitamos tu autorización para guardar tus datos";
+  return"";
+}
+$("send").addEventListener("click",async()=>{
+  const m=validate();err(m);if(m)return;
+  const co=S.kind==="company";
+  const bd=$("bDay").value&&$("bMonth").value?`${$("bMonth").value}-${$("bDay").value}`:"";
+  const an=co&&$("aDay").value&&$("aMonth").value?`${$("aYear").value||2000}-${$("aMonth").value}-${$("aDay").value}`:"";
+  const p={name:$("name").value.trim(),phone:$("phone").value.trim(),email:$("email").value.trim(),city:$("city").value.trim(),address:$("address").value.trim(),
+    document:co?"":$("doc").value.trim(),document_type:"CC",birthday:bd,
+    company_name:co?$("cName").value.trim():"",company_nit:co?$("cNit").value.trim():"",company_anniversary:an,
+    how_found:S.found||"",data_consent:$("consent").checked,marketing:$("marketing").checked};
+  $("send").disabled=true;$("send").textContent="Enviando…";
+  try{
+    const r=await rpc("client_register",{p});
+    $("thanks").textContent=`¡Mil gracias, ${r&&r.name?r.name:""}! 💛`.replace(", !","!");
+    $("formBox").classList.add("hide");$("nav").classList.add("hide");$("doneBox").classList.remove("hide");window.scrollTo({top:0});
+  }catch(e){err(e.message);$("send").disabled=false;$("send").textContent="Enviar mis datos ✨"}
+});
+})();
+</script>
+</body>
+</html>

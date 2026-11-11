@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Encuesta Tecnigráficas</title>
-<meta name="description" content="Actualiza tus datos y cuéntanos cómo te fue con Tecnigráficas. Toma 2 minutos.">
+<meta name="description" content="Cuéntanos cómo te fue con Tecnigráficas. Toma 1 minuto.">
 <meta property="og:title" content="¿Cómo te fue con Tecnigráficas? 💛">
-<meta property="og:description" content="Actualiza tus datos y cuéntanos tu experiencia. Toma 2 minutos.">
+<meta property="og:description" content="Cuéntanos tu experiencia. Toma 1 minuto.">
 <meta property="og:image" content="https://sistema.sastecnigraficas.com/donfer-salta.webp">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#E6007E">
@@ -89,30 +89,17 @@ textarea{min-height:96px;resize:vertical}
     <div class="hero">
       <img src="donfer-salta.webp" alt="Don Fer">
       <h1>¡Hola! ¿Cómo te fue con nosotros? 💛</h1>
-      <p class="sub">Queremos tener tus datos al día y saber qué hacemos bien y qué podemos mejorar.</p>
-      <div><span class="pill">⏱️ 2 minutos</span><span class="pill">🔒 Tus datos están seguros</span></div>
+      <p class="sub">Queremos saber qué hacemos bien y qué podemos mejorar.</p>
+      <div><span class="pill">⏱️ 1 minuto</span><span class="pill">🔒 Tus datos están seguros</span></div>
     </div>
   </section>
 
-  <!-- 1 Datos -->
+  <!-- 1 Quién eres -->
   <section class="step" data-step="1">
-    <h2>Tus datos</h2>
-    <p class="sub">Para atenderte mejor y saludarte en tu día especial 🎂</p>
-    <div class="hello hide" id="hello"></div>
-    <div class="field"><label class="q" for="name">Nombre completo *</label><input type="text" id="name" autocomplete="name" maxlength="120"></div>
+    <h2>¿Quién eres?</h2>
+    <p class="sub">Solo para saber de quién es esta opinión 💛</p>
+    <div class="field"><label class="q" for="name">Tu nombre *</label><input type="text" id="name" autocomplete="name" maxlength="120"></div>
     <div class="field"><label class="q" for="phone">WhatsApp *</label><input type="tel" id="phone" autocomplete="tel" inputmode="tel" placeholder="300 123 4567" maxlength="20"></div>
-    <div class="field"><label class="q" for="email">Correo <small>(opcional)</small></label><input type="email" id="email" autocomplete="email" inputmode="email" maxlength="120"></div>
-    <div class="field"><label class="q" for="city">Ciudad</label><input type="text" id="city" value="Popayán" maxlength="60"></div>
-    <div class="field"><label class="q">Tu cumpleaños <small>(opcional)</small></label>
-      <div class="row"><select id="bDay"></select><select id="bMonth"></select></div></div>
-    <div class="field"><label class="q">¿Nos compras para ti o para una empresa?</label>
-      <div class="choice" id="kind"><button type="button" data-v="person">Para mí</button><button type="button" data-v="company">Para una empresa</button></div></div>
-    <div class="card hide" id="companyBox">
-      <div class="field"><label class="q" for="cName">Nombre de la empresa *</label><input type="text" id="cName" maxlength="120" autocomplete="organization"></div>
-      <div class="field"><label class="q" for="cNit">NIT <small>(para tus facturas)</small></label><input type="text" id="cNit" inputmode="numeric" maxlength="20" placeholder="900123456-1"></div>
-      <div class="field" style="margin:0"><label class="q">Aniversario de la empresa <small>(opcional)</small></label>
-        <div class="row"><select id="aDay"></select><select id="aMonth"></select><select id="aYear"></select></div></div>
-    </div>
   </section>
 
   <!-- 2 Experiencia -->
@@ -151,8 +138,7 @@ textarea{min-height:96px;resize:vertical}
       <label class="q">¿Cómo nos conociste?</label>
       <div class="chips" id="found"></div>
     </div>
-    <label class="check"><input type="checkbox" id="consent"><span><b>Autorizo a Tecnigráficas</b> a guardar mis datos para atender mis pedidos y contactarme. *<small>Según la Ley 1581 de 2012. Puedes pedir que actualicemos o borremos tus datos cuando quieras escribiendo a contacto@sastecnigraficas.com.</small></span></label>
-    <label class="check"><input type="checkbox" id="marketing" checked><span>Quiero recibir promociones y novedades por WhatsApp 🎁</span></label>
+    <label class="check" id="consentBox"><input type="checkbox" id="consent"><span><b>Autorizo a Tecnigráficas</b> a guardar mis datos para atender mis pedidos y contactarme. *<small>Según la Ley 1581 de 2012. Puedes pedir que actualicemos o borremos tus datos cuando quieras escribiendo a contacto@sastecnigraficas.com.</small></span></label>
   </section>
 
   <!-- 4 Gracias -->
@@ -178,23 +164,16 @@ textarea{min-height:96px;resize:vertical}
 const API="https://kqrfcdfygskzhsdzzcze.supabase.co/rest/v1/rpc/",KEY="sb_publishable_KfkIr6TlW6ivuT5cD0g9Kg_EuZwDKJ9";
 const $=id=>document.getElementById(id);
 const token=(()=>{const c=new URLSearchParams(location.search).get("c")||"";return /^[0-9a-f-]{36}$/i.test(c)?c:null})();
-const S={step:0,kind:null,rating:0,nps:null,aspects:{},products:new Set(),found:null};
-const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const S={step:0,skipId:false,rating:0,nps:null,aspects:{},products:new Set(),found:null};
 async function rpc(fn,body){
   const r=await fetch(API+fn,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify(body)});
   const j=await r.json().catch(()=>null);
   if(!r.ok)throw new Error((j&&j.message)||"No se pudo enviar, revisa tu internet");
   return j;
 }
-function fillSelect(el,ph,items){el.innerHTML=`<option value="">${ph}</option>`+items.map(([v,t])=>`<option value="${v}">${t}</option>`).join("")}
-const days=[...Array(31)].map((_,i)=>[String(i+1).padStart(2,"0"),i+1]),months=MONTHS.map((m,i)=>[String(i+1).padStart(2,"0"),m]);
-const y=new Date().getFullYear(),years=[...Array(y-1949)].map((_,i)=>[y-i,y-i]);
-fillSelect($("bDay"),"Día",days);fillSelect($("bMonth"),"Mes",months);
-fillSelect($("aDay"),"Día",days);fillSelect($("aMonth"),"Mes",months);fillSelect($("aYear"),"Año",years);
 
 // selección única
 function single(box,onPick){box.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;box.querySelectorAll("button").forEach(x=>x.classList.toggle("sel",x===b));onPick(b.dataset.v)})}
-single($("kind"),v=>{S.kind=v;$("companyBox").classList.toggle("hide",v!=="company")});
 // estrellas
 const SL=["","Mala 😕","Regular 😐","Buena 🙂","Muy buena 😀","¡Excelente! 🤩"];
 $("stars").innerHTML=[1,2,3,4,5].map(n=>`<button type="button" aria-label="${n} estrellas" data-v="${n}">★</button>`).join("");
@@ -227,47 +206,35 @@ function show(n){
 function digits(v){return String(v||"").replace(/\D/g,"")}
 function validate(n){
   if(n===1){
-    if($("name").value.trim().length<3)return"Escribe tu nombre completo";
+    if($("name").value.trim().length<2)return"Escribe tu nombre";
     const d=digits($("phone").value);if(d.length<7||d.length>13)return"Revisa tu número de WhatsApp";
-    const em=$("email").value.trim();if(em&&!/^\S+@\S+\.\S+$/.test(em))return"Revisa tu correo";
-    if(!!$("bDay").value!==!!$("bMonth").value)return"Completa el día y el mes de tu cumpleaños";
-    if(S.kind==="company"&&$("cName").value.trim().length<2)return"Escribe el nombre de la empresa";
-    if(S.kind==="company"&&!!$("aDay").value!==!!$("aMonth").value)return"Completa el día y el mes del aniversario";
   }
   if(n===2&&!S.rating)return"Toca las estrellas para calificarnos ⭐";
-  if(n===3){if(S.nps===null)return"Elige un número del 0 al 10";if(!$("consent").checked)return"Necesitamos tu autorización para guardar tus datos"}
+  if(n===3){if(S.nps===null)return"Elige un número del 0 al 10";if(!S.skipId&&!$("consent").checked)return"Necesitamos tu autorización para guardar tus datos"}
   return"";
 }
 async function submit(){
-  const company=S.kind==="company";
-  const bd=$("bDay").value&&$("bMonth").value?`${$("bMonth").value}-${$("bDay").value}`:"";
-  const an=company&&$("aDay").value&&$("aMonth").value?`${$("aYear").value||2000}-${$("aMonth").value}-${$("aDay").value}`:"";
-  const p={name:$("name").value.trim(),phone:$("phone").value.trim(),email:$("email").value.trim(),city:$("city").value.trim(),birthday:bd,
-    buyer:S.kind||"",company_name:company?$("cName").value.trim():"",company_nit:company?$("cNit").value.trim():"",company_anniversary:an,
+  const p={name:$("name").value.trim(),phone:$("phone").value.trim(),
     rating:S.rating,...S.aspects,nps:S.nps,products:[...S.products],improve:$("improve").value.trim(),how_found:S.found||"",
-    data_consent:$("consent").checked,marketing:$("marketing").checked};
+    data_consent:$("consent").checked};
   const r=await rpc("survey_submit",{p_token:token,p});
   $("thanks").textContent=`¡Mil gracias, ${r&&r.name?r.name:""}! 💛`.replace(", !","!");
 }
 $("next").addEventListener("click",async()=>{
   const m=validate(S.step);err(m);if(m)return;
-  if(S.step<LAST){show(S.step+1);return}
+  if(S.step<LAST){show(S.step+1+(S.step===0&&S.skipId?1:0));return}
   $("next").disabled=true;$("next").textContent="Enviando…";
   try{await submit();show(4)}catch(e){err(e.message);$("next").disabled=false;$("next").textContent="Enviar ✨"}
 });
-$("back").addEventListener("click",()=>{err("");show(S.step-1)});
+$("back").addEventListener("click",()=>{err("");show(S.step-1-(S.step===2&&S.skipId?1:0))});
 
-// datos guardados (link personal)
+// link personal: ya sabemos quién es, no le pedimos nada
 if(token)rpc("survey_prefill",{p_token:token}).then(d=>{
   if(!d)return;
-  if(d.name)$("name").value=d.name;if(d.phone)$("phone").value=d.phone;if(d.email)$("email").value=d.email;if(d.city)$("city").value=d.city;
-  if(d.birthday){const[mm,dd]=d.birthday.split("-");$("bMonth").value=mm;$("bDay").value=dd}
-  if(d.company||d.kind==="company"){$("kind").querySelector('[data-v="company"]').click();const c=d.company||{};
-    if(c.name)$("cName").value=c.name;if(c.nit)$("cNit").value=c.nit;
-    if(c.anniversary){const[yy,mm,dd]=c.anniversary.split("-");$("aYear").value=yy==="2000"?"":yy;$("aMonth").value=mm;$("aDay").value=dd}}
-  else $("kind").querySelector('[data-v="person"]').click();
+  if(d.name)$("name").value=d.name;if(d.phone)$("phone").value=d.phone;
+  if(d.name&&d.phone){S.skipId=true;$("consentBox").classList.add("hide")}
   const first=(d.name||"").split(" ")[0];
-  $("hello").textContent=`👋 ${first?first+", e":"E"}stos son los datos que tenemos. Corrige lo que haya cambiado.`;$("hello").classList.remove("hide");
+  if(first)document.querySelector('[data-step="0"] h1').textContent=`¡Hola, ${first}! ¿Cómo te fue con nosotros? 💛`;
 }).catch(()=>{});
 show(0);
 })();

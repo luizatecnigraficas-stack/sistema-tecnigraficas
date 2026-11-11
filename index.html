@@ -995,7 +995,7 @@
 
         <section class="view" id="view-clients">
           <div class="view-head"><div><h2>Clientes</h2><p>Empresas y personas naturales disponibles para todo el equipo.</p></div><button class="btn primary" id="addClientButton">+ Nuevo cliente</button></div>
-          <div class="toolbar"><input class="search" id="clientSearch" placeholder="Buscar por nombre, documento, teléfono o correo…" /><select id="clientKindFilter" class="search" style="flex:0 0 180px"><option value="">Todos</option><option value="company">Empresas</option><option value="person">Personas</option></select><button type="button" class="btn secondary" id="surveyButton" style="flex:0 0 auto">📋 Encuesta</button></div>
+          <div class="toolbar"><input class="search" id="clientSearch" placeholder="Buscar por nombre, documento, teléfono o correo…" /><select id="clientKindFilter" class="search" style="flex:0 0 180px"><option value="">Todos</option><option value="company">Empresas</option><option value="person">Personas</option></select><button type="button" class="btn secondary" id="surveyButton" style="flex:0 0 auto">📋 Encuesta</button><button type="button" class="btn secondary" id="registroButton" style="flex:0 0 auto">📝 Pedir datos</button></div>
           <div class="table-wrap"><table class="table"><thead><tr><th>Cliente</th><th>Tipo</th><th>Documento</th><th>Contacto</th><th>Fecha especial</th><th>Ciudad</th><th>Acciones</th></tr></thead><tbody id="clientsBody"></tbody></table></div>
         </section>
 
@@ -3497,7 +3497,7 @@
     })();
     // V9.32: encuesta de clientes
     const SURVEY_URL="https://sistema.sastecnigraficas.com/encuesta";
-    function surveyMessage(first,link){return `¡Hola${first?" "+first:""}! 👋 Somos Tecnigráficas 💛\nQueremos tener tus datos al día y saber cómo te fue con nosotros. ¿Nos ayudas con esta encuesta de 2 minutos? 🙏\n👉 ${link}\n¡Gracias por elegirnos! ✨`}
+    function surveyMessage(first,link){return `¡Hola${first?" "+first:""}! 👋 Somos Tecnigráficas 💛\nQueremos saber cómo te fue con nosotros. ¿Nos ayudas con esta encuesta de 1 minuto? 🙏\n👉 ${link}\n¡Gracias por elegirnos! ✨`}
     async function copySurveyText(t,label){try{await navigator.clipboard.writeText(t);showToast("✓ "+label+" copiado")}catch(_){prompt("Copia esto:",t)}}
     function sendSurvey(id){
       const c=(state.clients||[]).find(x=>x.id===id);if(!c)return;
@@ -3538,7 +3538,7 @@
       $("surveyBody").innerHTML=`
         <p style="margin:0 0 8px"><b>Link para la difusión de WhatsApp</b> (sirve para todos; el sistema reconoce al cliente por su número):</p>
         <div class="sv-share"><input class="search" readonly value="${SURVEY_URL}"><button type="button" class="btn primary" id="svCopyMsg">Copiar mensaje</button><button type="button" class="btn secondary" id="svCopyLink">Copiar link</button><a class="btn secondary" href="${SURVEY_URL}" target="_blank" rel="noopener">Ver encuesta</a></div>
-        <p style="margin:0 0 14px;color:var(--muted,#666);font-size:.9rem">Para mandarla a un cliente en particular, usa el botón <b>📋 Encuesta</b> de su fila: le llega su link personal con sus datos ya llenos.</p>
+        <p style="margin:0 0 14px;color:var(--muted,#666);font-size:.9rem">Para mandarla a un cliente en particular, usa el botón <b>📋 Encuesta</b> de su fila: le llega su link personal y no tiene que escribir sus datos. Para pedirle los datos a alguien <b>nuevo</b>, usa el botón <b>📝 Pedir datos</b>.</p>
         <div class="sv-kpis"><div class="sv-kpi"><b>${n}</b><small>respuestas</small></div><div class="sv-kpi"><b>${n?avg("rating").toFixed(1):"—"} ⭐</b><small>calificación promedio</small></div><div class="sv-kpi"><b>${n?nps:"—"}</b><small>índice de recomendación (de −100 a 100)</small></div><div class="sv-kpi"><b>${mkt}</b><small>aceptan promociones</small></div></div>
         <div class="sv-bars">${bars}</div>
         <p style="margin:0 0 4px"><b>Lo que más compran:</b> ${prods}</p>
@@ -3554,6 +3554,45 @@
     }
     document.addEventListener("click",e=>{if(e.target.closest("#surveyButton"))openSurveySummary()});
     window.sendSurvey=sendSurvey;window.clientSurveys=clientSurveys;
+    // V9.68: pedir datos a un cliente nuevo (formulario aparte de la encuesta; crea el cliente solo)
+    const REGISTRO_URL="https://sistema.sastecnigraficas.com/registro";
+    function registroMessage(){return `¡Hola! 👋 Somos Tecnigráficas 💛\nPara armar tu cotización necesitamos unos datos. ¿Nos los llenas aquí? Toma 1 minuto 🙏\n👉 ${REGISTRO_URL}\n¡Gracias! ✨`}
+    function ensureRegistroModal(){
+      if($("registroModal"))return;
+      const el=document.createElement("div");el.className="modal-backdrop hidden";el.id="registroModal";
+      el.innerHTML='<div class="modal" style="width:min(720px,100%)"><div class="modal-head"><h3>📝 Pedir datos a un cliente nuevo</h3><button type="button" class="modal-close" id="registroClose">×</button></div><div id="registroBody"></div></div>';
+      document.body.appendChild(el);
+      $("registroClose").addEventListener("click",()=>closeModal("registroModal"));
+      el.addEventListener("click",e=>{if(e.target===el)closeModal("registroModal")});
+    }
+    async function loadRegistros(){
+      const box=$("rgList");if(!box)return;
+      try{
+        const {data,error}=await db.from("client_registrations").select("created_at,matched,client:clients!client_id(name,phone),company:clients!company_id(name)").order("created_at",{ascending:false}).limit(10);
+        if(error)throw error;
+        box.innerHTML=(data||[]).length?data.map(r=>`<div class="sv-item"><div class="h"><strong>${escapeHTML(r.client?.name||"Cliente borrado")}${r.company?` <small>· ${escapeHTML(r.company.name)}</small>`:""}</strong><span>${escapeHTML(formatDate(r.created_at.slice(0,10)))}</span></div><div class="sv-tags">${r.matched==="nuevo"?"🆕 Cliente nuevo creado":"Ya estaba en Clientes · se completaron sus datos"}</div></div>`).join(""):'<div class="empty">Todavía nadie ha llenado el formulario.</div>';
+      }catch(_){box.innerHTML='<div class="empty">No se pudo cargar la lista.</div>'}
+    }
+    function openRegistro(){
+      ensureRegistroModal();
+      $("registroBody").innerHTML=`
+        <p style="margin:0 0 8px">Mándale este link a quien todavía no es cliente. Cuando lo llene, <b>el cliente se crea solo</b> en Clientes (si ya existía, se le completan los datos que faltaban).</p>
+        <div class="sv-share"><input class="search" readonly value="${REGISTRO_URL}"><button type="button" class="btn primary" id="rgCopyMsg">Copiar mensaje</button><button type="button" class="btn secondary" id="rgCopyLink">Copiar link</button><a class="btn secondary" href="${REGISTRO_URL}" target="_blank" rel="noopener">Ver formulario</a></div>
+        <p style="margin:0 0 6px"><b>O mándalo directo por WhatsApp:</b></p>
+        <div class="sv-share"><input class="search" id="rgPhone" type="tel" inputmode="tel" placeholder="WhatsApp del cliente, ej. 300 123 4567"><button type="button" class="btn primary" id="rgWa">💬 Enviar por WhatsApp</button></div>
+        <h4 style="margin:6px 0 8px;display:flex;justify-content:space-between;align-items:center">Últimos que llenaron sus datos <button type="button" class="btn secondary" id="rgRefresh" style="padding:4px 10px">↻ Actualizar</button></h4>
+        <div id="rgList"><div class="empty">Cargando…</div></div>`;
+      $("rgCopyMsg").addEventListener("click",()=>copySurveyText(registroMessage(),"Mensaje"));
+      $("rgCopyLink").addEventListener("click",()=>copySurveyText(REGISTRO_URL,"Link"));
+      $("rgWa").addEventListener("click",()=>{
+        let d=String($("rgPhone").value||"").replace(/\D/g,"");if(d.length===10)d="57"+d;
+        if(d.length<11){showToast("Escribe el WhatsApp del cliente");return}
+        window.open(`https://wa.me/${d}?text=${encodeURIComponent(registroMessage())}`,"_blank");
+      });
+      $("rgRefresh").addEventListener("click",async()=>{await loadRegistros();try{await loadClients()}catch(_){}});
+      openModal("registroModal");loadRegistros();
+    }
+    document.addEventListener("click",e=>{if(e.target.closest("#registroButton"))openRegistro()});
     // V9.37/V9.38: Producción tipo Trello (arrastrar, ordenar, archivar, tableros, tarjetas rápidas) y menú que se esconde
     let woLastCols=[],woBoard="",woOpenAll=false;const woOpen=new Set();
     try{woBoard=localStorage.getItem("tecniWoBoard")||"";woOpenAll=localStorage.getItem("tecniWoOpenAll")==="1"}catch(e){}

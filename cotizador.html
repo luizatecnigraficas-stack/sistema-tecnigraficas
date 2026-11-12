@@ -1594,6 +1594,7 @@
           <div class="tq-more" id="tqMore" hidden>
             <button class="button secondary" type="button" id="saveCloud">💾 Guardar en historial (sin PDF)</button>
             <button class="button secondary" type="button" id="sendWhatsapp">💬 Preparar WhatsApp</button>
+            <button class="button secondary" type="button" id="copyMessage">📋 Copiar mensaje</button>
             <button class="button secondary" type="button" id="sendEmail">✉️ Preparar correo</button>
             <button class="button secondary" type="button" id="saveDraft">📝 Guardar borrador en este equipo</button>
             <button class="button secondary" type="button" id="newQuote">＋ Empezar cotización nueva</button>
@@ -1923,9 +1924,9 @@
       document.addEventListener("input",e=>{if(e.target.classList?.contains("tq-err")&&e.target.value.trim())e.target.classList.remove("tq-err")});
       function tqDone(number){
         const back=document.createElement("div");back.className="tq-done-back";
-        back.innerHTML=`<div class="tq-done"><div class="tq-done-ic">✓</div><h3>¡Cotización guardada!</h3><p><b>${escapeHTML(number||"")}</b> quedó en el historial y el PDF ya está listo.</p><div class="tq-done-btns"><button type="button" data-a="wa">📲 Enviar por WhatsApp</button><button type="button" data-a="new">＋ Hacer otra cotización</button><a href="index.html" data-a="home">← Volver al sistema</a></div></div>`;
+        back.innerHTML=`<div class="tq-done"><div class="tq-done-ic">✓</div><h3>¡Cotización guardada!</h3><p><b>${escapeHTML(number||"")}</b> quedó en el historial y el PDF ya está listo.</p><div class="tq-done-btns"><button type="button" data-a="wa">📲 Enviar por WhatsApp</button><button type="button" data-a="copy" style="background:#eef1f6;color:#20222a">📋 Copiar mensaje</button><button type="button" data-a="new">＋ Hacer otra cotización</button><a href="index.html" data-a="home">← Volver al sistema</a></div></div>`;
         document.body.appendChild(back);
-        back.addEventListener("click",async e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a;if(a==="home")return;e.preventDefault();back.remove();if(a==="wa"){try{await prepareWhatsapp()}catch(err){}}newQuote({message:"Nueva cotización lista"})});
+        back.addEventListener("click",async e=>{const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a;if(a==="home")return;e.preventDefault();if(a==="copy"){copyQuoteMessage();return}back.remove();if(a==="wa"){try{await prepareWhatsapp()}catch(err){}}newQuote({message:"Nueva cotización lista"})});
       }
       function tqResumeNotice(){
         const hasClient=$("clientName").value.trim(),hasItems=(state.items||[]).some(i=>String(i.productName||"").trim());if(!hasClient&&!hasItems)return;
@@ -2735,7 +2736,7 @@
             showToast("Imágenes guardadas permanentemente con la cotización");
           }
           if (printAfter) {
-            document.title = `${$("quoteNumber").value} - ${recipientSnapshot().name}`;
+            document.title = quoteFileName();
           }
           return true;
         } catch (error) {
@@ -3176,6 +3177,34 @@
         if(missing.length){tqMarkMissing(generic,validItems);alert(`Falta: ${missing.join(" y ")}. Te lo marqué en rojo 👇`);return false}return true;
       }
 
+      // V9.69: nombre bonito del PDF y mensaje formal para enviar la cotización
+      function quoteFileName(){
+        const number=String($("quoteNumber").value||"").trim();
+        const r=recipientSnapshot();
+        const name=r.mode==="generic"?"":String(r.name||"").trim();
+        const base=[/^Se asignará/i.test(number)?"Cotización":number,name].filter(Boolean).join(" - ");
+        return base.replace(/[\\/:*?"<>|]+/g,"-").replace(/\s+/g," ").trim().slice(0,120)||"Cotización";
+      }
+      function buildQuoteMessage(){
+        const r=recipientSnapshot();
+        const number=String($("quoteNumber").value||"").trim();
+        const num=/^Se asignará/i.test(number)?"":number;
+        const who=r.mode==="generic"?"":String(r.greeting||"").trim();
+        return [
+          "📄 *Notificación de cotización*","",
+          `Cordial saludo${who?`, ${who}`:""}.`,"",
+          `Desde Tecnigráficas le compartimos la cotización${num?` *${num}*`:""} con el detalle de los productos y servicios solicitados, sus cantidades y valores. Adjuntamos el documento en PDF a este mensaje.`,"",
+          "Quedamos atentos a cualquier duda o ajuste que necesite. ¡Gracias por tenernos en cuenta!","",
+          "Cordialmente,","*Tecnigráficas*","Publicidad e impresión · www.sastecnigraficas.com"
+        ].join("\n");
+      }
+      async function copyQuoteMessage(){
+        const text=buildQuoteMessage();
+        try{await navigator.clipboard.writeText(text)}
+        catch(e){const t=document.createElement("textarea");t.value=text;t.style.cssText="position:fixed;left:-9999px;top:0";document.body.appendChild(t);t.select();try{document.execCommand("copy")}catch(_){}t.remove()}
+        showToast("Mensaje copiado ✓ Pégalo en WhatsApp o en el correo");
+      }
+
       function cleanPhoneForWhatsapp(value) {
         let digits = String(value || "").replace(/\D/g, "");
         if (digits.length === 10) digits = `57${digits}`;
@@ -3185,15 +3214,12 @@
       async function prepareWhatsapp() {
         const recipient=recipientSnapshot();
         const phone = cleanPhoneForWhatsapp(recipient.phone);
-        if (!phone) { alert("Este cliente no tiene un número de celular registrado."); return; }
         if (!validateBeforePrint()) return;
         const saved = await saveQuoteToCloud();
         if (!saved) return;
-        const number = $("quoteNumber").value || "la cotización";
-        const client = recipient.greeting;
-        const message = `Hola${client ? ` ${client}` : ""}, te compartimos la cotización ${number} de Tecnigráficas. Enseguida adjuntamos el PDF.`;
+        const message = buildQuoteMessage();
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener");
-        showToast("WhatsApp preparado. Adjunta el PDF guardado desde el botón de generar PDF.");
+        showToast(phone ? "WhatsApp preparado. Adjunta el PDF guardado." : "Este cliente no tiene celular: elige el contacto en WhatsApp. Adjunta el PDF guardado.");
       }
 
       async function prepareEmail() {
@@ -3257,10 +3283,9 @@
           await loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js");
           await Promise.all(Array.from(host.querySelectorAll("img")).map(img => img.complete ? null : new Promise(r => { img.onload = img.onerror = r; })));
           if (document.fonts && document.fonts.ready) await document.fonts.ready;
-          const number = ($("quoteNumber").value || "Cotizacion").replace(/[\\/:*?"<>|]+/g, "-");
           await window.html2pdf().set({
             margin: 0,
-            filename: `${number} - Tecnigraficas.pdf`,
+            filename: `${quoteFileName()}.pdf`,
             image: { type: "jpeg", quality: 0.95 },
             html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff", windowWidth: 816, scrollX: 0, scrollY: 0 },
             jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
@@ -3304,6 +3329,11 @@
         const styles = Array.from(document.querySelectorAll("head style"))
           .map(style => style.outerHTML)
           .join("\n");
+
+        // El navegador propone como nombre del PDF el título de la página.
+        const fileName = quoteFileName();
+        const prevTitle = document.title;
+        document.title = fileName;
 
         const frame = document.createElement("iframe");
         frame.id = "tecniPrintFrame";
@@ -3384,7 +3414,7 @@
 
         const doc = frame.contentDocument || frame.contentWindow.document;
         doc.open();
-        doc.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${styles}${printOverrides}<title>${document.title}</title></head><body>${quoteClone.outerHTML}${referenceMarkup}</body></html>`);
+        doc.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${styles}${printOverrides}<title>${escapeHTML(fileName)}</title></head><body>${quoteClone.outerHTML}${referenceMarkup}</body></html>`);
         doc.close();
 
         const waitForImages = async () => {
@@ -3398,7 +3428,7 @@
         await waitForImages();
         await new Promise(resolve => setTimeout(resolve, 250));
 
-        const cleanup = () => setTimeout(() => frame.remove(), 800);
+        const cleanup = () => setTimeout(() => { frame.remove(); if (document.title === fileName) document.title = prevTitle; }, 800);
         frame.contentWindow.addEventListener("afterprint", cleanup, { once: true });
         frame.contentWindow.focus();
         frame.contentWindow.print();
@@ -3531,6 +3561,7 @@
         document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") saveContextUnlessViewing(); });
         $("newQuote").addEventListener("click", newQuote);
         $("sendWhatsapp").addEventListener("click", prepareWhatsapp);
+        $("copyMessage").addEventListener("click", copyQuoteMessage);
         $("sendEmail").addEventListener("click", prepareEmail);
         window.addEventListener("beforeprint", syncPrintablePages);
         $("printQuote").addEventListener("click", printQuote);

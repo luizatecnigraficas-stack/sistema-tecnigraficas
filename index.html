@@ -1678,7 +1678,7 @@
         <div class="field full hidden" id="workOrderInventorySection"><label>Materiales utilizados</label><div class="movement-source"><div id="workOrderInventorySummary" class="inventory-order-summary"><span>Aún no hay consumos registrados.</span></div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:9px"><button class="btn success" type="button" id="workOrderRegisterInventory">Registrar materiales utilizados</button><button class="btn secondary" type="button" id="workOrderViewInventory">Ver movimientos de esta orden</button></div></div>
         <div class="field full hidden" id="workOrderPaymentSection"><label>Pagos y saldo</label><div class="payment-source" id="workOrderPaymentSummary"></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:9px"><button class="btn success" type="button" id="workOrderRegisterPayment">Registrar pago o abono</button><button class="btn secondary" type="button" id="workOrderViewPayments">Ver historial de pagos</button></div></div>
       </div>
-      <div class="modal-actions"><button type="button" class="btn secondary hidden" id="workOrderMakeRemission" style="margin-right:auto">📄 Hacer remisión</button><button type="button" class="btn secondary" data-close="workOrderModal">Cancelar</button><button class="btn primary" id="saveWorkOrderButton" type="submit">Crear orden</button></div>
+      <div class="modal-actions"><button type="button" class="btn secondary hidden" id="workOrderMakeImage" style="margin-right:auto">📲 Imagen para WhatsApp</button><button type="button" class="btn secondary hidden" id="workOrderMakeRemission">📄 Hacer remisión</button><button type="button" class="btn secondary" data-close="workOrderModal">Cancelar</button><button class="btn primary" id="saveWorkOrderButton" type="submit">Crear orden</button></div>
     </form>
   </div>
 
@@ -3906,6 +3906,46 @@
     window.finGFSettle=async()=>{const t=finGFTotals(),txt=t.bal>0?`Todavía le debemos ${formatCOP(t.bal)} a gran formato. Si saldas ahora, esa plata pasa a la cuenta nueva como "Saldo anterior".`:t.bal<0?`Gran formato nos debe ${formatCOP(-t.bal)}. Si saldas ahora, esa plata pasa a la cuenta nueva como "Saldo anterior".`:"La cuenta está en cero.";if(!confirm(txt+"\n\n¿Cerrar esta cuenta y empezar una nueva?"))return;loading(true,"Saldando…");try{const r=await db.rpc("gf_settle",{p_date:todayISO()});if(r.error)throw r.error;showToast("Cuenta saldada");await loadFinGF()}catch(err){alert(err.message)}finally{loading(false)}};
     try{$("gfEntryForm")?.addEventListener("submit",finGFSave);$("gfEntryDelete")?.addEventListener("click",finGFDelete);$("gfPayForm")?.addEventListener("submit",finGFPaySave)}catch(e){}
 
+    // V9.70: la orden de producción como imagen para copiar y pegar en el grupo de WhatsApp (sin precios)
+    function woImageCardHTML(d){
+      const e=escapeHTML,items=(d.items||[]).map(i=>`<div style="display:flex;gap:12px;padding:11px 0;border-bottom:1px solid #e6e9ef"><div style="min-width:86px;font-weight:800;font-size:17px;color:#0b1220">${e(Number(i.quantity||0))} <span style="font-size:12px;font-weight:700;color:#596070">${e(i.unit||"Unidad")}</span></div><div style="font-size:15px;line-height:1.35;color:#1d2433">${e(i.description||"")}</div></div>`).join("")||'<div style="padding:12px 0;color:#596070;font-size:14px">Sin ítems.</div>';
+      const row=(k,v)=>v?`<div style="display:flex;gap:8px;margin-top:6px;font-size:14px"><span style="color:#667085;min-width:92px">${k}</span><strong style="color:#0b1220">${e(v)}</strong></div>`:"";
+      return `<div style="width:640px;background:#fff;font-family:Arial,Helvetica,sans-serif;color:#0b1220;border:1px solid #d9dde6">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:18px 24px 14px"><img src="logo-web.webp" style="height:34px;width:auto" alt=""><div style="text-align:right"><div style="font-size:12px;font-weight:800;letter-spacing:1px;color:#667085">ORDEN DE PRODUCCIÓN</div><div style="font-size:26px;font-weight:900;color:#0b1220">${e(d.number)}</div></div></div>
+<div style="height:6px;background:linear-gradient(90deg,#00a6d6 0 50%,#e6007e 50% 100%)"></div>
+<div style="padding:18px 24px 6px"><div style="font-size:22px;font-weight:900;line-height:1.2">${e(d.client)}</div>
+${d.urgent?'<div style="display:inline-block;margin-top:8px;padding:5px 12px;border-radius:999px;background:#ffe8d9;color:#b8470a;font-weight:900;font-size:13px">🔥 URGENTE</div>':""}
+<div style="margin-top:12px;padding:12px 14px;border-radius:12px;background:#e6f6fb;border:1px solid #b9e6f3"><div style="font-size:12px;font-weight:800;color:#087a9a;letter-spacing:.5px">ENTREGAR</div><div style="font-size:20px;font-weight:900;color:#0b1220;margin-top:2px">${e(d.date||"Sin fecha todavía")}</div></div>
+<div style="margin-top:10px">${row("Estado",d.status)}${row("Responsable",d.assigned)}${row("Cotización",d.quote)}</div></div>
+<div style="padding:8px 24px 4px"><div style="font-size:12px;font-weight:800;letter-spacing:.5px;color:#667085;margin-top:8px">QUÉ HAY QUE HACER</div>${items}</div>
+${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;background:#fff8e1;border:1px solid #f3dc8a"><div style="font-size:12px;font-weight:800;color:#7a5a00;letter-spacing:.5px">OBSERVACIONES</div><div style="font-size:15px;line-height:1.4;margin-top:4px;white-space:pre-wrap;color:#1d2433">${e(d.notes)}</div></div>`:""}
+<div style="padding:16px 24px 18px;font-size:12px;color:#667085;margin-top:6px">Está en el tablero de Producción del sistema · Tecnigráficas</div></div>`
+    }
+    function woImageData(){
+      const o=state.workOrderDraft?.order||{},iso=$("workOrderPromisedDate").value,sel=$("workOrderStatus").selectedOptions[0];
+      const date=iso?new Intl.DateTimeFormat("es-CO",{weekday:"long",day:"numeric",month:"long"}).format(new Date(iso+"T12:00:00")):"";
+      return{number:o.order_number||$("workOrderNumber").value,client:o.client_name||"",quote:o.quote_number||"",urgent:$("workOrderPriority").value==="urgent",date:date.charAt(0).toUpperCase()+date.slice(1),status:sel?sel.textContent:"",assigned:state.profiles.get($("workOrderAssignedTo").value)||"",notes:$("workOrderNotes").value.trim(),items:state.workOrderItems||[]}
+    }
+    async function woImageBlob(){
+      await remLoadHtml2pdf();const d=woImageData(),box=document.createElement("div");box.innerHTML=woImageCardHTML(d);const el=box.firstElementChild;
+      const imgs=[...el.querySelectorAll("img")];await Promise.all(imgs.map(i=>new Promise(ok=>{i.onload=i.onerror=ok;if(i.complete)ok()})));
+      const canvas=await window.html2pdf().set({margin:0,html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff",scrollX:0,scrollY:0}}).from(el).toCanvas().get("canvas");
+      return{blob:await new Promise(r=>canvas.toBlob(r,"image/png")),name:`Orden ${d.number} ${d.client}`.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9 _-]+/g,"").trim()}
+    }
+    async function woShareImage(){
+      loading(true,"Preparando imagen…");
+      try{
+        const work=woImageBlob(),mobile=/Android|iPhone|iPad/i.test(navigator.userAgent);
+        if(!mobile&&window.ClipboardItem&&navigator.clipboard?.write){
+          try{await navigator.clipboard.write([new ClipboardItem({"image/png":work.then(r=>r.blob)})]);showToast("✓ Imagen copiada: pégala en el grupo de WhatsApp (Ctrl+V)");return}catch(e){}
+        }
+        const {blob,name}=await work,file=new File([blob],name+".png",{type:"image/png"});
+        if(mobile&&navigator.canShare?.({files:[file]})){loading(false);try{await navigator.share({files:[file],title:name})}catch(e){}return}
+        downloadBlob(blob,file.name);showToast("✓ Imagen descargada: adjúntala en el grupo de WhatsApp")
+      }catch(err){alert(err.message)}finally{loading(false)}
+    }
+    try{$("workOrderMakeImage")?.addEventListener("click",woShareImage)}catch(e){}
+
     // V9.09: venta rápida, comprobantes y niveles de acceso
     function financePermsInstalled(){return state.permissions instanceof Map&&state.permissions.has("finance.view")}
     function supportsEnabled(){return financePermsInstalled()}
@@ -4578,7 +4618,7 @@
       loading(false);if(error)return alert(error.message);
       const quoteItems=items||[],alternatives=quoteItems.filter(i=>i.line_role==="alternative"),selectedAlternative=alternatives.find(i=>i.is_selected);
       state.workOrderDraft={quote,quoteItems};
-      $("workOrderModalTitle").textContent="Crear orden de producción";$("workOrderId").value="";$("workOrderQuoteId").value=quoteId;$("workOrderNumber").value="Se asignará al crear";$("workOrderStatus").value="pending_design";$("workOrderStatus").disabled=true;$("workOrderPromisedDate").value="";$("workOrderPriority").value="normal";$("workOrderNotes").value="";$("workOrderInventorySection").classList.add("hidden");$("workOrderPaymentSection").classList.add("hidden");fillWorkOrderProfiles();
+      $("workOrderModalTitle").textContent="Crear orden de producción";$("workOrderMakeImage")?.classList.add("hidden");$("workOrderId").value="";$("workOrderQuoteId").value=quoteId;$("workOrderNumber").value="Se asignará al crear";$("workOrderStatus").value="pending_design";$("workOrderStatus").disabled=true;$("workOrderPromisedDate").value="";$("workOrderPriority").value="normal";$("workOrderNotes").value="";$("workOrderInventorySection").classList.add("hidden");$("workOrderPaymentSection").classList.add("hidden");fillWorkOrderProfiles();
       $("workOrderAlternativeSection").classList.toggle("hidden",!alternatives.length);
       $("workOrderAlternativeSelect").innerHTML='<option value="">Selecciona la alternativa confirmada…</option>'+alternatives.map((item,index)=>`<option value="${item.id}" ${item.id===selectedAlternative?.id?"selected":""}>Opción ${index+1} · ${escapeHTML(item.description||"")} · ${formatCOP(item.line_total||0)}</option>`).join("");
       $("workOrderSource").innerHTML=`<strong>${escapeHTML(quote.quote_number)} · ${escapeHTML(quote.client_name)}</strong><span>${alternatives.length&&!selectedAlternative?"Selecciona la opción confirmada por el cliente para fijar el valor aprobado.":`${formatCOP(quote.total)} · La orden copiará exactamente los ítems aprobados.`}</span>`;
@@ -4597,7 +4637,7 @@
       $("workOrderSource").innerHTML=`<strong>${escapeHTML(order.quote_number)} · ${escapeHTML(order.client_name)}</strong><span>Valor aprobado: ${formatCOP(order.source_quote_total)}</span>`;renderWorkOrderItems(items);$("saveWorkOrderButton").textContent="Guardar cambios";$("saveWorkOrderButton").classList.toggle("hidden",!hasPermission("work_orders.update"));
       $("workOrderPaymentSection").classList.toggle("hidden",!hasPermission("payments.view"));if(hasPermission("payments.view")){$("workOrderPaymentSummary").innerHTML=paymentSummaryHTML(order);$("workOrderRegisterPayment").classList.toggle("hidden",!hasPermission("payments.create")||orderFinancial(order).balance<=.01||order.status==="cancelled")}
       $("workOrderInventorySection").classList.toggle("hidden",!hasPermission("inventory.view"));if(hasPermission("inventory.view")){$("workOrderRegisterInventory").classList.toggle("hidden",!hasPermission("inventory.manage")||order.status==="cancelled");refreshWorkOrderInventorySummary(order.id)}
-      $("workOrderMakeRemission").classList.toggle("hidden",!hasPermission("quotes.create")||order.status==="cancelled");
+      $("workOrderMakeRemission").classList.toggle("hidden",!hasPermission("quotes.create")||order.status==="cancelled");$("workOrderMakeImage").classList.remove("hidden");
       openModal("workOrderModal")
     }
     async function saveWorkOrder(event){

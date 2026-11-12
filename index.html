@@ -2395,9 +2395,22 @@
       try{
         const {error}=await db.from("quotes").update({status:newStatus,updated_by:state.session.user.id}).eq("id",id);if(error)throw error;
         showToast(`Estado actualizado a ${statusText[newStatus]}`);
-        await Promise.all([loadQuotes(),loadDashboard()])
+        await Promise.all([loadQuotes(),loadDashboard()]);
+        if(newStatus==="approved"&&previous!=="approved")await autoOrderFromApprovedQuote(id)
       }catch(error){quote.status=previous;renderQuotes();alert(`No fue posible cambiar el estado: ${error.message}`)}
       finally{if(control)control.disabled=false}
+    }
+    // V9.69: al aprobar una cotización se crea sola la orden en "Por diseñar" (y Cartera se llena por los triggers).
+    async function autoOrderFromApprovedQuote(quoteId){
+      try{
+        if(!hasPermission("work_orders.create"))return;
+        if(state.workOrders.some(o=>o.quote_id===quoteId))return;
+        if(state.quoteItems.some(i=>i.quote_id===quoteId&&i.line_role==="alternative"))return startWorkOrderFromQuote(quoteId);
+        const {error}=await db.rpc("create_work_order_from_quote",{p_quote_id:quoteId,p_promised_date:null,p_assigned_to:null,p_priority:"normal",p_notes:null});
+        if(error)throw error;
+        showToast("✓ Pedido creado en Producción → Por diseñar");
+        await Promise.all([loadQuotes(),loadProduction()])
+      }catch(error){showToast("La cotización quedó aprobada, pero no se pudo crear el pedido: "+error.message)}
     }
     async function deleteQuote(id){if(!hasPermission("quotes.delete"))return showToast("No tienes permiso para eliminar cotizaciones");if(!confirm("¿Eliminar esta cotización y todos sus ítems?"))return;const {error}=await db.from("quotes").delete().eq("id",id);if(error){alert(error.message);return}showToast("Cotización eliminada");await Promise.all([loadQuotes(),loadDashboard()])}
 

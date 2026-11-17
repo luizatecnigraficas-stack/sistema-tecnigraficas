@@ -108,6 +108,15 @@ input.big:disabled{background:#f2f4f7;color:var(--u)}
 .more summary{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.more summary small{margin-top:2px}.more summary:after{float:none}
 @media(max-width:700px){.head{padding-right:18px}.mini-actions{grid-template-columns:1fr 1fr}.ans-price{font-size:42px}.answer{padding:18px;min-height:0}.res-body .stats{grid-template-columns:1fr 1fr}.shapes{grid-template-columns:repeat(4,1fr)!important}.shape{font-size:11px}}
 @media print{.main-actions,.suggest-wrap,.res-details summary,.ans-empty,.ans-warn{display:none!important}.answer{background:#fff;color:#172033;border:1px solid #e4e7ec}.ans-unit,.ans-how,.ans-how b,.ans-what{color:#172033}.res-details{border:0}}
+
+.sheetfit{margin-top:14px;border:1px solid var(--l);border-radius:16px;background:#fbfcfe;padding:12px}
+.sheetfit .ttl2{font-weight:900;font-size:14px;margin-bottom:8px}
+.sheetfit .row{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;padding:9px 10px;border-radius:12px;background:#fff;border:1px solid var(--l);margin-top:7px}
+.sheetfit .row.best{border-color:#12b76a;background:#f0fdf4}
+.sheetfit .nm{font-weight:900;font-size:15px}.sheetfit .nm small{font-weight:600;color:var(--u);font-size:12px;margin-left:4px}
+.sheetfit .cnt{font-weight:900;font-size:22px;text-align:right}.sheetfit .cnt small{font-size:12px;font-weight:700;color:var(--u);margin-left:3px}
+.sheetfit .sub{font-size:12px;color:var(--u)}.sheetfit .sub.r{text-align:right}
+.sheetfit .no{color:#b42318;font-weight:800;font-size:13px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script>
 </head>
@@ -124,6 +133,7 @@ input.big:disabled{background:#f2f4f7;color:var(--u)}
 <div class="step"><div class="ttl"><span class="n">2</span>Medida en centímetros</div>
 <div class="size-row"><div><label for="itemW">Ancho</label><input id="itemW" class="big" type="number" min=".1" placeholder="5" step="any" inputmode="decimal"></div><span class="times">×</span><div><label for="itemH">Alto</label><input id="itemH" class="big" type="number" min=".1" placeholder="5" step="any" inputmode="decimal"></div></div>
 <div id="favChips" class="fav-chips"></div></div>
+<div id="sheetFit" class="sheetfit hide"></div>
 <div class="step" id="qtyWrap"><div class="ttl"><span class="n">3</span>¿Cuántos stickers?</div>
 <input id="qty" class="big" type="number" min="1" placeholder="Ej: 500" step="any" inputmode="decimal">
 <div class="quick"><button type="button" data-q="100">100</button><button type="button" data-q="200">200</button><button type="button" data-q="500">500</button><button type="button" data-q="1000">1.000</button><button type="button" data-q="2000">2.000</button></div></div>
@@ -131,15 +141,13 @@ input.big:disabled{background:#f2f4f7;color:var(--u)}
 <div class="seg"><button type="button" data-lam="no" class="on">Sin laminar</button><button type="button" data-lam="yes">Laminado<small>Más resistente · +50%</small></button></div>
 <select id="laminated" class="hide" aria-label="Acabado del vinilo"><option value="no">Sin laminado</option><option value="yes">Laminado</option></select></div>
 <div id="uvIncludedNote" class="uv-note hide-force">✓ Va en litografía: el acabado UV ya viene incluido.</div>
-<details class="more" id="moreOptions"><summary><span>⚙️ Más opciones<small>Tipo de impresión, imagen, observaciones</small></span></summary><div class="more-body">
-<label for="productionMode">Tipo de impresión</label>
-<select id="productionMode"><option value="auto">Automático (recomendado)</option><option value="digital">Digital en vinilo</option><option value="litho">Litográfica por cupos</option></select>
+<div class="step"><div class="ttl"><span class="n">5</span>Tipo de impresión</div>
+<select id="productionMode" style="font-size:15px;padding:10px"><option value="auto">Automático (recomendado)</option><option value="digital">Digital en vinilo</option><option value="litho">Litográfica por cupos</option></select>
 <p class="hint">Automático: menos de 1.000 va en digital; desde 1.000, en litografía.</p>
-<label for="calcMode">¿Qué quieres saber?</label>
-<select id="calcMode"><option value="quantity">El precio de una cantidad</option><option value="capacity">Cuántos caben en un pliego</option></select>
-<div id="sheetSelectorWrap" style="display:none;margin-top:10px"><label for="capacitySheet">Pliego</label>
-<select id="capacitySheet"><option value="lite">Lite — 26 × 115 cm</option><option value="plus">Plus — 50 × 115 cm</option><option value="ultra">Ultra — 100 × 115 cm</option></select></div>
-<label style="margin-top:14px">Imagen del sticker</label><div class="upload-box">
+<div style="display:none" aria-hidden="true"><select id="calcMode"><option value="quantity" selected>El precio de una cantidad</option><option value="capacity">Cuántos caben en un pliego</option></select>
+<div id="sheetSelectorWrap" style="display:none"><select id="capacitySheet"><option value="lite">Lite</option><option value="plus">Plus</option><option value="ultra">Ultra</option></select></div></div></div>
+<div class="step"><div class="ttl"><span class="n">6</span>Imagen y observaciones</div>
+<label>Imagen del sticker</label><div class="upload-box">
   <input id="stickerImage" type="file" accept="image/*">
   <div class="upload-preview" id="uploadPreview">
     <img id="stickerPreview" alt="Vista previa del adhesivo">
@@ -149,7 +157,7 @@ input.big:disabled{background:#f2f4f7;color:var(--u)}
 <label for="notes" style="margin-top:14px">Observaciones</label><textarea id="notes" placeholder="Cambios de diseño, corte, prioridad, entrega…"></textarea>
 <textarea id="designChanges" style="display:none" aria-hidden="true"></textarea>
 <details class="rules-details" style="margin-top:14px"><summary>Ver reglas y tarifas de Tecnigráficas</summary><div class="fixed"><div>Digital sin laminado<strong>$1.200 / cm lineal</strong></div><div>Digital laminado<strong>$1.800 / cm lineal</strong></div><div>Cupo litográfico<strong>9 × 5,5 cm</strong></div><div>Rectangular / cuadrado<strong>$90.000 por cupo</strong></div><div>Troquel especial · 1 cupo<strong>$150.000</strong></div><div>Troquel especial · 2+ cupos<strong>$125.000 c/u</strong></div><div>Troquel: costo interno<strong>$70.000/cupo + $18.000 envío</strong></div><div>Litografía<strong>Acabado UV incluido</strong></div><div>Digital: alto útil<strong>115 cm</strong></div><div>Digital: ancho máximo<strong>50 cm</strong></div></div></details>
-</div></details>
+</div>
 <div class="actions compact-actions"><button type="button" class="secondary" id="reset">🧹 Empezar de nuevo</button><button type="button" class="primary hide" id="calc">Calcular</button></div>
 </section>
 
@@ -420,6 +428,23 @@ function fillPrintDetails(){const iw=num("itemW"),ih=(shape==="circle"||shape===
 function printDocument(type){calculate();fillPrintDetails();document.body.classList.remove("print-production","print-quotation");document.body.classList.add(type==="production"?"print-production":"print-quotation");$("productionPrintTitle").style.display=type==="production"?"block":"none";$("quotationPrintTitle").style.display=type==="quotation"?"block":"none";const old=document.title;document.title=type==="production"?"Orden de producción - Adhesivos":"Cotización - Adhesivos";window.print();setTimeout(()=>{document.title=old;document.body.classList.remove("print-production","print-quotation");$("productionPrintTitle").style.display="none";$("quotationPrintTitle").style.display="none";$("printDetails").style.display="none";},300);}
 function discount(){if(!current)return;const sub=current.best.price,t=$("discountType").value,v=Math.max(0,num("discountValue"));let d=0;if(t==="percent")d=sub*Math.min(v,100)/100;if(t==="fixed")d=Math.min(v,sub);const f=sub-d;$("subtotal").textContent=money(sub);$("finalTotal").textContent=money(f);$("finalUnit").value=money(f/current.q);$("quoteRequested").textContent=current.q;$("quoteExtras").textContent=current.best.extra||0;$("quoteDelivery").textContent=current.best.total||current.q;$("discountApplied").textContent=d>0?`Descuento aplicado: ${money(d)}${$("discountReason").value?" · "+$("discountReason").value:""}`:"Sin descuento";current.discount={amount:d,final:f};renderAnswer()}
 
+
+// V9.71: "Cuántos caben por pliego" siempre visible, con los tres pliegos, apenas se escribe la medida.
+function renderSheetFit(){
+  const box=$("sheetFit");if(!box)return;
+  const iw=num("itemW"),ih=(shape==="circle"||shape==="square")?iw:num("itemH");
+  if(iw<=0||ih<=0){box.classList.add("hide");box.innerHTML="";return}
+  const info={lite:"26 × 115 cm",plus:"50 × 115 cm",ultra:"100 × 115 cm · 2 montajes de 50"};
+  const res=["lite","plus","ultra"].map(k=>({k,r:bestCapacityForSheet(k,iw,ih)}));
+  const maxTotal=Math.max(0,...res.map(x=>x.r?x.r.total:0));
+  box.innerHTML=`<div class="ttl2">📐 Cuántos caben por pliego <span class="sub">(${iw} × ${ih} cm)</span></div>`+res.map(({k,r})=>{
+    const name=k[0].toUpperCase()+k.slice(1);
+    if(!r)return `<div class="row"><div class="nm">${name}<small>${info[k]}</small></div><div class="no">No cabe</div></div>`;
+    return `<div class="row${r.total===maxTotal?" best":""}"><div class="nm">${name}<small>${info[k]}</small></div><div class="cnt">${r.total}<small>caben</small></div><div class="sub">${r.cols} columnas × ${r.rows} filas${r.mounts>1?" × 2 montajes":""}${r.rot?" · girado 90°":""}</div><div class="sub r">${money(r.price)} · ${money(r.price/r.total)} c/u</div></div>`}).join("");
+  box.classList.remove("hide");
+}
+["input","click","change"].forEach(ev=>document.addEventListener(ev,()=>setTimeout(renderSheetFit,0)));
+renderSheetFit();
 function calculationDataReady(){
   const iw=num("itemW"),ih=(shape==="circle"||shape==="square")?iw:num("itemH");
   if(iw<=0||ih<=0)return false;
@@ -588,8 +613,6 @@ document.querySelectorAll(".quick button").forEach(b=>b.onclick=()=>{$("qty").va
 const syncLam=()=>document.querySelectorAll(".seg button").forEach(b=>b.classList.toggle("on",b.dataset.lam===$("laminated").value));
 document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{$("laminated").value=b.dataset.lam;syncLam();$("laminated").onchange()});
 /* más opciones abiertas si algo no está en automático */
-const keepOpen=()=>{if($("productionMode").value!=="auto"||$("calcMode").value!=="quantity")$("moreOptions").open=true};
-$("productionMode").addEventListener("change",keepOpen);$("calcMode").addEventListener("change",keepOpen);
 /* dibujo al abrir detalles */
 $("prodDetails").addEventListener("toggle",()=>{if($("prodDetails").open&&current)draw(current.best,current.q)});
 /* imprimir: mostrar todo */

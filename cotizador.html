@@ -2724,13 +2724,17 @@
 
           await persistQuoteReferenceImages(quote.id);
 
+          // V9.71: si la cotización ya tiene orden de producción, la orden se actualiza sola con lo que acabas de guardar.
+          let orderSynced=null;
+          try{const {data:syncData}=await cloud.rpc("sync_work_order_from_quote",{p_quote_id:quote.id});orderSynced=syncData||null}catch(syncError){console.warn("No se pudo actualizar la orden",syncError)}
+
           const { data: refreshed } = await cloud.from("quotes").select("quote_number,total").eq("id", quote.id).single();
           $("quoteNumber").value = refreshed?.quote_number || quote.quote_number;
           updatePreview();
           storageRemove(STORAGE_KEY);
           saveWorkingContext();
           setCloudStatus("Guardada ✓");
-          showToast(`Cotización ${$("quoteNumber").value} guardada`);
+          showToast(orderSynced?`Cotización ${$("quoteNumber").value} guardada · orden ${orderSynced} actualizada`:`Cotización ${$("quoteNumber").value} guardada`);
 
           if ($("includeReferences").checked && state.referenceImages.length) {
             showToast("Imágenes guardadas permanentemente con la cotización");

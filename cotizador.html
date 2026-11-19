@@ -3169,7 +3169,7 @@
         if(state.items.length===1&&isBlankQuoteItem(state.items[0]))state.items=[];state.items.push(item);
         if(payload.client&&!$("clientName").value.trim())$("clientName").value=String(payload.client);
         if(payload.imageData&&state.referenceImages.length<6){state.referenceImages.push({data:payload.imageData,caption:"Arte del adhesivo calculado",name:payload.imageName||"Arte del adhesivo"});$("includeReferences").checked=true}
-        renderItemEditors();renderReferenceEditors();updatePreview();showToast(payload.source==="large_format_calculator"?"Cálculo de gran formato agregado a la cotización":payload.source==="costing_calculator"?"Costeo agregado a la cotización":payload.source==="packaging_calculator"?"Caja agregada a la cotización":"Cálculo de stickers agregado a la cotización");return true;
+        renderItemEditors();renderReferenceEditors();updatePreview();showToast(payload.source==="large_format_calculator"?"Cálculo de gran formato agregado a la cotización":payload.source==="costing_calculator"?"Costeo agregado a la cotización":payload.source==="packaging_calculator"?"Caja agregada a la cotización":payload.source==="frames_calculator"?"Cuadro agregado a la cotización":"Cálculo de stickers agregado a la cotización");return true;
       }
 
       function validateBeforePrint({forPrint=false}={}) {
@@ -3614,7 +3614,7 @@
             url.searchParams.set("quote", state.currentQuoteId);
             window.history.replaceState({}, "", url);
           } else {
-            window.history.replaceState({}, "", calculatorTransfer?.source==="large_format_calculator"?"cotizador.html?from=gran-formato":"cotizador.html?from=stickers");
+            window.history.replaceState({}, "", calculatorTransfer?.source==="large_format_calculator"?"cotizador.html?from=gran-formato":calculatorTransfer?.source==="frames_calculator"?"cotizador.html?from=cuadros":"cotizador.html?from=stickers");
           }
           applyCalculatorTransfer(calculatorTransfer);
           clearCalculatorTransfer();

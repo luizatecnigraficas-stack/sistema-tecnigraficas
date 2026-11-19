@@ -1,0 +1,12 @@
+V9.73 · Calculadora de cuadros
+- Nueva en Herramientas: "Calculadora de cuadros" (calculadora-cuadros.html).
+- Tres tipos: retablo en MDF con vinilo laminado (rectangular o circular, mate/brillante
+  o efecto especial +25 %), lienzo en bastidor (pino chileno o corriente) y lona
+  laminada tensada en bastidor burdo.
+- Medidas de la lista: usa el precio de lista. Medidas nuevas: retablos se calculan
+  siguiendo la lista por área; lienzo y lona por costo × factor. Nunca baja de 2× el costo.
+- Muestra el costo interno (privado), la otra opción de precio y avisos (pino corriente
+  en tamaños grandes, travesaño desde 1 m, lámina de MDF).
+- Los costos por cm² se pueden ajustar en "Costos que usa la calculadora" (se guardan
+  en el dispositivo).
+- Agrega el cuadro a la cotización en curso o crea una nueva.

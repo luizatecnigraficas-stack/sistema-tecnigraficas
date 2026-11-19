@@ -1,0 +1,235 @@
+<!doctype html><html lang="es"><head><script src="reintentar.js"></script><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Tecni"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#191b22">
+<script src="avisos.js"></script><script src="quote-bridge.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Calculadora de Cuadros · Tecnigráficas</title>
+<style>
+:root{--ink:#202533;--muted:#667085;--line:#e4e7ec;--bg:#f4f7fb;--cyan:#12a8d7;--mag:#e50087;--ok:#0f8a67;--warn:#a45c00}*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,Arial,sans-serif;color:var(--ink)}body.auth-pending>*{visibility:hidden}.top{height:52px;background:#171a22;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-size:12px}.top a{color:#fff;text-decoration:none;border:1px solid #3a3f4c;border-radius:10px;padding:8px 11px}.head{padding:24px 5%;background:linear-gradient(115deg,#10a6d5,#6b55bb,#e50087);color:#fff}.head h1{margin:0;font-size:28px}.head p{margin:6px 0 0}.wrap{max-width:1500px;margin:20px auto;padding:0 18px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(380px,.9fr);gap:18px}.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 8px 30px #14213d0c}.sec{padding:15px 0;border-bottom:1px solid #eef1f5}.sec:last-child{border:0}.ttl{font-weight:900;margin-bottom:10px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}label{display:block;font-size:12px;font-weight:800;color:#344054}input,select,textarea{width:100%;margin-top:6px;border:1px solid #d0d5dd;border-radius:11px;padding:11px;background:#fff;font:inherit}textarea{min-height:78px;resize:vertical}.checks{display:flex;flex-wrap:wrap;gap:8px}.check{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;gap:8px;align-items:center;font-size:13px;font-weight:800;background:#fafbfc}.check input{width:auto;margin:0}.finish-box{margin-top:10px;border:1px solid #dfe6ef;border-radius:14px;padding:12px;background:#fbfcfe}.hide{display:none!important}.hint{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.45}.suggest{font-size:12px;color:var(--ok);font-weight:800;margin-top:7px}.actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}button{border:0;border-radius:11px;padding:11px 14px;font-weight:900;cursor:pointer}.primary{background:linear-gradient(100deg,var(--cyan),var(--mag));color:#fff}.secondary{background:#eef2f7;color:#202533}.outline{background:#fff;border:1px solid #ccd5e0}.hero{background:linear-gradient(135deg,#effaff,#fff1f9);border:1px solid #cfe9f4;border-radius:18px;padding:17px}.hero small{color:var(--muted);font-weight:800}.hero h2{font-size:31px;margin:5px 0}.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}.metric{background:#f8fafc;border:1px solid var(--line);border-radius:13px;padding:12px}.metric span{display:block;font-size:11px;color:var(--muted);font-weight:800}.metric b{display:block;font-size:19px;margin-top:4px}.breakdown{margin-top:13px;border:1px solid var(--line);border-radius:13px;overflow:hidden}.row{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-bottom:1px solid #eef1f5;font-size:13px}.row:last-child{border:0}.row.total{font-weight:900;background:#f8fafc}.price-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.price-box{border-radius:14px;padding:13px;border:1px solid var(--line)}.price-box strong{font-size:22px;display:block;margin-top:4px}.price-box.rec{background:#effbf7;border-color:#b9ead8}.quick{background:#fff7dd;border:1px solid #f2d98a;border-radius:16px;padding:14px;margin-top:15px}.structure-list{max-height:230px;overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:10px}.struct-row{padding:10px;border-bottom:1px solid #eef1f5;font-size:12px}.struct-row:last-child{border:0}.tag{display:inline-flex;padding:4px 7px;border-radius:999px;background:#eef6ff;color:#20558c;font-size:10px;font-weight:900}.quote-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}.notice{padding:10px 12px;border-radius:12px;background:#fff8e6;border:1px solid #f4d48b;font-size:12px;color:#724b00;margin-top:10px}@media(max-width:980px){.wrap{grid-template-columns:1fr}.g4{grid-template-columns:1fr 1fr}}@media(max-width:620px){.g2,.g3,.g4,.price-grid,.quote-actions{grid-template-columns:1fr}.head h1{font-size:23px}}
+
+/* V7.41 · vista compacta */
+.compact-measures{display:grid;grid-template-columns:150px 120px 120px 92px;gap:9px;align-items:end;max-width:620px}
+.compact-measures label{min-width:0}.compact-measures input,.compact-measures select{padding:9px 10px}
+.checks{gap:6px}.check{padding:8px 10px;border-radius:10px}
+.sec{padding:12px 0}.ttl{margin-bottom:8px}
+details.fold{border:1px solid var(--line);border-radius:14px;background:#fff;margin-top:12px;overflow:hidden}
+details.fold>summary{cursor:pointer;list-style:none;padding:12px 14px;font-weight:900;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fbfcfe}
+details.fold>summary::-webkit-details-marker{display:none}details.fold>summary:after{content:'＋';font-size:18px;color:#667085}details.fold[open]>summary:after{content:'−'}
+.fold-body{padding:12px 14px}.private-fold>summary{background:#fff7fb}.quick-fold>summary{background:#fffaf0}.structure-fold>summary{background:#f7fbff}
+.suggested-main{background:#effbf7;border:1px solid #b9ead8;border-radius:16px;padding:15px}.suggested-main .hint{margin-top:0}.suggested-main strong{display:block;font-size:30px;margin:5px 0}.right-stack{display:flex;flex-direction:column;gap:12px}
+.mini-price-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}.mini-price-grid .price-box{margin:0}
+#structureHistorySec{margin-top:10px}
+@media(max-width:760px){.compact-measures{grid-template-columns:90px 1fr 1fr 85px;max-width:none}.wrap{padding:0 10px}.card{padding:14px}}
+@media(max-width:520px){.compact-measures{grid-template-columns:1fr 1fr}.compact-measures label:first-child,.compact-measures label:last-child{max-width:none}}
+</style>
+<style>
+/* V9.73 · Calculadora de cuadros */
+.types{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.type-btn{border:1.5px solid #d0d5dd;background:#fff;border-radius:14px;padding:12px;text-align:left;cursor:pointer;font:inherit;color:var(--ink)}
+.type-btn b{display:block;font-size:14px}.type-btn span{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+.type-btn[aria-pressed="true"]{border-color:var(--mag);background:#fff2f9;box-shadow:0 0 0 2px #e5008722}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{border:1px solid #d0d5dd;background:#fbfcfe;border-radius:999px;padding:6px 11px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;color:#344054}
+.chip:hover{border-color:var(--cyan)}
+.warnbox{margin-top:10px;padding:10px 12px;border-radius:12px;background:#fff8e6;color:#8a5300;border:1px solid #f2d79b;font-size:13px;line-height:1.4}
+.okbox{margin-top:10px;padding:10px 12px;border-radius:12px;background:#e8f7f1;color:#0f6046;border:1px solid #b9e5d2;font-size:13px;line-height:1.4}
+.ref-table{width:100%;border-collapse:collapse;font-size:13px}
+.ref-table th,.ref-table td{padding:6px 4px;border-bottom:1px solid #eef1f5;text-align:right}
+.ref-table th:first-child,.ref-table td:first-child{text-align:left}
+.ref-table th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.alt-price{display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:14px}
+@media(max-width:640px){.types{grid-template-columns:1fr}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script></head>
+<body class="auth-pending"><div class="top"><strong>Sistema Tecnigráficas · Cuadros</strong><div><a href="index.html">← Volver al sistema</a></div></div>
+<header class="head"><h1>Calculadora de Cuadros</h1><p>Retablos en MDF, lienzos en bastidor y lona tensada, en cualquier medida.</p></header>
+<div class="wrap"><section class="card">
+
+<div class="sec"><div class="ttl">1. Tipo de cuadro</div>
+<div class="types" role="group" aria-label="Tipo de cuadro">
+<button type="button" class="type-btn" data-type="retablo" aria-pressed="true"><b>Retablo en MDF</b><span>Vinilo laminado mate o brillante</span></button>
+<button type="button" class="type-btn" data-type="lienzo" aria-pressed="false"><b>Lienzo en bastidor</b><span>Canvas tensado, pino chileno o corriente</span></button>
+<button type="button" class="type-btn" data-type="lona" aria-pressed="false"><b>Lona tensada</b><span>Lona laminada en bastidor burdo</span></button>
+</div>
+<div id="retabloOpts" class="g2" style="margin-top:12px">
+<label>Forma<select id="shape"><option value="rect">Rectangular / cuadrado</option><option value="circle">Circular</option></select></label>
+<label>Acabado<select id="finish"><option value="normal">Mate o brillante</option><option value="special">Escarchado, holográfico o 3D (+25 %)</option></select></label>
+</div>
+<div id="lienzoOpts" class="g2 hide" style="margin-top:12px">
+<label>Madera del bastidor<select id="wood"><option value="chileno">Pino chileno (recomendado)</option><option value="corriente">Pino corriente</option></select></label>
+</div>
+</div>
+
+<div class="sec"><div class="ttl">2. Medidas</div>
+<div class="compact-measures" id="rectMeasures"><label>Unidad<select id="unit"><option value="cm">cm</option><option value="m">m</option></select></label><label>Base<input id="w" type="number" min="0" placeholder="70" step="any" inputmode="decimal"></label><label>Altura<input id="h" type="number" min="0" placeholder="50" step="any" inputmode="decimal"></label><label>Cantidad<input id="qty" type="number" min="1" value="1" step="any" inputmode="decimal"></label></div>
+<div class="compact-measures hide" id="circleMeasures"><label>Diámetro (cm)<input id="diam" type="number" min="0" placeholder="30" step="any" inputmode="decimal"></label><label>Cantidad<input id="qtyC" type="number" min="1" value="1" step="any" inputmode="decimal"></label></div>
+<div class="chips" id="sizeChips"></div>
+<div id="sizeWarn"></div>
+</div>
+
+<div class="sec"><div class="ttl">3. Diseño</div><div class="g2"><label>Servicio de diseño<select id="design"><option value="0" selected>Archivo o foto lista · $0</option><option value="15000">Arreglos sencillos · $15.000</option><option value="30000">Diseño estándar · $30.000</option><option value="manual">Diseño especial · valor manual</option></select></label><label id="designManualWrap" class="hide">Valor diseño<input id="designManual" type="number" min="0" value="30000" step="any" inputmode="decimal"></label></div></div>
+
+<div class="sec"><div class="ttl">4. Precio final</div><div class="g2"><label>Precio final al cliente (total)<input id="finalPrice" type="number" min="0" placeholder="Si lo dejas vacío se usa el sugerido" step="any" inputmode="decimal"></label><label>Observaciones<textarea id="notes" placeholder="Foto del cliente, entrega, detalles del trabajo..."></textarea></label></div><div class="actions"><button class="secondary" id="reset" type="button">Limpiar</button></div></div>
+</section>
+
+<section class="card"><div class="right-stack">
+<div class="suggested-main"><span class="hint" id="suggestedLabel">Precio sugerido al cliente</span><strong id="suggestedPrice">$ 0</strong><div class="hint" id="referenceText">Escribe las medidas para calcular.</div><div id="altPrices"></div></div>
+
+<details class="fold private-fold" id="costDetails"><summary>🔒 Ver costo interno y desglose</summary><div class="fold-body">
+<div class="hero"><small>Costo interno estimado</small><h2 id="costTotal">$ 0</h2><div class="tag" id="areaTag">0 cm²</div>
+<div class="metrics"><div class="metric"><span>Área por unidad</span><b id="areaOne">0 cm²</b></div><div class="metric"><span>Veces el costo</span><b id="marginX">—</b></div></div></div>
+<div class="breakdown" id="breakdown"></div>
+<div class="notice"><strong>Privado:</strong> costos internos. El precio sugerido nunca baja de 2 veces el costo.</div>
+</div></details>
+
+<details class="fold" id="ratesDetails"><summary>⚙️ Costos que usa la calculadora</summary><div class="fold-body">
+<div class="hint" style="margin-top:0">Si un proveedor sube precios, cámbialos aquí. Se guardan en este dispositivo.</div>
+<div class="ttl" style="margin-top:12px">Retablo (por cm²)</div>
+<div class="g3"><label>MDF 9 mm<input id="rMdf" type="number" step="any" inputmode="decimal"></label><label>Vinilo laminado<input id="rVin" type="number" step="any" inputmode="decimal"></label><label>Mano de obra<input id="rMo" type="number" step="any" inputmode="decimal"></label></div>
+<div class="ttl" style="margin-top:12px">Lienzo</div>
+<div class="g4"><label>Lienzo impreso /cm²<input id="lCanvas" type="number" step="any" inputmode="decimal"></label><label>Mano de obra /cm²<input id="lMo" type="number" step="any" inputmode="decimal"></label><label>Pino chileno /cm contorno<input id="lChileno" type="number" step="any" inputmode="decimal"></label><label>Pino corriente /cm contorno<input id="lCorriente" type="number" step="any" inputmode="decimal"></label></div>
+<div class="g2" style="margin-top:11px"><label>Factor lienzo (veces el costo)<input id="lFactor" type="number" step="any" inputmode="decimal"></label></div>
+<div class="ttl" style="margin-top:12px">Lona tensada</div>
+<div class="g4"><label>Lona laminada /m²<input id="nLona" type="number" step="any" inputmode="decimal"></label><label>Bastidor burdo /cm contorno<input id="nBast" type="number" step="any" inputmode="decimal"></label><label>Mano de obra /cm²<input id="nMo" type="number" step="any" inputmode="decimal"></label><label>Factor (veces el costo)<input id="nFactor" type="number" step="any" inputmode="decimal"></label></div>
+<div class="actions"><button class="outline" id="resetRates" type="button">Volver a los valores iniciales</button></div>
+</div></details>
+
+<details class="fold" id="listDetails"><summary>📋 Lista de precios de referencia</summary><div class="fold-body" id="priceList"></div></details>
+
+<div data-quote-bridge></div><div class="quote-actions"><button class="outline" id="appendQuote" type="button">＋ Agregar a cotización en curso</button><button class="primary" id="newQuote" type="button">Crear nueva cotización</button></div>
+</div></section></div>
+
+<script>
+const SUPABASE_URL="https://kqrfcdfygskzhsdzzcze.supabase.co",SUPABASE_KEY="sb_publishable_KfkIr6TlW6ivuT5cD0g9Kg_EuZwDKJ9",db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id),num=id=>Number($(id).value||0),money=v=>new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(Number(v||0)),roundThousand=v=>Math.round(Number(v||0)/1000)*1000,fmt=v=>new Intl.NumberFormat('es-CO',{maximumFractionDigits:0}).format(v);
+
+/* Lista oficial (Precios/Lista-precios-retablos, nov 2026) */
+const RETABLO_LIST=[[10,15,10000],[13,18,12000],[15,20,15000],[20,25,20000],[20,30,22000],[25,35,27000],[30,40,32000],[30,50,36000],[40,50,40000],[40,60,45000],[50,70,55000],[70,100,100000]];
+const RETABLO_CIRCLE=[[25,25000],[30,30000]];
+const LIENZO_LIST=[[20,30,18000,35000],[30,30,24000,42000],[30,40,31000,52000],[40,50,46000,72000],[40,60,54000,84000],[50,50,55000,85000],[50,70,74000,108000],[60,90,107000,150000],[70,100,null,215000],[80,120,null,260000],[100,150,null,320000]];
+const SPECIAL=1.25,MIN_X=2,CIRCLE_X=1.1;
+const DEFAULT_RATES={rMdf:3,rVin:2.8,rMo:1.2,lCanvas:5.5,lMo:1.2,lChileno:110,lCorriente:42,lFactor:2.2,nLona:25000,nBast:120,nMo:1.2,nFactor:2};
+const RATE_KEY='tecniCuadrosRatesV1';
+let type='retablo';
+
+function loadRates(){let saved={};try{saved=JSON.parse(localStorage.getItem(RATE_KEY)||'{}')||{}}catch(e){}Object.keys(DEFAULT_RATES).forEach(k=>{$(k).value=saved[k]!=null?saved[k]:DEFAULT_RATES[k]})}
+function saveRates(){const o={};Object.keys(DEFAULT_RATES).forEach(k=>o[k]=num(k));try{localStorage.setItem(RATE_KEY,JSON.stringify(o))}catch(e){}}
+function rate(k){const v=num(k);return v>0?v:DEFAULT_RATES[k]}
+
+function sameSize(a,b,w,h){return (Math.round(w)===a&&Math.round(h)===b)||(Math.round(w)===b&&Math.round(h)===a)}
+/* Interpola el precio de lista por área (para que las medidas nuevas queden coherentes con la lista) */
+function retabloListPrice(area){const pts=RETABLO_LIST.map(([a,b,p])=>[a*b,p]).sort((x,y)=>x[0]-y[0]);if(area<=pts[0][0])return pts[0][1];for(let i=1;i<pts.length;i++){if(area<=pts[i][0]){const [a0,p0]=pts[i-1],[a1,p1]=pts[i];return p0+(p1-p0)*(area-a0)/(a1-a0)}}const [aL,pL]=pts[pts.length-1];return pL/aL*area}
+
+function dims(){if(type==='retablo'&&$('shape').value==='circle'){const d=num('diam');return{w:d,h:d,circle:true,d}}let w=num('w'),h=num('h');if($('unit').value==='m'){w*=100;h*=100}return{w,h,circle:false}}
+function qty(){return Math.max(1,(type==='retablo'&&$('shape').value==='circle')?num('qtyC')||1:num('qty')||1)}
+function designValue(){return $('design').value==='manual'?num('designManual'):Number($('design').value)}
+
+function calc(){
+  const d=dims(),q=qty(),design=designValue();
+  const res={d,q,design,ok:d.w>0&&d.h>0,parts:[],warn:'',note:'',alts:[]};
+  if(!res.ok)return res;
+  const area=d.circle?Math.PI*(d.d/2)**2:d.w*d.h,perim=d.circle?Math.PI*d.d:2*(d.w+d.h);
+  res.area=area;
+  if(type==='retablo'){
+    const sq=d.circle?d.d*d.d:area; /* el círculo se corta de una lámina cuadrada */
+    const mdf=sq*rate('rMdf'),vin=sq*rate('rVin'),mo=sq*rate('rMo');
+    res.cost=mdf+vin+mo;res.parts=[['MDF 9 mm'+(d.circle?' (lámina cuadrada)':''),mdf],['Vinilo laminado',vin],['Mano de obra',mo]];
+    let base,src;
+    const listC=d.circle&&RETABLO_CIRCLE.find(([dd])=>Math.round(d.d)===dd);
+    const listR=!d.circle&&RETABLO_LIST.find(([a,b])=>sameSize(a,b,d.w,d.h));
+    if(listC){base=listC[1];src='Precio de lista'}
+    else if(listR){base=listR[2];src='Precio de lista'}
+    else{base=retabloListPrice(sq)*(d.circle?CIRCLE_X:1);src='Calculado a partir de la lista'}
+    if(base<res.cost*MIN_X){base=res.cost*MIN_X;src='Ajustado a 2 veces el costo'}
+    const normal=roundThousand(base),special=roundThousand(base*SPECIAL);
+    const isSpecial=$('finish').value==='special';
+    res.unit=isSpecial?special:normal;
+    res.label=`Retablo en MDF${d.circle?' circular':''} con vinilo laminado ${isSpecial?'efecto especial (escarchado, holográfico o 3D)':'mate o brillante'}`;
+    res.note=src+(isSpecial?' · +25 % por efecto especial':'');
+    res.alts=[[isSpecial?'Mate o brillante':'Con efecto especial',isSpecial?normal:special]];
+    if(isSpecial)res.note+=' · recargo pendiente de confirmar con el costo real del vinilo';
+    if(Math.max(d.w,d.h)>244||Math.min(d.w,d.h)>122)res.warn='Ojo: pasa del tamaño de una lámina de MDF (122 × 244 cm). Hay que unir piezas o cotizar aparte.';
+  }else if(type==='lienzo'){
+    const wood=$('wood').value,woodRate=wood==='chileno'?rate('lChileno'):rate('lCorriente');
+    const canvas=area*rate('lCanvas'),mo=area*rate('lMo'),frame=perim*woodRate;
+    res.cost=canvas+mo+frame;res.parts=[['Lienzo impreso',canvas],['Mano de obra',mo],['Bastidor pino '+wood+' · '+fmt(perim)+' cm de contorno',frame]];
+    const list=LIENZO_LIST.find(([a,b])=>sameSize(a,b,d.w,d.h));
+    const otherRate=wood==='chileno'?rate('lCorriente'):rate('lChileno');
+    const otherCost=canvas+mo+perim*otherRate;
+    let base,src;
+    const listPrice=list?(wood==='chileno'?list[3]:list[2]):null;
+    if(listPrice){base=listPrice;src='Precio de lista'}else{base=res.cost*rate('lFactor');src=`Calculado: ${String(rate('lFactor')).replace('.',',')} veces el costo`}
+    if(base<res.cost*MIN_X){base=res.cost*MIN_X;src='Ajustado a 2 veces el costo'}
+    res.unit=roundThousand(base);
+    res.label=`Cuadro en lienzo con bastidor en pino ${wood}`;
+    res.note=src;
+    const otherList=list?(wood==='chileno'?list[2]:list[3]):null;
+    res.alts=[[wood==='chileno'?'En pino corriente':'En pino chileno (recomendado)',roundThousand(otherList||otherCost*rate('lFactor'))]];
+    if(wood==='corriente'&&(Math.max(d.w,d.h)>90||area>5400))res.warn='Recomendamos pino chileno de 60 × 90 para arriba: el pino corriente se puede torcer en tamaños grandes.';
+    if(Math.max(d.w,d.h)>=100)res.warn=(res.warn?res.warn+' ':'')+'Desde 1 m de lado conviene preguntar si el bastidor lleva travesaño (sube el costo).';
+  }else{
+    const lona=area/10000*rate('nLona'),frame=perim*rate('nBast'),mo=area*rate('nMo');
+    res.cost=lona+frame+mo;res.parts=[['Lona laminada · '+(area/10000).toFixed(2).replace('.',',')+' m²',lona],['Bastidor burdo · '+fmt(perim)+' cm de contorno',frame],['Mano de obra (tensado)',mo]];
+    res.unit=roundThousand(Math.max(res.cost*rate('nFactor'),res.cost*MIN_X));
+    res.label='Lona laminada tensada en bastidor de madera';
+    res.note=`Calculado: ${String(Math.max(rate('nFactor'),MIN_X)).replace('.',',')} veces el costo`;
+    if(Math.max(d.w,d.h)>=100)res.warn='Desde 1 m de lado confirma con la señora de la madera si lleva travesaño (sube el costo).';
+  }
+  res.suggested=res.unit*q+design;
+  res.final=num('finalPrice')>0?num('finalPrice'):res.suggested;
+  res.totalCost=res.cost*q+design;
+  return res;
+}
+
+function render(){
+  const r=calc();
+  $('suggestedPrice').textContent=money(r.ok?r.suggested:0);
+  $('suggestedLabel').textContent=r.ok&&r.q>1?`Precio sugerido · ${fmt(r.q)} unidades`:'Precio sugerido al cliente';
+  $('referenceText').textContent=r.ok?(r.q>1?`${money(r.unit)} c/u · `:'')+r.note+(r.design?` · incluye diseño ${money(r.design)}`:''):'Escribe las medidas para calcular.';
+  $('altPrices').innerHTML=r.ok?r.alts.map(([k,v])=>`<div class="alt-price"><span class="hint" style="margin:0">${k}</span><b>${money(v)} c/u</b></div>`).join(''):'';
+  $('sizeWarn').innerHTML=r.ok&&r.warn?`<div class="warnbox">${r.warn}</div>`:'';
+  $('costTotal').textContent=money(r.ok?r.totalCost:0);
+  $('areaOne').textContent=r.ok?fmt(r.area)+' cm²':'0 cm²';
+  $('areaTag').textContent=r.ok?`${fmt(r.d.w)} × ${fmt(r.d.h)} cm${r.d.circle?' (Ø)':''}`:'Sin medidas';
+  $('marginX').textContent=r.ok&&r.cost?(r.unit/r.cost).toFixed(1).replace('.',',')+'×':'—';
+  $('breakdown').innerHTML=r.ok?r.parts.map(([k,v])=>`<div class="struct-row"><strong>${k}</strong><br><span class="hint">${money(v)} por unidad</span></div>`).join(''):'';
+  return r;
+}
+
+function chips(){
+  let list=[];
+  if(type==='retablo'&&$('shape').value==='circle')list=RETABLO_CIRCLE.map(([d])=>({t:'Ø '+d,set:()=>{$('diam').value=d}}));
+  else if(type==='retablo')list=RETABLO_LIST.map(([a,b])=>({t:`${a}×${b}`,set:()=>{$('unit').value='cm';$('w').value=a;$('h').value=b}}));
+  else if(type==='lienzo')list=LIENZO_LIST.map(([a,b])=>({t:`${a}×${b}`,set:()=>{$('unit').value='cm';$('w').value=a;$('h').value=b}}));
+  else list=[[100,100],[100,150],[150,200]].map(([a,b])=>({t:`${a}×${b}`,set:()=>{$('unit').value='cm';$('w').value=a;$('h').value=b}}));
+  $('sizeChips').innerHTML='';
+  list.forEach(c=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=c.t;b.onclick=()=>{c.set();render()};$('sizeChips').appendChild(b)});
+}
+
+function priceList(){
+  const ret=RETABLO_LIST.map(([a,b,p])=>`<tr><td>${a} × ${b}</td><td>${money(p)}</td><td>${money(roundThousand(p*SPECIAL))}</td></tr>`).join('')+RETABLO_CIRCLE.map(([d,p])=>`<tr><td>Circular Ø ${d}</td><td>${money(p)}</td><td>${money(roundThousand(p*SPECIAL))}</td></tr>`).join('');
+  const lie=LIENZO_LIST.map(([a,b,c,ch])=>`<tr><td>${a} × ${b}</td><td>${c?money(c):'Solo chileno'}</td><td>${money(ch)}</td></tr>`).join('');
+  $('priceList').innerHTML=`<div class="ttl">Retablos en MDF</div><table class="ref-table"><thead><tr><th>Medida (cm)</th><th>Mate o brillante</th><th>Efecto especial</th></tr></thead><tbody>${ret}</tbody></table><div class="ttl" style="margin-top:16px">Lienzos en bastidor</div><table class="ref-table"><thead><tr><th>Medida (cm)</th><th>Pino corriente</th><th>Pino chileno</th></tr></thead><tbody>${lie}</tbody></table>`;
+}
+
+function setType(t){
+  type=t;document.querySelectorAll('.type-btn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.type===t)));
+  $('retabloOpts').classList.toggle('hide',t!=='retablo');$('lienzoOpts').classList.toggle('hide',t!=='lienzo');
+  const circle=t==='retablo'&&$('shape').value==='circle';
+  $('rectMeasures').classList.toggle('hide',circle);$('circleMeasures').classList.toggle('hide',!circle);
+  chips();render();
+}
+
+function description(r){
+  const size=r.d.circle?`Ø ${fmt(r.d.d)} cm`:`${fmt(r.d.w)} × ${fmt(r.d.h)} cm`;
+  const ps=[size];if(r.design)ps.push(`Incluye diseño: ${money(r.design)}`);if($('notes').value.trim())ps.push($('notes').value.trim());return ps.join(' · ');
+}
+function transfer(mode){const r=render();if(!r.ok)return alert('Escribe las medidas del cuadro.');TecniQuote.send({source:'frames_calculator',quantity:r.q,unit:'Unidad',detail:r.label,description:description(r),unitPrice:r.final/r.q,total:r.final,suggestedUnitPrice:r.suggested/r.q,unitCost:r.totalCost/r.q},mode,'cuadros')}
+
+document.querySelectorAll('.type-btn').forEach(b=>b.addEventListener('click',()=>setType(b.dataset.type)));
+$('shape').addEventListener('change',()=>setType(type));
+['w','h','qty','diam','qtyC','unit','finish','wood','finalPrice','notes','designManual'].forEach(id=>$(id).addEventListener('input',render));
+$('design').addEventListener('input',()=>{$('designManualWrap').classList.toggle('hide',$('design').value!=='manual');render()});
+Object.keys(DEFAULT_RATES).forEach(k=>$(k).addEventListener('input',()=>{saveRates();render()}));
+$('resetRates').onclick=()=>{try{localStorage.removeItem(RATE_KEY)}catch(e){}loadRates();render()};
+$('reset').onclick=()=>location.reload();
+$('appendQuote').onclick=()=>transfer('append');$('newQuote').onclick=()=>transfer('new');
+loadRates();priceList();setType('retablo');
+(async()=>{const {data:{session:s}}=await db.auth.getSession();if(!s){location.replace('index.html');return}document.body.classList.remove('auth-pending')})();
+</script></body></html>

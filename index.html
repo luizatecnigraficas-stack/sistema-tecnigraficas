@@ -3946,6 +3946,31 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
     }
     try{$("workOrderMakeImage")?.addEventListener("click",woShareImage)}catch(e){}
 
+    // V9.67: Producción en vivo (Realtime): lo que mueve una persona se ve en las demás pantallas sin refrescar
+    let woRT=null,woRTTimer=null;
+    function woRTRefresh(){
+      clearTimeout(woRTTimer);
+      woRTTimer=setTimeout(async function run(){
+        try{
+          if(!state.session||!$("view-production")?.classList.contains("active"))return;
+          if(woD.on||woD.pan){woRTTimer=setTimeout(run,1500);return}
+          const body=$("productionBody"),left=body?body.scrollLeft:0,tops={};
+          body?.querySelectorAll("[data-col]").forEach(c=>{const l=c.querySelector(".wo-list,.wo-cards,.wo-col-body")||c;tops[c.dataset.col]=l.scrollTop});
+          await loadProduction();
+          const b2=$("productionBody");if(b2){b2.scrollLeft=left;b2.querySelectorAll("[data-col]").forEach(c=>{const l=c.querySelector(".wo-list,.wo-cards,.wo-col-body")||c;if(tops[c.dataset.col])l.scrollTop=tops[c.dataset.col]})}
+        }catch(e){}
+      },700);
+    }
+    function woRTStart(){
+      if(woRT||!state.session)return;
+      try{
+        woRT=db.channel("produccion-en-vivo");
+        ["work_orders","work_order_items","production_tasks","production_boards"].forEach(t=>woRT.on("postgres_changes",{event:"*",schema:"public",table:t},woRTRefresh));
+        woRT.subscribe(st=>{if(st==="SUBSCRIBED"&&woRT.__was)woRTRefresh();if(st==="SUBSCRIBED")woRT.__was=true});
+      }catch(e){woRT=null}
+    }
+    document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&woRT)woRTRefresh()});
+    db.auth.onAuthStateChange((_e,s)=>{if(!s&&woRT){try{db.removeChannel(woRT)}catch(e){}woRT=null}});
     // V9.09: venta rápida, comprobantes y niveles de acceso
     function financePermsInstalled(){return state.permissions instanceof Map&&state.permissions.has("finance.view")}
     function supportsEnabled(){return financePermsInstalled()}
@@ -4473,7 +4498,7 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       const ids=state.workOrders.filter(o=>o.status!=="cancelled").map(o=>o.id);state.productionItems=[];for(let i=0;i<ids.length;i+=150){const r=await db.from("work_order_items").select("work_order_id,quantity,unit,description,sort_order").in("work_order_id",ids.slice(i,i+150)).order("sort_order");if(!r.error)state.productionItems.push(...(r.data||[]))}
       const [bRes,tRes]=await Promise.all([db.from("production_boards").select("*").order("created_at"),db.from("production_tasks").select("*").order("created_at")]);
       state.prodMissing=!!(bRes.error||tRes.error);state.prodBoards=bRes.error?[]:(bRes.data||[]);state.prodTasks=tRes.error?[]:(tRes.data||[]).map(t=>(t.__task=true,t));
-      renderProduction();woLoadActivity()
+      renderProduction();woLoadActivity();woRTStart()
     }
     const WO_COLS=[{k:"todo",t:"📝 Pendientes",st:[],help:"Tareas y cosas por hacer"},{k:"design",t:"🎨 Por diseñar",st:["pending_design"],help:"Hay que hacer o ajustar el arte"},{k:"client",t:"✏️ En diseño",st:["waiting_approval"],help:"Ya le mandamos el diseño"},{k:"approved",t:"👍 Aprobado",st:["approved"],help:"El cliente aprobó, falta producir"},{k:"pause",t:"⏸️ En pausa",st:["paused"],help:"Esperando algo, sin afán"},{k:"doing",t:"🖨 En producción",st:["in_production","finishing"],help:"Impresión y acabados"},{k:"ready",t:"📦 Listo para entregar",st:["ready"],help:"Solo falta entregarlo"},{k:"done",t:"✅ Entregado",st:["delivered"],help:"Últimos 7 días"}];
     const WO_NEXT={paused:"pending_design",pending_design:"waiting_approval",waiting_approval:"approved",approved:"in_production",in_production:"ready",finishing:"ready",ready:"delivered"},WO_PREV={waiting_approval:"pending_design",approved:"waiting_approval",in_production:"approved",finishing:"in_production",ready:"in_production",delivered:"ready"};

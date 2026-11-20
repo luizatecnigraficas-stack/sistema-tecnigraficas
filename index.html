@@ -425,6 +425,7 @@
     .df-att{display:flex;align-items:center;gap:10px;padding:8px 10px;border-top:1px solid var(--line);background:#fffbe6;font-size:14px}
     .df-att img{width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
     .df-att span{flex:1}.df-att button{border:0;background:none;font-size:22px;cursor:pointer;color:#952635}
+    .df-pdf{font-weight:800;margin-bottom:4px}
     .df-msg.me img{display:block;max-width:100%;max-height:220px;border-radius:10px;margin-bottom:6px}
     @media(max-width:650px){.df-fab span{display:none}.df-fab{padding:6px}.df-panel{right:6px;bottom:6px;width:calc(100vw - 12px);height:calc(100vh - 12px)}}
     /* V9.29 Proveedores: lo que debemos */
@@ -3340,12 +3341,26 @@
     try{wireSuppliersPay()}catch(e){console.error("Proveedores",e)}
 
     // V9.30: Asistente Don Fer (consulta datos con los permisos de quien pregunta)
-    const df={msgs:[],busy:false,pending:null,img:null};
+    const df={msgs:[],busy:false,pending:null,img:null,pdfName:"",pdfText:""};
     // V9.33: Don Fer lee fotos (listas de precios, facturas). Se achica a 1600 px en JPEG antes de enviar.
     function dfShrink(file){return new Promise((ok,bad)=>{if(!file||!/^image\//.test(file.type))return bad(new Error("Ese archivo no es una imagen."));const url=URL.createObjectURL(file),im=new Image();im.onload=()=>{const k=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(url);ok(c.toDataURL("image/jpeg",.85))};im.onerror=()=>{URL.revokeObjectURL(url);bad(new Error("No pude abrir esa imagen."))};im.src=url})}
-    async function dfSetImg(file){try{df.img=await dfShrink(file);$("dfAttImg").src=df.img;$("dfAtt").classList.remove("hidden");$("dfInput").placeholder="Dile qué hago con la foto…";$("dfInput").focus()}catch(e){showToast(e.message)}}
-    function dfClearImg(){df.img=null;$("dfAtt").classList.add("hidden");$("dfFile").value="";$("dfInput").placeholder="Escribe tu pregunta…"}
-    const dfSugs=["¿Cuántos stickers de 5x5 salen en un pliego Lite?","¿Cuánto nos cobró el herrero por el último rompetráfico?","¿Cuánto le debemos a proveedores?","Regístrame un egreso de $8.000 en efectivo por un domicilio","Hazme una cotización de 1.000 volantes media carta para Arquidiócesis","¿Qué hay atrasado en Producción?","📎 Mándame una foto de una lista de precios y la cargo a Cartera"];
+    async function dfSetImg(file){if(file&&(file.type==="application/pdf"||/\.pdf$/i.test(file.name||"")))return dfSetPdf(file);try{const im=await dfShrink(file);dfClearImg();df.img=im;$("dfAttImg").src=df.img;$("dfAttTxt").textContent="Foto lista para enviar";$("dfAtt").classList.remove("hidden");$("dfInput").placeholder="Dile qué hago con la foto…";$("dfInput").focus()}catch(e){showToast(e.message)}}
+    // V9.70: Don Fer lee PDFs (ej. RUT de la DIAN → crea el cliente). La hoja 1 va como foto y el texto de las hojas 1–3 va escondido en el mensaje.
+    let dfPdfLib=null;
+    function dfPdfJs(){return dfPdfLib||(dfPdfLib=new Promise((ok,bad)=>{if(window.pdfjsLib)return ok(window.pdfjsLib);const sc=document.createElement("script");sc.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";sc.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";ok(pdfjsLib)};sc.onerror=()=>{dfPdfLib=null;bad(new Error("No pude cargar el lector de PDF. Revisa tu internet."))};document.head.appendChild(sc)}))}
+    async function dfSetPdf(file){
+      if(file.size>8*1024*1024)return showToast("Ese PDF pesa mucho. Manda solo la hoja del RUT o una foto.");
+      $("dfAttTxt").textContent="Leyendo el PDF…";$("dfAttImg").removeAttribute("src");$("dfAtt").classList.remove("hidden");
+      try{const L=await dfPdfJs(),pdf=await L.getDocument({data:await file.arrayBuffer()}).promise;
+        const pg=await pdf.getPage(1),v0=pg.getViewport({scale:1}),k=Math.min(3,2000/Math.max(v0.width,v0.height)),v=pg.getViewport({scale:k}),c=document.createElement("canvas");c.width=Math.round(v.width);c.height=Math.round(v.height);const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:x,viewport:v}).promise;
+        let txt="";for(let n=1;n<=Math.min(3,pdf.numPages);n++){const tc=await (await pdf.getPage(n)).getTextContent();txt+=(n>1?"\n[Hoja "+n+"] ":"")+tc.items.map(t=>t.str).join(" ")}
+        dfClearImg();df.img=c.toDataURL("image/jpeg",.85);df.pdfName=file.name||"documento.pdf";df.pdfText=txt.replace(/\s+/g," ").trim();
+        $("dfAttImg").src=df.img;$("dfAttTxt").textContent="📄 "+df.pdfName;$("dfAtt").classList.remove("hidden");$("dfInput").placeholder="Ej.: créame este cliente con el RUT";$("dfInput").focus();
+      }catch(e){dfClearImg();showToast(e.message||"No pude leer ese PDF.")}
+    }
+    const DF_RUT="[Nota del sistema: si el adjunto es un RUT de la DIAN, es para crear el cliente. Datos: NIT (casilla 5) y DV (6) → documento NIT-DV con tipo_documento NIT; casilla 24 jurídica = empresa, natural = persona; razón social (35) o nombres y apellidos (31-34) en Nombres Apellidos con mayúscula inicial; dirección (41), municipio (40), correo (42), teléfono (44/45). En notas: 'Datos del RUT', nombre comercial (36), actividad principal (46, CIIU), responsabilidades (53) y representante legal. Primero busca en clients por el NIT (9 dígitos) o el nombre: si ya existe, propón cliente_editar solo con lo que falte; si no, cliente_nuevo. Si algo no se lee, déjalo vacío y avísame; no inventes. Usa el texto de abajo para los números y la foto para ubicar las casillas.]";
+    function dfClearImg(){df.img=null;df.pdfName="";df.pdfText="";$("dfAtt").classList.add("hidden");$("dfFile").value="";$("dfInput").placeholder="Escribe tu pregunta…"}
+    const dfSugs=["¿Cuántos stickers de 5x5 salen en un pliego Lite?","¿Cuánto nos cobró el herrero por el último rompetráfico?","¿Cuánto le debemos a proveedores?","Regístrame un egreso de $8.000 en efectivo por un domicilio","Hazme una cotización de 1.000 volantes media carta para Arquidiócesis","¿Qué hay atrasado en Producción?","📎 Mándame una foto de una lista de precios y la cargo a Cartera","📎 Mándame el RUT (PDF o foto) y creo el cliente"];
     function dfFormat(t){return escapeHTML(t).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/^#{1,3} (.+)$/gm,"<strong>$1</strong>").replace(/^[-*] /gm,"• ").replace(/(https:\/\/sistema\.sastecnigraficas\.com\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:#0b6f93;font-weight:800">📄 Abrir</a>')}
     // V9.51: la conversación de Don Fer se guarda en el navegador y avisa si hay tarjetas sin confirmar
     const dfKey=()=>"donfer:"+(state.session?.user?.id||"anon");let dfLoaded=false;
@@ -3359,14 +3374,14 @@
       dfSave();dfBadge();
       const box=$("dfMsgs");
       box.innerHTML=(df.msgs.length?"":`<div class="df-msg bot">¡Hola${state.profile?.full_name?" "+escapeHTML(String(state.profile.full_name).split(" ")[0]):""}! 👋 Soy Don Fer. Pregúntame lo que necesites del sistema.</div><div class="df-sugs">${dfSugs.map(q=>`<button type="button" data-df-q="${escapeHTML(q)}">${escapeHTML(q)}</button>`).join("")}</div>`)
-        +df.msgs.map((m,i)=>m.card?`<div class="df-card${m.card.state?" done":""}">${escapeHTML(m.card.resumen)}${m.card.state?`<div class="df-acts"><small>${m.card.state==="ok"?"✅ Confirmado":"✖ Cancelado"}</small></div>`:`<div class="df-acts"><button type="button" class="ok" data-df-ok="${i}">✅ Confirmar</button><button type="button" class="no" data-df-no="${i}">Cancelar</button></div>`}</div>`:`<div class="df-msg ${m.role==="user"?"me":m.error?"err":"bot"}">${m.role==="user"?(m.img?`<img src="${m.img}" alt="Foto adjunta" />`:"")+escapeHTML(m.content):dfFormat(m.content)}</div>`).join("")
+        +df.msgs.map((m,i)=>m.card?`<div class="df-card${m.card.state?" done":""}">${escapeHTML(m.card.resumen)}${m.card.state?`<div class="df-acts"><small>${m.card.state==="ok"?"✅ Confirmado":"✖ Cancelado"}</small></div>`:`<div class="df-acts"><button type="button" class="ok" data-df-ok="${i}">✅ Confirmar</button><button type="button" class="no" data-df-no="${i}">Cancelar</button></div>`}</div>`:`<div class="df-msg ${m.role==="user"?"me":m.error?"err":"bot"}">${m.role==="user"?(m.pdfName?`<div class="df-pdf">📄 ${escapeHTML(m.pdfName)}</div>`:m.img?`<img src="${m.img}" alt="Foto adjunta" />`:"")+escapeHTML(m.content):dfFormat(m.content)}</div>`).join("")
         +(df.busy?'<div class="df-typing">Don Fer está buscando… 🔎</div>':"");
       box.scrollTop=box.scrollHeight;$("dfSend").disabled=df.busy;
     }
     async function dfAsk(q){
-      q=String(q||"").trim();if(df.busy||(!q&&!df.img))return;if(!q)q="Lee esta imagen y dime qué ves.";df.msgs.push({role:"user",content:q,img:df.img||null});if(df.img)dfClearImg();df.busy=true;$("dfInput").value="";dfRender();
+      q=String(q||"").trim();if(df.busy||(!q&&!df.img))return;if(!q)q=df.pdfName?"Lee este documento. Si es un RUT, créame el cliente.":"Lee esta imagen y dime qué ves.";const ex=df.pdfName?("\n\n[Adjunté el PDF "+df.pdfName+"] "+DF_RUT+"\nTexto del PDF: "+df.pdfText).slice(0,Math.max(0,3950-q.length)):"";df.msgs.push({role:"user",content:q,img:df.img||null,pdfName:df.pdfName||"",extra:ex});if(df.img)dfClearImg();df.busy=true;$("dfInput").value="";dfRender();
       try{
-        const {data,error}=await db.functions.invoke("tecni-asistente",{body:{messages:(()=>{const h=df.msgs.filter(m=>!m.error&&!m.card);let n=0;return h.slice().reverse().map(m=>{const o={role:m.role,content:m.content};if(m.img){if(n<2)o.image=m.img.split(",")[1];else o.content+="\n[Antes adjunté una foto]";n++}return o}).reverse()})()}});
+        const {data,error}=await db.functions.invoke("tecni-asistente",{body:{messages:(()=>{const h=df.msgs.filter(m=>!m.error&&!m.card);let n=0;return h.slice().reverse().map(m=>{const o={role:m.role,content:m.content+(m.extra||"")};if(m.img){if(n<2)o.image=m.img.split(",")[1];else o.content+="\n[Antes adjunté una foto]";n++}return o}).reverse()})()}});
         if(error){let msg="No pude conectarme con Don Fer. Revisa tu internet.";try{const b=await error.context?.json?.();if(b?.error)msg=b.error}catch(e){}throw new Error(msg)}
         df.msgs.push({role:"assistant",content:data?.reply||data?.error||"Sin respuesta."});
         if(data?.pending)df.msgs.push({card:data.pending});
@@ -3390,7 +3405,7 @@
       $("dfClose").addEventListener("click",()=>{const n=dfPendingN();if(n&&!confirm(`Ojo: tienes ${n===1?"una tarjeta amarilla":n+" tarjetas amarillas"} SIN CONFIRMAR. Todavía no se ha guardado nada.\n\n¿Cerrar igual? (La tarjeta queda aquí para confirmarla después.)`))return;$("dfPanel").classList.add("hidden");$("dfPanel").classList.remove("min");$("dfMin").textContent="–";$("dfFab").classList.remove("hidden");dfBadge()});
       $("dfClear").addEventListener("click",()=>{const n=dfPendingN();if(n&&!confirm(`Hay ${n===1?"una tarjeta":n+" tarjetas"} sin confirmar. Si borras la conversación, se pierde${n===1?"":"n"}. ¿Borrar igual?`))return;df.msgs=[];dfClearImg();dfRender()});
       $("dfClip").addEventListener("click",()=>$("dfFile").click());$("dfFile").addEventListener("change",e=>{const f=e.target.files?.[0];if(f)dfSetImg(f)});$("dfAttX").addEventListener("click",dfClearImg);
-      $("dfInput").addEventListener("paste",e=>{const f=[...(e.clipboardData?.items||[])].find(x=>x.kind==="file"&&/^image\//.test(x.type))?.getAsFile();if(f){e.preventDefault();dfSetImg(f)}});
+      $("dfInput").addEventListener("paste",e=>{const f=[...(e.clipboardData?.items||[])].find(x=>x.kind==="file"&&(/^image\//.test(x.type)||x.type==="application/pdf"))?.getAsFile();if(f){e.preventDefault();dfSetImg(f)}});
       $("dfPanel").addEventListener("dragover",e=>e.preventDefault());$("dfPanel").addEventListener("drop",e=>{const f=e.dataTransfer?.files?.[0];if(f){e.preventDefault();dfSetImg(f)}});
       $("dfForm").addEventListener("submit",e=>{e.preventDefault();dfAsk($("dfInput").value)});
       $("dfInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();dfAsk($("dfInput").value)}});
@@ -5911,8 +5926,8 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
   <div class="df-panel hidden" id="dfPanel" role="dialog" aria-label="Asistente Don Fer">
     <div class="df-head"><img src="donfer-chat.webp" alt="" /><div><strong>Don Fer</strong><small>Pregúntame precios, proveedores, stickers…</small></div><button type="button" id="dfMin" title="Minimizar (la conversación queda abierta)">–</button><button type="button" id="dfClear" title="Nueva conversación">↺</button><button type="button" id="dfClose" title="Cerrar (la conversación queda guardada)">×</button></div>
     <div class="df-msgs" id="dfMsgs"></div>
-    <div class="df-att hidden" id="dfAtt"><img id="dfAttImg" alt="" /><span>Foto lista para enviar</span><button type="button" id="dfAttX" title="Quitar foto">×</button></div>
-    <form class="df-form" id="dfForm"><input type="file" id="dfFile" accept="image/*" hidden /><button type="button" class="df-clip" id="dfClip" title="Adjuntar foto (lista de precios, factura…)">📎</button><textarea id="dfInput" rows="1" placeholder="Escribe tu pregunta…"></textarea><button type="submit" id="dfSend">Enviar</button></form>
+    <div class="df-att hidden" id="dfAtt"><img id="dfAttImg" alt="" /><span id="dfAttTxt">Foto lista para enviar</span><button type="button" id="dfAttX" title="Quitar">×</button></div>
+    <form class="df-form" id="dfForm"><input type="file" id="dfFile" accept="image/*,application/pdf,.pdf" hidden /><button type="button" class="df-clip" id="dfClip" title="Adjuntar foto o PDF (RUT, lista de precios, factura…)">📎</button><textarea id="dfInput" rows="1" placeholder="Escribe tu pregunta…"></textarea><button type="submit" id="dfSend">Enviar</button></form>
   </div>
 </body>
 </html>

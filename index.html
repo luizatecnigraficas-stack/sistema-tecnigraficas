@@ -732,6 +732,12 @@
     .tbb-mood img{display:block;width:100%;border-radius:3px}
     .tbb-pdf{display:grid;place-items:center;aspect-ratio:3/4;background:#f3f3f5;border-radius:3px;font:600 1rem var(--fd)}
     .tbb-ig{display:inline-flex;align-items:center;gap:8px;font:600 1.05rem var(--fd);color:var(--m);text-decoration:none}
+    .tbb-sum{background:#fff7fb;border:2px dashed #EC008C;margin-top:16px}
+    .tbb-sumh{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 6px}
+    .tbb-sumh .tbb-act{background:#EC008C}
+    .tbb-sumt{color:#777;font-size:.9rem;margin:0 0 10px}
+    .tbb-sumx{box-sizing:border-box;width:100%;border:0;border-radius:16px;background:#fff;padding:16px 18px;font:500 .98rem/1.55 Inter,system-ui,sans-serif;color:#1A1A1A;resize:vertical;min-height:200px;box-shadow:inset 0 0 0 1px #f1d4e4;white-space:pre-wrap}
+    .tbb-sumx:focus{outline:none;box-shadow:inset 0 0 0 2px #EC008C}
     .tbb-lb{position:fixed;inset:0;z-index:9999;background:rgba(15,15,20,.88);display:grid;place-items:center;padding:24px;cursor:zoom-out}
     .tbb-lb img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
     .tbb-in{animation:tbbIn .5s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 60ms)}
@@ -3707,13 +3713,36 @@
       }catch(_){box.innerHTML='<div class="empty">No se pudo cargar la lista.</div>'}
     }
     function tbText(b){
-      const L=[];const a=(t,v)=>{if(v&&String(v).trim())L.push(`${t}: ${String(v).trim()}`)};
-      a("Marca",b.brand_name||(b.name_defined?"":"Aún no tiene nombre definido"));a("Cliente",(b.client?.name||b.contact_name||"")+(b.phone?` (${b.phone})`:""));
-      a("Significado del nombre",b.meaning);a("Cómo nació",b.origin);a("Qué hace",b.what_you_do);
-      a("Quiere transmitir",[...(b.feelings||[]).filter(x=>x!=="Otro"),b.feelings_other].filter(Boolean).join(", "));
-      a("Cliente ideal",b.audience);a("Colores que le gustan",b.colors_like);a("Colores que NO le gustan",b.colors_dislike);
-      a("Elementos",b.elements);a("Dónde usará el logo",[...(b.uses||[]).filter(x=>x!=="Otro"),b.uses_other].filter(Boolean).join(", "));a("Instagram",b.instagram);
-      return L.join("\n\n");
+      const t=v=>String(v||"").trim(),low=v=>t(v).replace(/[.\s]+$/,"");
+      const lst=(arr,o)=>[...(arr||[]).filter(x=>x!=="Otro"),...(t(o)?[t(o)]:[])];
+      const sp=v=>{const lines=String(v||"").split("\n");let inks=[];const rest=[];lines.forEach(l=>{const m=l.match(/^Tintas:\s*(.+)$/);if(m)inks=m[1].split(",").map(x=>x.trim()).filter(Boolean);else rest.push(l)});return {inks,text:rest.join(" ").trim()}};
+      const like=sp(b.colors_like),no=sp(b.colors_dislike),feel=lst(b.feelings,b.feelings_other),uses=lst(b.uses,b.uses_other);
+      const marca=t(b.brand_name)||"una marca que aún no tiene nombre";
+      const join=a=>a.length>1?a.slice(0,-1).join(", ")+" y "+a[a.length-1]:a.join("");
+      // En pocas palabras (sirve también como instrucción para herramientas de IA)
+      const P=[`Logo para ${marca}`+(t(b.what_you_do)?`: ${low(b.what_you_do).replace(/^./,c=>c.toLowerCase())}.`:".")];
+      if(t(b.audience))P.push(`Va dirigido a ${low(b.audience).replace(/^./,c=>c.toLowerCase())}.`);
+      if(feel.length)P.push(`Debe transmitir ${join(feel.map(x=>x.toLowerCase()))}.`);
+      const cph=c=>{const ink=c.inks.map(x=>x.toLowerCase());let tx=low(c.text).replace(/^./,x=>x.toLowerCase());if(/^ningun/i.test(tx)||ink.includes(tx))tx="";
+        return ink.length?join(ink)+(tx?` (${tx})`:""):tx};
+      const cl=cph(like),cn=cph(no);
+      if(cl)P.push(`Colores que le gustan: ${cl}.`);
+      if(cn)P.push(`Evitar: ${cn}.`);
+      if(t(b.elements)&&!/^ningun/i.test(t(b.elements)))P.push(`Le gustaría incluir: ${low(b.elements)}.`);
+      if(uses.length)P.push(`Se va a usar en ${join(uses.map(x=>x.toLowerCase()))}.`);
+      const L=[`🎨 BRIEF DE LOGO · ${t(b.brand_name)||"Marca sin nombre todavía"}`,
+        `Cliente: ${t(b.client?.name||b.contact_name)}${t(b.phone)?" · "+t(b.phone):""}`,"",
+        "✨ EN POCAS PALABRAS",P.join(" "),""];
+      const a=(k,v)=>{if(t(v))L.push(`• ${k}: ${t(v).replace(/\s*\n\s*/g," / ")}`)};
+      L.push("📋 DETALLE");
+      if(!b.name_defined)L.push("• Nombre: aún no lo tiene definido"+(t(b.brand_name)?` (ideas: ${t(b.brand_name)})`:""));
+      a("Significado del nombre",b.meaning);a("Cómo nació",b.origin);a("Qué hace",b.what_you_do);a("Para quién",b.audience);
+      a("Debe transmitir",feel.join(", "));
+      const dd=c=>[c.inks.join(", "),c.inks.some(x=>x.toLowerCase()===c.text.toLowerCase())?"":c.text].filter(Boolean).join(" — ");
+      a("Colores ❤",dd(like));a("Colores ✕ (evitar)",dd(no));
+      a("Elementos",b.elements);a("Dónde se usará",uses.join(", "));a("Instagram",b.instagram);
+      if((b.ref_files||[]).length)L.push(`• Referencias: ${b.ref_files.length} imagen(es) en el sistema (TecniBrand)`);
+      return L.join("\n");
     }
     const TB_INKS={"Rosado":"#F7A8C9","Fucsia":"#EC008C","Rojo":"#E3242B","Naranja":"#F7941D","Amarillo":"#FFE14D","Dorado":"#C9A24B","Verde limón":"#A6CE39","Verde":"#2E8B57","Menta":"#9EE2C9","Turquesa":"#1BC0C4","Azul cielo":"#7CC6F2","Azul":"#1F4FA8","Morado":"#6A2C91","Lila":"#C8A2E0","Café":"#7A4B2A","Beige":"#E8D9C0","Negro":"#1A1A1A","Gris":"#9A9A9A","Blanco":"#FFFFFF","Pastel":"linear-gradient(135deg,#F9C6D9,#C8E7F5,#FFF3B0)"};
     const TB_EMO={"Elegancia":"🥂","Ternura":"🧸","Confianza":"🤝","Modernidad":"⚡","Diversión":"🎉","Exclusividad":"💎","Natural":"🌿","Creatividad":"🎨","Redes sociales":"📱","Empaques":"📦","Papelería":"📄","Uniformes":"👕","Página web":"💻"};
@@ -3767,9 +3796,14 @@
         </div>
         ${(b.ref_files||[]).length?`<section class="tbb-card tbb-in" ${I()}><h3 class="tbb-h">📌 Moodboard <small style="font-weight:500;color:#777;font-size:.85rem">(toca para ver en grande)</small></h3><div class="tbb-mood" id="tbRefs"><div class="empty">Cargando…</div></div></section>`:""}
         ${b.name_defined?"":`<p style="margin:4px 0 0;color:#777">⚠ El cliente todavía no tiene el nombre definido.</p>`}
+        <section class="tbb-card tbb-sum tbb-in" ${I()}><div class="tbb-sumh"><h3 class="tbb-h" style="margin:0">📝 Resumen para diseñar</h3><button type="button" class="tbb-act" id="tbCopySum">📋 Copiar resumen</button></div>
+          <p class="tbb-sumt">Pégalo donde lo necesites: el grupo de WhatsApp, tus notas o una herramienta de IA. Puedes editarlo aquí antes de copiar.</p>
+          <textarea id="tbSum" class="tbb-sumx" spellcheck="false">${E(tbText(b))}</textarea></section>
       </div>`;
       $("tbBack").addEventListener("click",openTecniBrand);
-      $("tbCopy").addEventListener("click",()=>copySurveyText(tbText(b),"Resumen"));
+      $("tbCopy").addEventListener("click",()=>copySurveyText($("tbSum").value,"Resumen"));
+      const sumX=$("tbSum");const fit=()=>{sumX.style.height="auto";sumX.style.height=(sumX.scrollHeight+6)+"px"};setTimeout(fit,60);sumX.addEventListener("input",fit);
+      $("tbCopySum").addEventListener("click",async()=>{await copySurveyText(sumX.value,"Resumen");const bt=$("tbCopySum");bt.textContent="✅ ¡Copiado!";setTimeout(()=>{bt.textContent="📋 Copiar resumen"},1800)});
       $("tbSeg").addEventListener("click",async e=>{const btn=e.target.closest("button");if(!btn||btn.dataset.s===b.status)return;const v=btn.dataset.s,prev=b.status;
         $("tbSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===btn));
         const {error}=await db.from("brand_briefs").update({status:v}).eq("id",b.id);

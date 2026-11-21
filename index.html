@@ -1147,6 +1147,7 @@
         <button data-group="Taller" data-view="inventory"><span class="icon">◫</span>Inventario</button>
         <button data-group="Taller" data-view="products"><span class="icon">▦</span>Productos</button>
         <button data-group="Taller" data-view="calculators"><span class="icon">⚒</span>Herramientas</button>
+        <button data-group="Taller" data-view="gfpaul" id="gfPaulNav" class="hidden"><span class="icon">🖨</span>Gran formato</button>
         <div class="nav-label" role="button" tabindex="0" data-group="Dinero"><span>Dinero</span><i>▾</i></div>
         <button data-group="Dinero" data-view="finance" id="financeNav"><span class="icon">◉</span>Finanzas</button>
         <button data-group="Dinero" data-view="payments"><span class="icon">$</span>Cartera</button>
@@ -2318,6 +2319,7 @@
     function navigate(view){
       if(view==="catalog")view="products";if(view==="design")view="calculators";
       if(view!=="resources"){resourcePhotoObserver?.disconnect();resourceTab="";}
+      if(view==="gfpaul"){if(!(hasPermission("gran_formato.manage")||canViewFinance()))return showToast("No tienes permiso para abrir Gran formato");window.location.href="gran-formato-paul.html";return;}
       if(view==="cdc"){if(!hasPermission("quotes.view"))return showToast("No tienes permiso para abrir cuentas de cobro");window.location.href="cuentas-cobro.html";return;}
       if((view==="finance"||view==="suppliers")&&!canViewFinance()){showToast("No tienes permiso para abrir Finanzas");return}if(view==="costing"&&!hasPermission("quotes.create")){showToast("No tienes permiso para abrir Costeo rápido");return}
       const required=viewPermissions[view];
@@ -2339,7 +2341,7 @@
     }
 
     function applyPermissionUI(){try{$("topProduction").classList.toggle("hidden",!hasPermission("work_orders.view"))}catch(e){}
-      document.querySelectorAll("#nav button[data-view]").forEach(btn=>{const required=viewPermissions[btn.dataset.view];btn.classList.toggle("hidden",Boolean(required&&!hasPermission(required)))});
+      document.querySelectorAll("#nav button[data-view]").forEach(btn=>{const required=viewPermissions[btn.dataset.view];btn.classList.toggle("hidden",Boolean(required&&!hasPermission(required)))});$("gfPaulNav")?.classList.toggle("hidden",!(hasPermission("gran_formato.manage")||canViewFinance()));
       $("addRemissionButton").classList.toggle("hidden",!hasPermission("quotes.create"));
       $("financeNav").classList.toggle("hidden",!canViewFinance());$("suppliersNav")?.classList.toggle("hidden",!canViewFinance());document.querySelector('#nav button[data-view="costing"]')?.classList.toggle("hidden",!hasPermission("quotes.create"));
       $("topNewQuote").classList.toggle("hidden",!hasPermission("quotes.create"));
@@ -4304,10 +4306,10 @@
     function finGFTotals(){const s=k=>finGF.rows.filter(x=>x.side===k).reduce((t,x)=>t+Number(x.amount||0),0),gf=s("gf"),te=s("tecni");return{gf,te,bal:Math.round((gf-te)*100)/100}}
     function renderFinGF(){
       const box=$("finGF");if(!box)return;const can=canManageFinance(),t=finGFTotals();
-      const row=x=>`<div class="fin-credit-row" style="padding:9px 0;border-bottom:1px solid var(--line);align-items:center;gap:10px"><span><strong>${escapeHTML(x.detail)}</strong><br><small class="fin-muted">${x.is_carry?"Viene de la cuenta pasada":formatDate(x.entry_date)}${x.finance_movement_id?" · está en Finanzas":""}</small></span><span style="display:flex;gap:8px;align-items:center"><strong>${formatCOP(x.amount)}</strong>${can&&!x.finance_movement_id?`<button class="mini" type="button" onclick="window.finGFEdit('${x.id}')">Editar</button>`:""}</span></div>`;
+      const row=x=>`<div class="fin-credit-row" style="padding:9px 0;border-bottom:1px solid var(--line);align-items:center;gap:10px"><span><strong>${escapeHTML(x.detail)}</strong><br><small class="fin-muted">${x.is_carry?"Viene de la cuenta pasada":formatDate(x.entry_date)}${x.finance_movement_id?" · está en Finanzas":""}</small></span><span style="display:flex;gap:8px;align-items:center"><strong>${formatCOP(x.amount)}</strong>${can&&!x.finance_movement_id&&x.source!=="prints"?`<button class="mini" type="button" onclick="window.finGFEdit('${x.id}')">Editar</button>`:""}${x.source==="prints"?`<button class="mini" type="button" onclick="location.href='gran-formato-paul.html'">Ver trabajos</button>`:""}</span></div>`;
       const list=k=>finGF.rows.filter(x=>x.side===k).map(row).join("")||`<div class="empty">Nada anotado todavía.</div>`;
       const msg=t.bal>0?`Tecni le debe a gran formato <strong>${formatCOP(t.bal)}</strong>`:t.bal<0?`Gran formato le debe a Tecni <strong>${formatCOP(-t.bal)}</strong>`:"Estamos a paz y salvo ✅";
-      box.innerHTML=`<div class="fin-card"><div class="fin-credit-nums"><div><span>Le debemos a gran formato</span><strong>${formatCOP(t.gf)}</strong></div><div><span>Pagamos por ellos</span><strong>${formatCOP(t.te)}</strong></div><div><span>${t.bal<0?"Nos deben":"Falta por pagarles"}</span><strong style="color:${t.bal>0?"#b3263a":"#11834d"}">${formatCOP(Math.abs(t.bal))}</strong></div></div><div class="fin-card-head" style="margin-top:4px"><p style="margin:0">${msg}</p>${can&&finGF.rows.length?`<button class="btn secondary" type="button" onclick="window.finGFSettle()">✅ Saldar cuenta</button>`:""}</div><p class="fin-muted" style="margin:0">Es la cuenta con Paul por la impresora y la laminadora. Lo que Tecni paga por gran formato se resta de lo que le debemos por las impresiones.</p></div>
+      box.innerHTML=`<div class="fin-card"><div class="fin-credit-nums"><div><span>Le debemos a gran formato</span><strong>${formatCOP(t.gf)}</strong></div><div><span>Pagamos por ellos</span><strong>${formatCOP(t.te)}</strong></div><div><span>${t.bal<0?"Nos deben":"Falta por pagarles"}</span><strong style="color:${t.bal>0?"#b3263a":"#11834d"}">${formatCOP(Math.abs(t.bal))}</strong></div></div><div class="fin-card-head" style="margin-top:4px"><p style="margin:0">${msg}</p>${can&&finGF.rows.length?`<button class="btn secondary" type="button" onclick="window.finGFSettle()">✅ Saldar cuenta</button>`:""}</div><p class="fin-muted" style="margin:0"><a href="gran-formato-paul.html" style="font-weight:700">🖨️ Abrir la página de gran formato</a> (Paul anota ahí sus impresiones) · Es la cuenta con Paul por la impresora y la laminadora. Lo que Tecni paga por gran formato se resta de lo que le debemos por las impresiones.</p></div>
       <div class="fin-two">
         <section class="fin-card"><div class="fin-card-head"><h3>🖨️ Lo que le debemos</h3>${can?`<button class="btn secondary" type="button" onclick="window.finGFNew()">+ Anotar</button>`:""}</div>${list("gf")}</section>
         <section class="fin-card"><div class="fin-card-head"><h3>🧾 Lo que pagamos por ellos</h3>${can?`<button class="btn secondary" type="button" onclick="window.finGFPay()">+ Pagamos algo</button>`:""}</div>${list("tecni")}</section>

@@ -1,0 +1,373 @@
+<!doctype html><html lang="es"><head><script src="reintentar.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Tecni"><meta name="theme-color" content="#191b22">
+<script src="avisos.js"></script>
+<title>Gran formato · Tecnigráficas</title>
+<style>
+:root{--c:#09acd8;--m:#eb008b;--y:#ffc400;--i:#172033;--u:#667085;--l:#e4e7ec;--g:#067647;--r:#b42318;--soft:#f6f7fb}
+*{box-sizing:border-box}html:not(.auth-ready) body{visibility:hidden}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--i);background:linear-gradient(145deg,#edfafe,#fff 43%,#fff1f8);min-height:100vh;font-size:15px}
+header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--l)}
+.head{max-width:1180px;margin:auto;padding:10px 16px;display:flex;align-items:center;gap:14px}
+.logo{height:42px;max-width:200px;object-fit:contain}.htitle{flex:1;min-width:0}.htitle b{display:block;font-size:19px}.htitle span{font-size:12px;color:var(--u)}
+.back{background:#eef2f7;color:#344054;border:0;border-radius:12px;padding:11px 14px;font-size:13px;cursor:pointer}
+main{max-width:1180px;margin:16px auto;padding:0 14px 70px}
+.card{background:#fff;border-radius:22px;padding:18px;box-shadow:0 14px 40px rgba(23,32,51,.08);margin-bottom:14px}
+h1,h2,h3{margin:0}h2{font-size:20px}h3{font-size:16px}
+.muted{color:var(--u);font-size:13px}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.sum div{background:var(--soft);border-radius:16px;padding:12px 14px}.sum span{display:block;font-size:12px;color:var(--u);font-weight:700}.sum strong{font-size:20px}
+.big{margin-top:12px;border-radius:18px;padding:14px 16px;font-size:17px;background:#e7f8f0;color:#05603a}.big.debe{background:#fff4e5;color:#93370d}.big strong{font-size:24px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}
+.tabs button{border:0;background:#fff;border-radius:999px;padding:10px 16px;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(23,32,51,.07);color:var(--i)}
+.tabs button.on{background:linear-gradient(135deg,var(--c),var(--m));color:#fff}
+.grid{display:grid;grid-template-columns:420px 1fr;gap:14px;align-items:start}
+label{display:block;font-size:12px;font-weight:800;margin:12px 0 6px}
+input,select{width:100%;border:1px solid #d0d5dd;border-radius:13px;padding:11px 12px;font-size:16px;background:#fff;font-family:inherit;color:inherit}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:2px solid var(--l);background:#fff;border-radius:14px;padding:9px 11px;font-size:13px;cursor:pointer;color:var(--i)}
+.chip.on{border-color:var(--m);background:#fff0f8;color:#a3005f}
+.price{margin-top:14px;background:var(--soft);border-radius:16px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.price strong{font-size:22px}.price small{display:block;color:var(--u)}
+.minflag{display:inline-block;margin-top:4px;background:#fff4e5;color:#93370d;border-radius:999px;padding:3px 9px;font-size:12px;font-weight:700}
+.btn{border:0;border-radius:14px;padding:13px 16px;font-size:15px;cursor:pointer;background:linear-gradient(135deg,var(--c),var(--m));color:#fff}
+.btn.sec{background:#eef2f7;color:#344054}.btn.red{background:#fde8e8;color:var(--r)}.btn.full{width:100%;margin-top:12px}
+.btn.sm{padding:8px 12px;font-size:13px;border-radius:11px}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 4px;border-bottom:1px solid var(--l)}
+.row:last-child{border-bottom:0}.row.tap{cursor:pointer;border-radius:12px}.row.tap:hover{background:var(--soft)}
+.row b{display:block}.row small{color:var(--u)}.row .amt{font-weight:800;white-space:nowrap}
+.day{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--u);margin:14px 0 2px}
+.empty{color:var(--u);padding:16px 4px;text-align:center}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.rate{display:grid;grid-template-columns:1fr 120px 110px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--l)}
+.rate small{color:var(--u)}
+.rolls{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:12px}
+.roll{border:1px solid var(--l);border-radius:18px;padding:14px;background:#fff}
+.roll.low{border-color:#fdb022;background:#fffcf5}
+.roll h4{margin:0;font-size:16px}.roll .meta{font-size:12px;color:var(--u);margin-top:2px}
+.bar{height:10px;border-radius:99px;background:#eef2f7;margin:10px 0 6px;overflow:hidden}.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--c),var(--m))}
+.roll.low .bar i{background:#f79009}
+.left{font-size:20px;font-weight:800}.left small{font-size:13px;color:var(--u);font-weight:600}
+.tag{display:inline-block;background:#fff4e5;color:#93370d;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:700;margin-left:6px}
+.stock{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:10px}
+.stock div{background:var(--soft);border-radius:14px;padding:10px 12px}.stock b{display:block;font-size:14px}.stock span{font-size:13px;color:var(--u)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+details summary{cursor:pointer;font-weight:700;margin-top:6px}
+.hidden{display:none!important}
+.modal{position:fixed;inset:0;background:rgba(16,24,40,.45);display:grid;place-items:center;z-index:50;padding:14px}
+.modal .card{width:min(440px,100%);margin:0}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#172033;color:#fff;padding:11px 18px;border-radius:999px;z-index:60;font-size:14px}
+.editing{outline:3px solid #ffd6ec}
+@media(max-width:860px){.grid,.two{grid-template-columns:1fr}.sum{grid-template-columns:1fr 1fr}.sum div:last-child{grid-column:1/-1}.rate{grid-template-columns:1fr 100px 90px}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script><link rel="stylesheet" href="estilo-tecni.css">
+</head><body>
+<header><div class="head"><img class="logo" src="logo-web.webp" alt="Tecnigráficas"><div class="htitle"><b>🖨️ Gran formato</b><span id="who">Impresiones, abonos y pago de cada viernes</span></div><button class="back" onclick="location.href='index.html'">← Sistema</button></div></header>
+<main>
+  <section class="card" id="resumen"></section>
+  <div class="tabs" id="tabs">
+    <button data-tab="anotar" class="on">🖨️ Anotar trabajos</button>
+    <button data-tab="abonos">🧾 Abonos y cuenta</button>
+    <button data-tab="mes">📅 Por mes</button>
+    <button data-tab="inv">📦 Inventario</button>
+    <button data-tab="tarifas">⚙️ Tarifas</button>
+  </div>
+
+  <div id="tab-anotar" class="grid">
+    <section class="card" id="formCard">
+      <h3 id="formTitle">Anotar un trabajo</h3>
+      <form id="f" autocomplete="off">
+        <label for="fDetail">¿Qué es? (cliente o nombre del archivo)</label>
+        <input id="fDetail" required placeholder="Ej: Lona Cisscol">
+        <div class="g3">
+          <div><label for="fQty">Cantidad</label><input id="fQty" type="number" min="1" step="1" value="1" required inputmode="numeric"></div>
+          <div><label for="fBase">Base (cm)</label><input id="fBase" type="number" min="0.1" step="0.1" required inputmode="decimal"></div>
+          <div><label for="fAlto">Alto (cm)</label><input id="fAlto" type="number" min="0.1" step="0.1" required inputmode="decimal"></div>
+        </div>
+        <label>Material</label><div class="chips" id="fMat"></div>
+        <label>Acabado</label><div class="chips" id="fFin"></div>
+        <div id="finQtyWrap" class="hidden"><label for="fFinQty" id="finQtyLabel">¿Cuántos?</label><input id="fFinQty" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+        <label for="fDate">Fecha</label><input id="fDate" type="date">
+        <div class="price"><div><small>Valor por pieza</small><span id="pUnit">$0</span><div id="pMin" class="minflag hidden"></div></div><div style="text-align:right"><small>Total</small><strong id="pTotal">$0</strong></div></div>
+        <button class="btn full" type="submit" id="fSave">✓ Guardar trabajo</button>
+        <div class="actions hidden" id="editActions"><button type="button" class="btn sec sm" id="fCancel">Cancelar</button><button type="button" class="btn red sm" id="fDelete">Borrar trabajo</button></div>
+      </form>
+    </section>
+    <section class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3>Trabajos de esta semana</h3><span class="muted" id="weekCount"></span></div><div id="weekList"></div></section>
+  </div>
+
+  <div id="tab-abonos" class="hidden">
+    <div class="two">
+      <section class="card"><h3>🖨️ Lo que Tecni le debe a gran formato</h3><div id="ladoGF"></div><div class="actions hidden fin-only"><button class="btn sec sm" onclick="otroCobro()">＋ Otro cobro (préstamo, etc.)</button></div></section>
+      <section class="card"><h3>🧾 Abonos de Tecni</h3><div id="ladoTecni"></div><div class="actions hidden fin-only"><button class="btn sec sm" onclick="semanaAlejo()">＋ Semana de Alejo (mitad)</button><button class="btn sec sm" onclick="nuevoAbono()">＋ Abono</button></div></section>
+    </div>
+    <section class="card hidden fin-only"><h3>💸 Cierre del viernes</h3><p class="muted">Paga lo que falta y cierra la semana. Si queda saldo, pasa a la semana siguiente como "Saldo anterior".</p><button class="btn" onclick="abrirCierre()">💸 Pagar y cerrar la semana</button></section>
+    <section class="card"><h3>📁 Semanas cerradas</h3><div id="cortes"></div></section>
+  </div>
+
+  <div id="tab-mes" class="hidden">
+    <section class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between"><h3>Impresiones del mes</h3><select id="mesSel" style="width:auto"></select></div><div class="sum" id="mesSum"></div><div id="mesList"></div></section>
+  </div>
+
+  <div id="tab-inv" class="hidden">
+    <section class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h3>📦 Inventario de rollos</h3><p class="muted" style="margin:4px 0 0">Cuántos metros quedan de cada material.</p></div><button class="btn" onclick="nuevoRollo()">＋ Rollo nuevo</button></div><div class="stock" id="stock"></div></section>
+    <section class="card"><h3>Rollos en uso</h3><div class="rolls" id="rolls"></div><details id="doneWrap"><summary>Rollos terminados</summary><div id="rollsDone"></div></details></section>
+  </div>
+
+  <div id="tab-tarifas" class="hidden">
+    <section class="card"><h3>⚙️ Tarifas</h3><p class="muted">El precio es base × alto (cm) × valor por cm², más el acabado. Si una pieza da menos que el mínimo, se cobra el mínimo. Los cambios aplican a los trabajos nuevos.</p><div id="rates"></div><button class="btn full" id="ratesSave">✓ Guardar tarifas</button>
+      <details style="margin-top:14px"><summary>＋ Agregar un material o acabado</summary>
+        <div class="g3" style="align-items:end"><div><label for="nrName">Nombre</label><input id="nrName" placeholder="Ej: Reflectivo"></div><div><label for="nrKind">Es</label><select id="nrKind"><option value="material">Material (por cm²)</option><option value="unidad">Acabado (c/u)</option><option value="cm">Acabado (por cm)</option></select></div><div><label for="nrPrice">Valor</label><input id="nrPrice" type="number" min="0" step="any" placeholder="Ej: 3.2"></div></div>
+        <button class="btn sec full" id="nrAdd" type="button">＋ Agregar</button></details></section>
+  </div>
+</main>
+
+<div class="modal hidden" id="mAbono"><div class="card"><h3 id="mAbonoTitle">Abono</h3><form id="fAbono">
+  <label for="aDetail">Detalle</label><input id="aDetail" required>
+  <div class="g2"><div><label for="aAmount">Valor</label><input id="aAmount" type="number" min="1" step="1" required inputmode="numeric"></div><div><label for="aDate">Fecha</label><input id="aDate" type="date" required></div></div>
+  <div id="aAccWrap"><label for="aAcc">¿De qué cuenta salió?</label><select id="aAcc"></select><p class="muted" style="margin:6px 0 0">También queda como egreso en Finanzas.</p></div>
+  <div class="actions"><button type="button" class="btn sec" onclick="cerrarModal('mAbono')">Cancelar</button><button class="btn" type="submit" id="aSave">✓ Guardar</button></div>
+</form></div></div>
+
+<div class="modal hidden" id="mRollo"><div class="card"><h3 id="mRolloTitle">Rollo nuevo</h3><form id="fRollo" autocomplete="off">
+  <label for="rMat">Material</label><input id="rMat" list="matList" required placeholder="Ej: Lona"><datalist id="matList"></datalist>
+  <label>Ancho del rollo (metros)</label><div class="seg" id="rWidths"></div><input id="rWidth" type="number" min="0.1" step="0.01" required inputmode="decimal" style="margin-top:6px" placeholder="Ej: 1.20">
+  <div class="g3"><div><label for="rLen">Metros que trae</label><input id="rLen" type="number" min="1" step="0.1" value="50" required inputmode="decimal"></div><div><label for="rCount">¿Cuántos rollos?</label><input id="rCount" type="number" min="1" step="1" value="1" inputmode="numeric"></div><div><label for="rDate">Fecha</label><input id="rDate" type="date" required></div></div>
+  <div class="g2"><div><label for="rCost">Costo por rollo (opcional)</label><input id="rCost" type="number" min="0" step="1" inputmode="numeric"></div><div><label for="rSup">Proveedor (opcional)</label><input id="rSup" list="supList"><datalist id="supList"></datalist></div></div>
+  <div class="actions"><button type="button" class="btn sec" onclick="cerrarModal('mRollo')">Cancelar</button><button type="button" class="btn red hidden" id="rDel">Borrar</button><button class="btn" type="submit" id="rSave">✓ Guardar</button></div>
+</form></div></div>
+
+<div class="modal hidden" id="mUso"><div class="card"><h3 id="mUsoTitle">Rollo</h3><p class="muted" id="mUsoSub"></p><form id="fUso" autocomplete="off">
+  <div class="seg" id="usoModes"><button type="button" class="chip on" data-m="uso">➖ Usé metros</button><button type="button" class="chip" data-m="ajuste">📏 Medí: quedan…</button><button type="button" class="chip" data-m="terminado">✓ Se acabó</button></div>
+  <div id="usoNumWrap"><label for="uMeters" id="uLabel">¿Cuántos metros usaste?</label><input id="uMeters" type="number" min="0" step="0.1" inputmode="decimal"></div>
+  <label for="uNote">Nota (opcional)</label><input id="uNote" placeholder="Ej: pasacalles del comité">
+  <div class="actions"><button type="button" class="btn sec" onclick="cerrarModal('mUso')">Cancelar</button><button type="button" class="btn sec" id="uEdit">✏️ Editar datos</button><button class="btn" type="submit">✓ Guardar</button></div>
+</form><div id="uHist" style="margin-top:10px"></div></div></div>
+
+<div class="toast hidden" id="toast"></div>
+
+<script>
+const SUPABASE_URL="https://kqrfcdfygskzhsdzzcze.supabase.co",SUPABASE_KEY="sb_publishable_KfkIr6TlW6ivuT5cD0g9Kg_EuZwDKJ9";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id);
+const S={session:null,fin:false,rates:[],prints:[],entries:[],cuts:[],accounts:[],cat:null,mat:null,fin_code:"sin",editId:null,abonoMode:null,monthPrints:[],rolls:[],rollId:null,usoMode:"uso"};
+const cop=n=>"$"+Math.round(Number(n)||0).toLocaleString("es-CO");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const today=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)};
+const fdate=s=>{if(!s)return"";const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("es-CO",{weekday:"long",day:"numeric",month:"long"})};
+const fshort=s=>{if(!s)return"";const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("es-CO",{day:"numeric",month:"short"})};
+const num=v=>{const n=Number(String(v).replace(",","."));return isFinite(n)?n:0};
+function toast(t){const e=$("toast");e.textContent=t;e.classList.remove("hidden");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.add("hidden"),2600)}
+function cerrarModal(id){$(id).classList.add("hidden")}
+const rate=c=>S.rates.find(r=>r.code===c);
+const minimo=()=>Number(rate("minimo")?.price||0);
+
+// ---------- cálculo (el mismo que hace la base de datos) ----------
+function calc(qty,b,h,mat,fin,fq){
+  const m=rate(mat),f=rate(fin)||{price:0,code:"sin"};if(!m||!(qty>0&&b>0&&h>0))return{unit:0,total:0,min:false};
+  const raw=b*h*Number(m.price)+(f.code==="sin"?0:Number(f.price)*fq),mn=minimo(),unit=Math.round(Math.max(raw,mn)*100)/100;
+  return{unit,total:Math.round(unit*qty),min:raw<mn};
+}
+
+// ---------- carga ----------
+async function cargar(){
+  const [r,p,e,c,ro]=await Promise.all([
+    db.from("gf_rates").select("*").eq("active",true).order("sort_order"),
+    db.from("gf_prints").select("*").order("print_date",{ascending:false}).order("created_at",{ascending:false}).limit(600),
+    db.from("gf_entries").select("*").is("settlement_id",null).order("entry_date").order("created_at"),
+    db.from("gf_settlements").select("*").order("created_at",{ascending:false}).limit(12),
+    db.from("gf_rolls").select("*").order("bought_on",{ascending:false}).order("created_at",{ascending:false}).limit(400)]);
+  for(const x of[r,p,e,c,ro])if(x.error)throw x.error;S.rolls=ro.data||[];
+  S.rates=r.data||[];S.entries=e.data||[];S.cuts=c.data||[];
+  const open=new Set(S.entries.filter(x=>x.source==="prints").map(x=>x.id));
+  S.prints=(p.data||[]);S.week=S.prints.filter(x=>x.entry_id&&open.has(x.entry_id));
+  if(!S.mat)S.mat=(S.rates.find(x=>x.kind==="material")||{}).code;
+  pintarTodo();
+}
+function totales(){const s=k=>S.entries.filter(x=>x.side===k).reduce((t,x)=>t+Number(x.amount||0),0),gf=s("gf"),te=s("tecni");return{gf,te,bal:Math.round(gf-te)}}
+function desde(){const d=S.entries.map(x=>x.entry_date).sort()[0]||S.week.map(x=>x.print_date).sort()[0];return d}
+
+function pintarTodo(){pintarResumen();pintarChips();precio();pintarSemana();pintarCuenta();pintarMeses();pintarTarifas();pintarInv()}
+
+function pintarResumen(){
+  const t=totales(),imp=S.week.reduce((a,x)=>a+Number(x.total||0),0),d=desde();
+  const big=t.bal>0?`<div class="big">El viernes Tecni le paga a gran formato <strong>${cop(t.bal)}</strong></div>`:t.bal<0?`<div class="big debe">Gran formato le debe a Tecni <strong>${cop(-t.bal)}</strong><br><small>Pasa a la próxima semana si no se cruza.</small></div>`:`<div class="big">Están a paz y salvo ✅</div>`;
+  $("resumen").innerHTML=`<h2>Esta semana${d?` <span class="muted">· desde el ${esc(fshort(d))}</span>`:""}</h2>
+  <div class="sum"><div><span>Impresiones (${S.week.length})</span><strong>${cop(imp)}</strong></div><div><span>Todo lo que Tecni debe</span><strong>${cop(t.gf)}</strong></div><div><span>Abonos de Tecni</span><strong>${cop(t.te)}</strong></div></div>${big}`;
+}
+
+function pintarChips(){
+  const mats=S.rates.filter(x=>x.kind==="material"),fins=S.rates.filter(x=>x.kind==="finish");
+  $("fMat").innerHTML=mats.map(m=>`<button type="button" class="chip${m.code===S.mat?" on":""}" data-c="${m.code}">${esc(m.name)}</button>`).join("");
+  $("fFin").innerHTML=fins.map(f=>`<button type="button" class="chip${f.code===S.fin_code?" on":""}" data-c="${f.code}">${esc(f.name)}</button>`).join("");
+  const f=rate(S.fin_code);$("finQtyWrap").classList.toggle("hidden",!f||f.code==="sin");
+  if(f)$("finQtyLabel").textContent=f.unit==="cm"?`¿Cuántos cm de ${f.name.toLowerCase()}?`:`¿Cuántos ${f.name.toLowerCase()} por pieza?`;
+}
+$("fMat").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;S.mat=b.dataset.c;pintarChips();precio()});
+$("fFin").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;S.fin_code=b.dataset.c;
+  const f=rate(S.fin_code);if(f&&f.unit==="cm"&&!num($("fFinQty").value))$("fFinQty").value=Math.round(num($("fBase").value))||"";
+  if(f&&f.code==="ojales"&&!num($("fFinQty").value))$("fFinQty").value=4;
+  if(f&&f.code==="bastidores"&&!num($("fFinQty").value))$("fFinQty").value=4;
+  if(f&&f.code==="roll_up"&&!num($("fFinQty").value))$("fFinQty").value=1;
+  if(f&&f.code==="sin")$("fFinQty").value=0;pintarChips();precio()});
+function precio(){
+  const r=calc(num($("fQty").value),num($("fBase").value),num($("fAlto").value),S.mat,S.fin_code,num($("fFinQty").value));
+  $("pUnit").textContent=cop(r.unit);$("pTotal").textContent=cop(r.total);
+  $("pMin").classList.toggle("hidden",!r.min);$("pMin").textContent=`Se cobra el mínimo (${cop(minimo())})`;
+}
+["fQty","fBase","fAlto","fFinQty"].forEach(id=>$(id).addEventListener("input",precio));
+
+function filaTrabajo(x,tap){
+  const fin=x.finish_code&&x.finish_code!=="sin"?` · ${esc(x.finish_name)}${Number(x.finish_qty)?" "+Number(x.finish_qty):""}`:"";
+  return `<div class="row${tap?" tap":""}" ${tap?`data-id="${x.id}"`:""}><span><b>${esc(x.detail)}</b><small>${x.quantity} × ${Number(x.base_cm)}×${Number(x.height_cm)} cm · ${esc(x.material_name)}${fin}${x.minimum_applied?" · mínimo":""}</small></span><span class="amt">${cop(x.total)}</span></div>`;
+}
+function pintarSemana(){
+  $("weekCount").textContent=S.week.length?`${S.week.length} trabajo${S.week.length===1?"":"s"}`:"";
+  if(!S.week.length){$("weekList").innerHTML=`<div class="empty">Todavía no hay trabajos esta semana.</div>`;return}
+  let h="",last="";for(const x of S.week){if(x.print_date!==last){last=x.print_date;h+=`<div class="day">${esc(fdate(last))}</div>`}h+=filaTrabajo(x,true)}
+  $("weekList").innerHTML=h+`<p class="muted" style="margin:10px 4px 0">Toca un trabajo para corregirlo.</p>`;
+}
+$("weekList").addEventListener("click",e=>{const r=e.target.closest("[data-id]");if(r)editar(r.dataset.id)});
+
+function limpiar(){S.editId=null;$("f").reset();$("fQty").value=1;$("fFinQty").value=0;$("fDate").value=today();S.fin_code="sin";$("formTitle").textContent="Anotar un trabajo";$("fSave").textContent="✓ Guardar trabajo";$("editActions").classList.add("hidden");$("formCard").classList.remove("editing");pintarChips();precio()}
+function editar(id){const x=S.week.find(p=>p.id===id);if(!x)return;S.editId=id;$("fDetail").value=x.detail;$("fQty").value=x.quantity;$("fBase").value=Number(x.base_cm);$("fAlto").value=Number(x.height_cm);$("fFinQty").value=Number(x.finish_qty)||0;$("fDate").value=x.print_date;S.mat=x.material_code;S.fin_code=x.finish_code||"sin";$("formTitle").textContent="Corregir trabajo";$("fSave").textContent="✓ Guardar cambios";$("editActions").classList.remove("hidden");$("formCard").classList.add("editing");pintarChips();precio();$("formCard").scrollIntoView({behavior:"smooth",block:"start"})}
+$("fCancel").addEventListener("click",limpiar);
+$("fDelete").addEventListener("click",async()=>{if(!S.editId||!confirm("¿Borrar este trabajo?"))return;const r=await db.from("gf_prints").delete().eq("id",S.editId);if(r.error)return alert(r.error.message);toast("Trabajo borrado");limpiar();await cargar()});
+$("f").addEventListener("submit",async e=>{
+  e.preventDefault();if(!S.mat)return alert("Escoge el material");
+  const f=rate(S.fin_code),p={detail:$("fDetail").value.trim(),quantity:Math.round(num($("fQty").value)),base_cm:num($("fBase").value),height_cm:num($("fAlto").value),material_code:S.mat,finish_code:S.fin_code,finish_qty:f&&f.code!=="sin"?num($("fFinQty").value):0,print_date:$("fDate").value||today()};
+  if(!p.detail||!(p.quantity>0&&p.base_cm>0&&p.height_cm>0))return alert("Revisa el nombre, la cantidad y las medidas.");
+  $("fSave").disabled=true;
+  try{const r=S.editId?await db.from("gf_prints").update(p).eq("id",S.editId):await db.from("gf_prints").insert(p);if(r.error)throw r.error;
+    toast(S.editId?"Cambios guardados":"Trabajo anotado ✓");const keep=S.mat;limpiar();S.mat=keep;await cargar();$("fDetail").focus()}
+  catch(err){alert(err.message)}finally{$("fSave").disabled=false}
+});
+
+// ---------- cuenta / abonos ----------
+function filaEntrada(x){const extra=x.is_carry?"Viene de la semana pasada":x.source==="prints"?"Se suma solo con los trabajos":esc(fshort(x.entry_date))+(x.finance_movement_id?" · está en Finanzas":"");
+  const del=S.fin&&!x.is_carry&&x.source!=="prints"&&!x.finance_movement_id?`<button class="btn red sm" onclick="borrarEntrada('${x.id}')">Borrar</button>`:"";
+  return `<div class="row"><span><b>${esc(x.detail)}</b><small>${extra}</small></span><span style="display:flex;gap:8px;align-items:center"><span class="amt">${cop(x.amount)}</span>${del}</span></div>`}
+function pintarCuenta(){
+  const l=k=>S.entries.filter(x=>x.side===k).map(filaEntrada).join("")||`<div class="empty">Nada todavía.</div>`;
+  $("ladoGF").innerHTML=l("gf");$("ladoTecni").innerHTML=l("tecni");
+  $("cortes").innerHTML=S.cuts.map(c=>`<div class="row"><span><b>Cerrada el ${esc(fshort(c.closed_on))}</b><small>Debía ${cop(c.total_gf)} · abonó ${cop(c.total_tecni)}</small></span><span class="amt">${Number(c.balance)>0?"Quedó debiendo "+cop(c.balance):Number(c.balance)<0?"A favor de Tecni "+cop(-c.balance):"Paz y salvo ✅"}</span></div>`).join("")||`<div class="empty">Todavía no hay semanas cerradas.</div>`;
+}
+window.borrarEntrada=async id=>{if(!confirm("¿Borrar esta anotación?"))return;const r=await db.from("gf_entries").delete().eq("id",id);if(r.error)return alert(r.error.message);toast("Borrado");cargar()};
+function lastSaturday(){const d=new Date();d.setDate(d.getDate()-((d.getDay()+1)%7));d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
+window.semanaAlejo=async()=>{const v=250000;if(!confirm(`¿Anotar ${cop(v)} de la semana de Alejo como abono de Tecni?`))return;
+  const r=await db.from("gf_entries").insert({side:"tecni",detail:"Semana de Alejo (mitad)",amount:v,entry_date:lastSaturday(),created_by:S.session.user.id});if(r.error)return alert(r.error.message);toast("Semana de Alejo anotada");cargar()};
+function abrirAbono(mode,title,detail,amount){S.abonoMode=mode;$("mAbonoTitle").textContent=title;$("fAbono").reset();$("aDetail").value=detail||"";$("aAmount").value=amount||"";$("aDate").value=today();
+  $("aAccWrap").classList.toggle("hidden",mode==="gf");$("aAcc").innerHTML=S.accounts.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join("");$("mAbono").classList.remove("hidden");$("aDetail").focus()}
+window.nuevoAbono=()=>abrirAbono("abono","Abono de Tecni","",null);
+window.otroCobro=()=>abrirAbono("gf","Otro cobro de gran formato","",null);
+window.abrirCierre=()=>{const t=totales();if(t.bal<=0){cerrarSemana(t);return}abrirAbono("cierre","Pagar y cerrar la semana","Pago semana gran formato",t.bal)};
+async function movimiento(detail,amount,date,acc){if(!S.cat)throw new Error("Falta la categoría de gran formato en Finanzas.");
+  const r=await db.from("finance_movements").insert({movement_type:"expense",movement_date:date,concept:detail,category_id:S.cat,account_id:acc,amount,notes:"Cuenta de gran formato",expense_class:"other",created_by:S.session.user.id});if(r.error)throw r.error}
+async function cerrarSemana(t){const txt=t.bal>0?`Todavía quedan ${cop(t.bal)} por pagar: pasan a la semana siguiente.`:t.bal<0?`Gran formato le queda debiendo ${cop(-t.bal)} a Tecni: pasa a la semana siguiente.`:"La cuenta queda en cero.";
+  if(!confirm(txt+"\n\n¿Cerrar la semana?"))return;const r=await db.rpc("gf_settle",{p_date:today(),p_notes:"Cierre semanal"});if(r.error)return alert(r.error.message);toast("Semana cerrada ✓");await cargar()}
+$("fAbono").addEventListener("submit",async e=>{e.preventDefault();const d=$("aDetail").value.trim(),a=Math.round(num($("aAmount").value)),dt=$("aDate").value||today(),acc=$("aAcc").value;if(!d||!(a>0))return;
+  $("aSave").disabled=true;try{
+    if(S.abonoMode==="gf"){const r=await db.from("gf_entries").insert({side:"gf",detail:d,amount:a,entry_date:dt,created_by:S.session.user.id});if(r.error)throw r.error}
+    else{if(!acc)throw new Error("Escoge la cuenta");await movimiento(d,a,dt,acc)}
+    cerrarModal("mAbono");await cargar();
+    if(S.abonoMode==="cierre"){await cerrarSemana(totales())}else toast("Guardado ✓")}
+  catch(err){alert(err.message)}finally{$("aSave").disabled=false}});
+
+// ---------- por mes ----------
+function pintarMeses(){
+  const months=[...new Set(S.prints.map(x=>x.print_date.slice(0,7)))].sort().reverse(),sel=$("mesSel"),cur=sel.value||months[0];
+  sel.innerHTML=months.map(m=>{const [y,mm]=m.split("-").map(Number);return `<option value="${m}"${m===cur?" selected":""}>${new Date(y,mm-1,1).toLocaleDateString("es-CO",{month:"long",year:"numeric"})}</option>`}).join("")||`<option value="">Sin trabajos</option>`;
+  const list=S.prints.filter(x=>x.print_date.slice(0,7)===sel.value),tot=list.reduce((a,x)=>a+Number(x.total||0),0),pz=list.reduce((a,x)=>a+Number(x.quantity||0),0),mins=list.filter(x=>x.minimum_applied).length;
+  $("mesSum").innerHTML=`<div><span>Total del mes</span><strong>${cop(tot)}</strong></div><div><span>Trabajos · piezas</span><strong>${list.length} · ${pz}</strong></div><div><span>Con mínimo</span><strong>${mins}</strong></div>`;
+  let h="",last="";for(const x of list){if(x.print_date!==last){last=x.print_date;h+=`<div class="day">${esc(fdate(last))}</div>`}h+=filaTrabajo(x,false)}
+  $("mesList").innerHTML=h||`<div class="empty">No hay trabajos en este mes.</div>`;
+}
+$("mesSel").addEventListener("change",pintarMeses);
+
+// ---------- tarifas ----------
+function pintarTarifas(){
+  const u={cm2:"por cm²",cm:"por cm",unidad:"c/u",valor:"por pieza"},hint=r=>r.unit==="cm2"?`m² = ${cop(Number(r.price)*10000)}`:"";
+  const sec=(t,k)=>`<div class="day">${t}</div>`+S.rates.filter(r=>r.kind===k).map(r=>`<div class="rate"><span><b>${esc(r.name)}</b><br><small>${hint(r)}</small></span><input type="number" min="0" step="any" data-code="${r.code}" value="${Number(r.price)}" ${r.code==="sin"?"disabled":""}><small>${u[r.unit]||""}</small></div>`).join("");
+  $("rates").innerHTML=sec("Mínimo","setting")+sec("Materiales","material")+sec("Acabados","finish");
+}
+$("ratesSave").addEventListener("click",async()=>{const ch=[...$("rates").querySelectorAll("input[data-code]")].map(i=>({code:i.dataset.code,price:num(i.value)})).filter(x=>{const r=rate(x.code);return r&&Number(r.price)!==x.price&&x.price>=0});
+  if(!ch.length)return toast("No hay cambios");if(!confirm(`¿Guardar ${ch.length} cambio${ch.length===1?"":"s"} de tarifa? Aplica a los trabajos nuevos.`))return;
+  try{for(const x of ch){const r=await db.from("gf_rates").update({price:x.price,updated_at:new Date().toISOString(),updated_by:S.session.user.id}).eq("code",x.code);if(r.error)throw r.error}toast("Tarifas guardadas ✓");await cargar()}catch(err){alert(err.message)}});
+
+// ---------- inventario ----------
+const MATS=["Lona","Lona blackout","Vinilo blanco brillante","Vinilo blanco mate","Vinilo transparente","Laminado brillante","Laminado mate","Lienzo","Reflectivo","Laminado reflectivo","Microperforado","Panaflex","Opalizado","Vinilo 3D / escarcha / holográfico","Polietileno"];
+const WIDTHS=[0.9,1.07,1.2,1.27,1.37,1.52,1.6,2.2,3.2];
+const mfmt=n=>Number(n||0).toLocaleString("es-CO",{maximumFractionDigits:2});
+const wfmt=n=>Number(n||0).toLocaleString("es-CO",{minimumFractionDigits:2,maximumFractionDigits:2});
+const low=r=>Number(r.remaining_m)<=Math.max(5,Number(r.length_m)*0.15);
+function pintarInv(){
+  const act=S.rolls.filter(r=>r.status==="activo"),done=S.rolls.filter(r=>r.status!=="activo");
+  const g=new Map();act.forEach(r=>{const k=r.material.trim()+" · "+wfmt(r.width_m)+" m";const o=g.get(k)||{m:0,n:0,low:false};o.m+=Number(r.remaining_m);o.n++;g.set(k,o)});
+  $("stock").innerHTML=[...g.entries()].sort().map(([k,o])=>`<div><b>${esc(k)}</b><span>${mfmt(o.m)} m · ${o.n} rollo${o.n===1?"":"s"}</span></div>`).join("")||`<div class="empty" style="grid-column:1/-1;background:none">Todavía no hay rollos. Toca "＋ Rollo nuevo".</div>`;
+  $("rolls").innerHTML=act.sort((a,b)=>a.material.localeCompare(b.material)||a.remaining_m-b.remaining_m).map(r=>{const pc=Math.max(0,Math.min(100,100*r.remaining_m/r.length_m));
+    return `<div class="roll${low(r)?" low":""}"><h4>${esc(r.material)} · ${wfmt(r.width_m)} m${low(r)?'<span class="tag">Se está acabando</span>':""}</h4><div class="meta">Comprado el ${esc(fshort(r.bought_on))}${r.supplier?" · "+esc(r.supplier):""}</div>
+    <div class="bar"><i style="width:${pc}%"></i></div><div class="left">${mfmt(r.remaining_m)} m <small>de ${mfmt(r.length_m)} m</small></div>
+    <div class="actions"><button class="btn sm" onclick="usoRollo('${r.id}')">➖ Usé / quedan</button></div></div>`}).join("")||`<div class="empty" style="grid-column:1/-1">No hay rollos en uso.</div>`;
+  $("doneWrap").classList.toggle("hidden",!done.length);
+  $("rollsDone").innerHTML=done.map(r=>`<div class="row tap" onclick="usoRollo('${r.id}')"><span><b>${esc(r.material)} · ${wfmt(r.width_m)} m</b><small>${mfmt(r.length_m)} m · comprado el ${esc(fshort(r.bought_on))}${r.supplier?" · "+esc(r.supplier):""}</small></span><span class="muted">Terminado</span></div>`).join("");
+  const mats=[...new Set([...MATS,...S.rolls.map(r=>r.material.trim())])];$("matList").innerHTML=mats.map(m=>`<option value="${esc(m)}">`).join("");
+  const sups=[...new Set(["Proadhesivos","Grupo ESS","DPS Insumos",...S.rolls.map(r=>r.supplier).filter(Boolean)])];$("supList").innerHTML=sups.map(m=>`<option value="${esc(m)}">`).join("");
+  $("rWidths").innerHTML=WIDTHS.map(w=>`<button type="button" class="chip" data-w="${w}">${wfmt(w)} m</button>`).join("");
+}
+$("rWidths").addEventListener("click",e=>{const b=e.target.closest("[data-w]");if(!b)return;$("rWidth").value=b.dataset.w;marcarAncho()});
+function marcarAncho(){const v=num($("rWidth").value);$("rWidths").querySelectorAll("[data-w]").forEach(b=>b.classList.toggle("on",Number(b.dataset.w)===v))}
+$("rWidth").addEventListener("input",marcarAncho);
+window.nuevoRollo=()=>{S.rollId=null;$("fRollo").reset();$("mRolloTitle").textContent="Rollo nuevo";$("rLen").value=50;$("rCount").value=1;$("rCount").disabled=false;$("rDate").value=today();$("rDel").classList.add("hidden");marcarAncho();$("mRollo").classList.remove("hidden");$("rMat").focus()};
+function editarRollo(id){const r=S.rolls.find(x=>x.id===id);if(!r)return;S.rollId=id;$("mRolloTitle").textContent="Editar rollo";$("rMat").value=r.material;$("rWidth").value=Number(r.width_m);$("rLen").value=Number(r.length_m);$("rCount").value=1;$("rCount").disabled=true;$("rDate").value=r.bought_on;$("rCost").value=r.cost??"";$("rSup").value=r.supplier||"";$("rDel").classList.remove("hidden");marcarAncho();cerrarModal("mUso");$("mRollo").classList.remove("hidden")}
+$("fRollo").addEventListener("submit",async e=>{e.preventDefault();
+  const p={material:$("rMat").value.trim(),width_m:num($("rWidth").value),length_m:num($("rLen").value),bought_on:$("rDate").value||today(),cost:$("rCost").value===""?null:num($("rCost").value),supplier:$("rSup").value.trim()||null};
+  if(!p.material||!(p.width_m>0&&p.length_m>0))return alert("Revisa el material, el ancho y los metros.");
+  if(p.width_m>10&&confirm(`¿El ancho es ${mfmt(p.width_m/100)} m? (escribiste ${p.width_m}, parece que está en cm)`))p.width_m=p.width_m/100;
+  $("rSave").disabled=true;try{
+    if(S.rollId){const old=S.rolls.find(x=>x.id===S.rollId);const r=await db.from("gf_rolls").update({...p,remaining_m:Math.min(Number(old.remaining_m),p.length_m),updated_at:new Date().toISOString()}).eq("id",S.rollId);if(r.error)throw r.error}
+    else{const n=Math.max(1,Math.round(num($("rCount").value)||1));const r=await db.from("gf_rolls").insert(Array.from({length:n},()=>({...p,remaining_m:p.length_m,created_by:S.session.user.id})));if(r.error)throw r.error}
+    cerrarModal("mRollo");toast(S.rollId?"Rollo actualizado":"Rollo guardado ✓");await cargar()}catch(err){alert(err.message)}finally{$("rSave").disabled=false}});
+$("rDel").addEventListener("click",async()=>{if(!S.rollId||!confirm("¿Borrar este rollo del inventario? (solo si lo anotaste por error)"))return;const r=await db.from("gf_rolls").delete().eq("id",S.rollId);if(r.error)return alert(r.error.message);cerrarModal("mRollo");toast("Rollo borrado");cargar()});
+window.usoRollo=async id=>{const r=S.rolls.find(x=>x.id===id);if(!r)return;S.rollId=id;$("fUso").reset();$("mUsoTitle").textContent=`${r.material} · ${wfmt(r.width_m)} m`;$("mUsoSub").textContent=`Quedan ${mfmt(r.remaining_m)} m de ${mfmt(r.length_m)} m`;usoModo("uso");
+  $("uHist").innerHTML="";$("mUso").classList.remove("hidden");
+  const h=await db.from("gf_roll_moves").select("*").eq("roll_id",id).order("created_at",{ascending:false}).limit(8);
+  const k={uso:"Usó",ajuste:"Midió",terminado:"Se acabó"};
+  if(h.data?.length)$("uHist").innerHTML=`<div class="day">Últimos movimientos</div>`+h.data.map(m=>`<div class="row"><span><b>${k[m.kind]||m.kind}${m.note?" · "+esc(m.note):""}</b><small>${new Date(m.created_at).toLocaleDateString("es-CO",{day:"numeric",month:"short"})}</small></span><span class="muted">${Number(m.meters)>0?"+":""}${mfmt(m.meters)} m → ${mfmt(m.remaining_after)} m</span></div>`).join("")};
+function usoModo(m){S.usoMode=m;$("usoModes").querySelectorAll("[data-m]").forEach(b=>b.classList.toggle("on",b.dataset.m===m));$("usoNumWrap").classList.toggle("hidden",m==="terminado");$("uLabel").textContent=m==="uso"?"¿Cuántos metros usaste?":"¿Cuántos metros quedan?"}
+$("usoModes").addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(b)usoModo(b.dataset.m)});
+$("uEdit").addEventListener("click",()=>editarRollo(S.rollId));
+$("fUso").addEventListener("submit",async e=>{e.preventDefault();const m=S.usoMode,v=num($("uMeters").value);
+  if(m==="uso"&&!(v>0))return alert("Escribe cuántos metros usaste.");if(m==="ajuste"&&$("uMeters").value==="")return alert("Escribe cuántos metros quedan.");
+  if(m==="terminado"&&!confirm("¿Marcar este rollo como terminado?"))return;
+  const r=await db.rpc("gf_roll_move",{p_roll:S.rollId,p_kind:m,p_meters:m==="terminado"?0:v,p_note:$("uNote").value||null});if(r.error)return alert(r.error.message);
+  cerrarModal("mUso");toast(Number(r.data)<=0?"Rollo terminado ✓":`Quedan ${mfmt(r.data)} m`);cargar()});
+
+// agregar material o acabado nuevo
+$("nrAdd").addEventListener("click",async()=>{const name=$("nrName").value.trim(),k=$("nrKind").value,price=num($("nrPrice").value);if(!name||!(price>=0)||$("nrPrice").value==="")return alert("Escribe el nombre y el valor.");
+  const code=name.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"").slice(0,40)||"item";
+  if(S.rates.some(r=>r.code===code||r.name.toLowerCase()===name.toLowerCase()))return alert("Ya existe uno con ese nombre.");
+  const kind=k==="material"?"material":"finish",unit=k==="material"?"cm2":k,sort=Math.max(0,...S.rates.filter(r=>r.kind===kind).map(r=>r.sort_order||0))+1;
+  const r=await db.from("gf_rates").insert({code,kind,name,price,unit,sort_order:sort,updated_by:S.session.user.id});if(r.error)return alert(r.error.message);
+  $("nrName").value="";$("nrPrice").value="";toast(`${name} agregado ✓`);cargar()});
+
+// ---------- pestañas ----------
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]");if(!b)return;document.querySelectorAll("#tabs button").forEach(x=>x.classList.toggle("on",x===b));["anotar","abonos","mes","inv","tarifas"].forEach(t=>$("tab-"+t).classList.toggle("hidden",t!==b.dataset.tab))});
+
+// ---------- inicio ----------
+(async()=>{
+  const {data:{session}}=await db.auth.getSession();if(!session){location.replace("index.html");return}S.session=session;
+  try{
+    const pr=await db.rpc("get_profile_permissions");if(pr.error)throw pr.error;const perms=new Map((pr.data||[]).map(p=>[p.permission_code,Boolean(p.effective_allowed)]));
+    S.fin=perms.get("finance.view")===true;
+    if(!S.fin&&perms.get("gran_formato.manage")!==true){document.documentElement.classList.add("auth-ready");document.querySelector("main").innerHTML=`<section class="card"><h2>No tienes acceso a esta página</h2><p class="muted">Pídele a Luiza que te active el permiso "Manejar gran formato".</p></section>`;return}
+    document.querySelectorAll(".fin-only").forEach(x=>x.classList.toggle("hidden",!S.fin));
+    if(S.fin){const [a,c]=await Promise.all([db.from("finance_accounts").select("id,name").eq("active",true).order("sort_order").order("name"),db.from("app_settings").select("value").eq("key","gf_category_id").maybeSingle()]);S.accounts=a.data||[];S.cat=c.data?.value||null}
+    const me=await db.from("profiles").select("full_name").eq("id",session.user.id).maybeSingle();if(me.data?.full_name)$("who").textContent=`Hola, ${me.data.full_name.split(" ")[0]} · impresiones, abonos y pago de cada viernes`;
+    $("fDate").value=today();await cargar();
+  }catch(err){console.error(err);document.querySelector("main").insertAdjacentHTML("afterbegin",`<section class="card"><b>No pude cargar la página:</b> ${esc(err.message)}</section>`)}
+  finally{document.documentElement.classList.add("auth-ready")}
+})();
+window.__gf={calc,S};
+</script>
+</body></html>

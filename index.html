@@ -1075,6 +1075,17 @@
     /* barra de desplazamiento delgada */
     *{scrollbar-width:thin;scrollbar-color:#e4c8dc transparent}
     ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#e4c8dc;border-radius:99px;border:3px solid transparent;background-clip:padding-box}
+    /* V9.78b: Inicio, pestañas y subtítulos */
+    .content h3,.content h4,.tt-label,.today-tile strong,.when{font-family:var(--fd)}
+    .content h4{font-weight:600}
+    .tt-label{font-weight:500;font-size:12.5px}
+    .today-tile strong{font-weight:600;letter-spacing:-.01em}
+    .when{font-weight:600;box-shadow:0 0 0 2px #fff,0 2px 0 2px rgba(0,0,0,.05)}
+    .today-row{border-radius:14px;transition:background .12s,transform .15s}.today-row:hover{background:#fff5fa;transform:translateX(3px)}
+    .fin-tabs{border-radius:999px;border-color:#eadfe8;padding:5px}
+    .fin-tabs>button{font-family:var(--fd);font-weight:600;border-radius:999px;transition:background .15s,transform .15s}
+    .fin-tabs>button.on{background:var(--tc-m);color:#fff;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+    .finance-tabs .btn.active,.resource-tabs .btn.active{background:var(--tc-m);color:#fff;box-shadow:0 3px 0 rgba(0,0,0,.12)}
     @media (prefers-reduced-motion:reduce){.btn,.nav button,.module-card{transition:none}.modal-backdrop:not(.hidden)>.modal,.toast.show{animation:none}}
 </style>
 </head>

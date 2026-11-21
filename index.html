@@ -1023,6 +1023,59 @@
     .wo-peek-b{position:fixed;z-index:10000;left:92px;bottom:160px;background:#fff;color:#1A1A1A;font:600 14px "Fredoka",system-ui,sans-serif;padding:9px 14px;border-radius:16px 16px 16px 4px;box-shadow:0 8px 22px rgba(0,0,0,.18);opacity:0;transform:scale(.6);transform-origin:0 100%;transition:opacity .25s,transform .4s cubic-bezier(.3,1.6,.5,1);pointer-events:none}
     .wo-peek-b.on{opacity:1;transform:none;transition-delay:.3s}
     @media (prefers-reduced-motion:reduce){#productionBody .wo-card.tc,#woShell .wo-bchip{transition:none}#productionBody .wo-card.tc.wo-pop,.tc-check.on{animation:none}.wo-burst,.wo-peek,.wo-peek-b{display:none}}
+    /* V9.78 Estilo TecniBrand en todo el sistema: base suave, color CMYK en detalles, Fredoka en títulos y botones */
+    :root{--fd:"Fredoka","Tondu Beta","Arial Rounded MT Bold",system-ui,sans-serif;--tc-c:#00AEEF;--tc-m:#EC008C;--tc-y:#FFF200;--tc-k:#1A1A1A}
+    body{background:linear-gradient(160deg,#fdf3f8 0%,#f4f2fb 45%,#eef5fc 100%) fixed}
+    .topbar{background:rgba(255,255,255,.82)}
+    .topbar h1,.view-head h2,.today-head h2,.card h3,.modal-head h3,.module-card h3,.tools-title,.empty,.nav-label{font-family:var(--fd)}
+    .topbar h1{font-weight:600;font-size:23px;letter-spacing:-.01em}
+    .view-head h2{font-weight:600;font-size:22px}
+    .today-head h2{font-weight:700;letter-spacing:-.01em}
+    .card h3,.modal-head h3,.module-card h3{font-weight:600}
+    .tools-title{font-weight:600}
+    /* menú */
+    .nav button{font-family:var(--fd);font-weight:500;font-size:13px;letter-spacing:.005em;border-radius:14px;transition:transform .18s cubic-bezier(.3,1.5,.5,1),background .15s,color .15s}
+    .nav button:hover{transform:translateX(3px)}
+    .nav button.active{background:linear-gradient(110deg,rgba(0,174,239,.28),rgba(236,0,140,.3));box-shadow:inset 3px 0 0 var(--tc-m)}
+    .nav-label{font-weight:500;letter-spacing:.04em}
+    /* botones */
+    .btn{font-family:var(--fd);font-weight:600;font-size:13px;border-radius:999px;padding:10px 16px;transition:transform .15s cubic-bezier(.3,1.6,.5,1),filter .15s,box-shadow .15s}
+    .btn:hover{transform:translateY(-1px)}
+    .btn:active{transform:scale(.95)}
+    .btn.primary{box-shadow:0 4px 0 rgba(236,0,140,.25)!important}
+    .btn.secondary{background:#fff;box-shadow:inset 0 0 0 1.5px #ecdcea}
+    .btn.secondary:hover{background:#fff6fb;box-shadow:inset 0 0 0 1.5px #f3b6d6}
+    .btn[disabled]{transform:none}
+    /* tarjetas y ventanas */
+    .card{border-radius:22px;border-color:#f0e6ef;box-shadow:0 10px 30px rgba(120,60,110,.06)}
+    .module-card{border-radius:22px;border-color:#f0e6ef;transition:transform .2s cubic-bezier(.3,1.5,.5,1),box-shadow .2s}
+    .module-card.actionable:hover{transform:translateY(-3px) rotate(-.4deg);box-shadow:0 14px 30px rgba(120,60,110,.12)}
+    .module-card .module-icon{display:inline-grid;place-items:center;width:52px;height:52px;border-radius:50%;background:#fff3a6;box-shadow:0 0 0 3px #fff,0 4px 0 2px rgba(0,0,0,.06)}
+    .module-grid .module-card:nth-child(4n+2) .module-icon{background:#ffd3ea}.module-grid .module-card:nth-child(4n+3) .module-icon{background:#cdefff}.module-grid .module-card:nth-child(4n) .module-icon{background:#e6e0ff}
+    .today-tile{border-radius:22px}
+    .modal{border-radius:26px}
+    .modal-backdrop{background:rgba(40,20,45,.45);backdrop-filter:blur(3px)}
+    .modal-backdrop:not(.hidden)>.modal{animation:tcModal .32s cubic-bezier(.3,1.35,.5,1)}
+    @keyframes tcModal{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+    /* campos */
+    .search,input.search,select.search{border-radius:14px;border-color:#eadfe8;transition:border-color .15s,box-shadow .15s}
+    .search:focus{border-color:var(--tc-m);box-shadow:0 0 0 4px rgba(236,0,140,.1)}
+    /* tablas: sin mayúsculas gritonas, encabezado pastel */
+    .table th{background:#f3eefc;color:#3b3650;font-family:var(--fd);font-weight:600;font-size:11px;text-transform:none;letter-spacing:0;border-bottom:2px solid #e6dcf6}
+    .table th:first-child{border-top-left-radius:14px}.table th:last-child{border-top-right-radius:14px}
+    .table tbody tr{transition:background .12s}.table tbody tr:hover{background:#fff5fa}
+    /* estados como stickers */
+    .badge{font-family:var(--fd);font-weight:600;font-size:10.5px;padding:4px 10px;box-shadow:0 0 0 2px #fff,0 2px 0 2px rgba(0,0,0,.05)}
+    .quote-status-select{font-family:var(--fd);font-weight:600;font-size:11px;border-radius:999px;border-color:#eadfe8}
+    /* aviso (toast) */
+    .toast{font-family:var(--fd);font-weight:500;font-size:14px;border-radius:999px;padding:12px 20px;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+    .toast.show{animation:tcToast .45s cubic-bezier(.3,1.6,.5,1)}
+    @keyframes tcToast{from{transform:translate(-50%,24px) scale(.85)}to{transform:translate(-50%,0)}}
+    .empty{font-weight:500;font-size:15px}
+    /* barra de desplazamiento delgada */
+    *{scrollbar-width:thin;scrollbar-color:#e4c8dc transparent}
+    ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#e4c8dc;border-radius:99px;border:3px solid transparent;background-clip:padding-box}
+    @media (prefers-reduced-motion:reduce){.btn,.nav button,.module-card{transition:none}.modal-backdrop:not(.hidden)>.modal,.toast.show{animation:none}}
 </style>
 </head>
 <body>
@@ -2176,7 +2229,25 @@
     const viewPermissions={dashboard:"dashboard.view",clients:"clients.view",quotes:"quotes.view",remissions:"quotes.view",cdc:"quotes.view",products:"products.view",catalog:"products.view",calculators:"calculators.use",inventory:"inventory.view",production:"work_orders.view",payments:"payments.view",reports:"reports.view",users:"users.view",resources:"dashboard.view",design:"calculators.use"};
     let toastTimer,productCodePreviewTimer;
 
-    function showToast(text){const el=$("toast");el.textContent=text;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2600)}
+    // V9.78: festejo cuando pasa algo bueno (confeti desde el aviso + Don Fer); en Producción ya festeja woJuice
+    function tcParty(text){
+      try{
+        if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+        if(!/^✓|^✅|^🎉/.test(String(text)))return;
+        if(!/(aprobad|entregad|cerrada como pagada|pagad[ao] completo|pedido creado en producción|cierre .*guardad|caja .*cerrad|venta .*registrad)/i.test(text))return;
+        if(document.querySelector("#view-production.active")&&/entregad|listo/i.test(text))return;
+        const t=$("toast").getBoundingClientRect(),x=t.left+t.width/2||innerWidth/2,y=t.top||innerHeight-60,col=["#00AEEF","#EC008C","#FFF200","#1A1A1A","#22a06b"];
+        for(let i=0;i<30;i++){const d=document.createElement("i");d.className="wo-burst";const a=-Math.PI*(0.1+0.8*Math.random()),r=80+Math.random()*140;
+          d.style.left=x+"px";d.style.top=y+"px";d.style.background=col[i%5];d.style.setProperty("--dx",Math.cos(a)*r*1.6+"px");d.style.setProperty("--dy",Math.sin(a)*r+"px");if(i%3===0)d.style.borderRadius="2px";
+          document.body.appendChild(d);setTimeout(()=>d.remove(),950)}
+        let p=document.getElementById("woPeek"),b=document.getElementById("woPeekB");
+        if(!p){p=document.createElement("img");p.id="woPeek";p.className="wo-peek";p.src="donfer-asoma.webp";p.alt="";document.body.appendChild(p);b=document.createElement("div");b.id="woPeekB";b.className="wo-peek-b";document.body.appendChild(b)}
+        const m=/aprobad/i.test(text)?["¡Aprobada! 🎉","¡A producir! 💪"]:/pagad/i.test(text)?["¡Pagada! 💸","¡Al día! 🙌"]:/pedido creado/i.test(text)?["¡Pedido nuevo! 🎨","¡A trabajar! 💪"]:["¡Así se hace! 🙌","¡Uno menos! 🎉"];
+        clearTimeout(tcParty.t);b.textContent=m[Math.floor(Math.random()*m.length)];requestAnimationFrame(()=>{p.classList.add("on");b.classList.add("on")});
+        tcParty.t=setTimeout(()=>{p.classList.remove("on");b.classList.remove("on")},2600);
+      }catch(_){}
+    }
+    function showToast(text){const el=$("toast");el.textContent=text;el.classList.remove("show");void el.offsetWidth;el.classList.add("show");tcParty(text);clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2600)}
     function loading(on,text="Cargando…"){$("loadingText").textContent=text;$("loading").classList.toggle("hidden",!on)}
     async function withTimeout(promise,ms,message){let timer;try{return await Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(message||"La operación tardó demasiado. Intenta nuevamente.")),ms)})])}finally{clearTimeout(timer)}}
     function escapeHTML(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}

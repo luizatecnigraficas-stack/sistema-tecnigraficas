@@ -1075,6 +1075,24 @@
     /* barra de desplazamiento delgada */
     *{scrollbar-width:thin;scrollbar-color:#e4c8dc transparent}
     ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#e4c8dc;border-radius:99px;border:3px solid transparent;background-clip:padding-box}
+    /* V9.82: más movimiento — entrada de cada sección, escalonados, números que cuentan */
+    .view.active>*{animation:tcView .5s cubic-bezier(.2,.8,.2,1) backwards}
+    .view.active>*:nth-child(2){animation-delay:.06s}.view.active>*:nth-child(3){animation-delay:.12s}.view.active>*:nth-child(4){animation-delay:.18s}.view.active>*:nth-child(5){animation-delay:.24s}.view.active>*:nth-child(n+6){animation-delay:.3s}
+    @keyframes tcView{from{opacity:0;transform:translateY(16px)}}
+    .view.active .today-grid>*,.view.active .module-grid>*{animation:tcPopIn .55s cubic-bezier(.3,1.4,.5,1) backwards}
+    .view.active .today-grid>*:nth-child(1),.view.active .module-grid>*:nth-child(1){animation-delay:.12s}
+    .view.active .today-grid>*:nth-child(2),.view.active .module-grid>*:nth-child(2){animation-delay:.19s}
+    .view.active .today-grid>*:nth-child(3),.view.active .module-grid>*:nth-child(3){animation-delay:.26s}
+    .view.active .today-grid>*:nth-child(4),.view.active .module-grid>*:nth-child(4){animation-delay:.33s}
+    .view.active .today-grid>*:nth-child(n+5),.view.active .module-grid>*:nth-child(n+5){animation-delay:.4s}
+    @keyframes tcPopIn{from{opacity:0;transform:translateY(18px) scale(.94)}}
+    .table tbody tr:nth-child(-n+14){animation:tcRow .35s ease-out backwards}
+    .table tbody tr:nth-child(2){animation-delay:.03s}.table tbody tr:nth-child(3){animation-delay:.06s}.table tbody tr:nth-child(4){animation-delay:.09s}.table tbody tr:nth-child(5){animation-delay:.12s}.table tbody tr:nth-child(6){animation-delay:.15s}.table tbody tr:nth-child(7){animation-delay:.18s}.table tbody tr:nth-child(n+8){animation-delay:.21s}
+    @keyframes tcRow{from{opacity:0;transform:translateX(-8px)}}
+    .today-row{animation:tcRow .4s ease-out backwards}
+    .today-tile.tc-count strong{display:inline-block;animation:tcNum .5s cubic-bezier(.3,1.6,.5,1)}
+    @keyframes tcNum{40%{transform:scale(1.08)}}
+    @media (prefers-reduced-motion:reduce){.view.active>*,.view.active .today-grid>*,.view.active .module-grid>*,.table tbody tr,.today-row{animation:none!important}}
     /* V9.81: Don Fer saluda en Inicio */
     .today-head{display:flex;align-items:center;gap:12px}
     .today-don{width:74px;height:auto;flex:0 0 74px;margin:-10px 0 -12px -6px;filter:drop-shadow(0 6px 10px rgba(236,0,140,.18));animation:tcDonIn .7s cubic-bezier(.3,1.5,.5,1) backwards}
@@ -2246,6 +2264,22 @@
     const viewPermissions={dashboard:"dashboard.view",clients:"clients.view",quotes:"quotes.view",remissions:"quotes.view",cdc:"quotes.view",products:"products.view",catalog:"products.view",calculators:"calculators.use",inventory:"inventory.view",production:"work_orders.view",payments:"payments.view",reports:"reports.view",users:"users.view",resources:"dashboard.view",design:"calculators.use"};
     let toastTimer,productCodePreviewTimer;
 
+    // V9.82: los números de Inicio cuentan hacia arriba cuando cambian
+    (function tcCountUp(){
+      if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+      const busy=new WeakSet();
+      const fmt=n=>Math.round(n).toLocaleString("es-CO");
+      function run(el){
+        if(busy.has(el))return;const txt=el.textContent,m=txt.match(/^(\D*)([\d.]+)(\D*)$/);if(!m)return;
+        const end=+m[2].replace(/\./g,"");if(!end||end<2)return;
+        busy.add(el);const t0=performance.now(),dur=end>1000?900:500;el.closest(".today-tile")?.classList.add("tc-count");
+        const step=t=>{const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);el.textContent=m[1]+fmt(end*e)+m[3];
+          if(k<1)requestAnimationFrame(step);else{el.textContent=txt;setTimeout(()=>{busy.delete(el);el.closest(".today-tile")?.classList.remove("tc-count")},50)}};
+        requestAnimationFrame(step);
+      }
+      const obs=new MutationObserver(ms=>ms.forEach(mu=>{const el=mu.target.nodeType===1?mu.target:mu.target.parentElement;if(el&&el.matches&&el.matches(".today-tile strong"))run(el)}));
+      document.querySelectorAll(".today-tile strong").forEach(el=>obs.observe(el,{childList:true,characterData:true,subtree:true}));
+    })();
     // V9.78: festejo cuando pasa algo bueno (confeti desde el aviso + Don Fer); en Producción ya festeja woJuice
     function tcParty(text){
       try{

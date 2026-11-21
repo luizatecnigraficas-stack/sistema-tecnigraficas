@@ -3034,7 +3034,7 @@
     async function loadFinBalance(){
       const box=$("finBalance");if(!box)return;
       try{finEnsureObligations()}catch(e){}
-      const [sv,ca,pr,gf]=await Promise.all([db.from("finance_savings").select("*").eq("active",true).order("created_at"),db.from("client_account_balances").select("balance"),db.from("supplier_account_balances").select("balance"),db.from("gf_entries").select("side,amount").is("settlement_id",null)]);
+      const [sv,ca,pr,gf]=await Promise.all([db.from("finance_savings").select("*").eq("active",true).order("created_at"),db.from("client_account_balances").select("balance"),db.from("supplier_account_balances").select("balance"),(async()=>{const c=await db.from("gf_clients").select("id").eq("is_tecni",true).maybeSingle();if(!c.data)return{data:[]};const b=await db.from("gf_client_balances").select("balance").eq("client_id",c.data.id).maybeSingle();return{data:[{side:"gf",amount:Number(b.data?.balance||0)}]}})()]);
       finBal.gf=(gf.data||[]).reduce((t,x)=>t+(x.side==="gf"?1:-1)*Number(x.amount||0),0);
       if(sv.error){box.innerHTML=`<div class="empty">No pude cargar los ahorros: ${escapeHTML(sv.error.message)}</div>`;return}
       finBal.savings=sv.data||[];finBal.cartera=(ca.data||[]).reduce((t,x)=>t+Math.max(0,Number(x.balance||0)),0);finBal.proveedores=(pr.data||[]).reduce((t,x)=>t+Math.max(0,Number(x.balance||0)),0);
@@ -4298,10 +4298,16 @@
     // V9.66: cuenta con gran formato (Paul) — lo que le debemos y lo que pagamos por ellos
     const finGF={rows:[],cuts:[],cat:null};
     async function loadFinGF(){
+      // V9.94: gran formato es el negocio de Paul y Tecni es un cliente más: aquí solo se ve nuestra cuenta con él
       const box=$("finGF");if(!box)return;
-      const [en,st,cs]=await Promise.all([db.from("gf_entries").select("*").is("settlement_id",null).order("entry_date").order("created_at"),db.from("gf_settlements").select("*").eq("hidden",false).order("created_at",{ascending:false}).limit(8),db.from("app_settings").select("value").eq("key","gf_category_id").maybeSingle()]);
-      if(en.error){box.innerHTML=`<div class="empty">No pude cargar la cuenta: ${escapeHTML(en.error.message)}</div>`;return}
-      finGF.rows=en.data||[];finGF.cuts=st.data||[];finGF.cat=cs.data?.value||(state.financeCategories||[]).find(c=>/^gran formato/i.test(c.name))?.id||null;renderFinGF();
+      const c=await db.from("gf_clients").select("id,name").eq("is_tecni",true).maybeSingle();
+      if(c.error||!c.data){box.innerHTML=`<div class="empty">No encontré la cuenta de Tecnigráficas en gran formato.</div>`;return}
+      const [b,pr,py]=await Promise.all([db.from("gf_client_balances").select("*").eq("client_id",c.data.id).maybeSingle(),db.from("gf_prints").select("print_date,detail,quantity,base_cm,height_cm,material_name,total").eq("client_id",c.data.id).order("print_date",{ascending:false}).order("created_at",{ascending:false}).limit(40),db.from("gf_client_payments").select("paid_on,amount,method,note").eq("client_id",c.data.id).order("paid_on",{ascending:false}).limit(20)]);
+      const x=b.data||{billed:0,paid:0,balance:0},bal=Number(x.balance||0);
+      const row=(t,sm,v)=>`<div class="fin-credit-row" style="padding:9px 0;border-bottom:1px solid var(--line);gap:10px"><span><strong>${escapeHTML(t)}</strong><br><small class="fin-muted">${escapeHTML(sm)}</small></span><strong>${formatCOP(v)}</strong></div>`;
+      box.innerHTML=`<div class="fin-card"><div class="fin-credit-nums"><div><span>Nos ha cobrado</span><strong>${formatCOP(x.billed)}</strong></div><div><span>Le hemos pagado</span><strong>${formatCOP(x.paid)}</strong></div><div><span>${bal<0?"Tenemos a favor":"Le debemos"}</span><strong style="color:${bal>0?"#b3263a":"#11834d"}">${formatCOP(Math.abs(bal))}</strong></div></div><p class="fin-muted" style="margin:0">Gran formato es el negocio de Paul y Tecnigráficas es uno de sus clientes. Él anota los trabajos y los abonos en su página. <a href="gran-formato-paul.html" style="font-weight:700">🖨️ Abrir la página de gran formato</a></p></div>
+      <div class="fin-two"><section class="fin-card"><div class="fin-card-head"><h3>🖨️ Trabajos que nos ha hecho</h3></div>${(pr.data||[]).map(p=>row(p.detail,`${formatDate(p.print_date)} · ${p.quantity} × ${Number(p.base_cm)}×${Number(p.height_cm)} cm · ${p.material_name||""}`,p.total)).join("")||`<div class="empty">Todavía no hay trabajos.</div>`}</section>
+      <section class="fin-card"><div class="fin-card-head"><h3>💵 Abonos que le hemos hecho</h3></div>${(py.data||[]).map(p=>row("Abono"+(p.method?" · "+p.method:""),formatDate(p.paid_on)+(p.note?" · "+p.note:""),p.amount)).join("")||`<div class="empty">Todavía no hay abonos.</div>`}</section></div>`;
     }
     function finGFTotals(){const s=k=>finGF.rows.filter(x=>x.side===k).reduce((t,x)=>t+Number(x.amount||0),0),gf=s("gf"),te=s("tecni");return{gf,te,bal:Math.round((gf-te)*100)/100}}
     function renderFinGF(){

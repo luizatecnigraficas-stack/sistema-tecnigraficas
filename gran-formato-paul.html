@@ -129,14 +129,13 @@ details summary{cursor:pointer;font-weight:600;margin-top:8px;font-family:var(--
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script><link rel="stylesheet" href="estilo-tecni.css">
 </head><body>
-<header><div class="head"><img class="logo" src="logo-web.webp" alt="Tecnigráficas"><div class="htitle"><b>🖨️ Gran formato</b><span id="who">Impresiones, abonos y pago de cada viernes</span></div><button class="back" onclick="location.href='index.html'">← Sistema</button></div></header>
+<header><div class="head"><img class="logo" src="logo-web.webp" alt="Tecnigráficas"><div class="htitle"><b>🖨️ Gran formato</b><span id="who">Trabajos, clientes, inventario y pedidos</span></div><button class="back" onclick="location.href='index.html'">← Sistema</button></div></header>
 <main>
   <section class="card" id="resumen"></section>
   <div class="tabs" id="tabs">
     <button data-tab="anotar" class="on">🖨️ Anotar trabajos</button>
-    <button data-tab="abonos">🧾 Abonos y cuenta</button>
+    <button data-tab="clientes">🧾 Clientes y abonos</button>
     <button data-tab="mes">📅 Por mes</button>
-    <button data-tab="clientes">👥 Mis clientes</button>
     <button data-tab="inv">📦 Inventario</button>
     <button data-tab="costos">🛒 Costos y pedidos</button>
     <button data-tab="tarifas">⚙️ Tarifas</button>
@@ -158,7 +157,7 @@ details summary{cursor:pointer;font-weight:600;margin-top:8px;font-family:var(--
         <label>Material</label><div class="chips" id="fMat"></div>
         <label>Acabado</label><div class="chips" id="fFin"></div>
         <div id="finQtyWrap" class="hidden"><label for="fFinQty" id="finQtyLabel">¿Cuántos?</label><input id="fFinQty" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
-        <div id="fPriceWrap" class="hidden"><label for="fPrice">Precio especial por pieza (opcional)</label><input id="fPrice" type="number" min="1" step="1" inputmode="numeric" placeholder="Vacío = con las tarifas"></div>
+        <div id="fPriceWrap"><label for="fPrice">Precio especial por pieza (opcional)</label><input id="fPrice" type="number" min="1" step="1" inputmode="numeric" placeholder="Vacío = con las tarifas"></div>
         <label for="fDate">Fecha</label><input id="fDate" type="date">
         <div class="price"><div><small>Valor por pieza</small><span id="pUnit">$0</span><div id="pMin" class="minflag hidden"></div></div><div style="text-align:right"><small>Total</small><strong id="pTotal">$0</strong></div></div>
         <button class="btn full" type="submit" id="fSave">✓ Guardar trabajo</button>
@@ -168,21 +167,14 @@ details summary{cursor:pointer;font-weight:600;margin-top:8px;font-family:var(--
     <section class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3>Trabajos de esta semana</h3><span class="muted" id="weekCount"></span></div><div id="weekList"></div></section>
   </div>
 
-  <div id="tab-abonos" class="hidden">
-    <div class="two">
-      <section class="card"><h3>🖨️ Lo que Tecni le debe a gran formato</h3><div id="ladoGF"></div><div class="actions hidden fin-only"><button class="btn sec sm" onclick="otroCobro()">＋ Otro cobro (préstamo, etc.)</button></div></section>
-      <section class="card"><h3>🧾 Abonos de Tecni</h3><div id="ladoTecni"></div><div class="actions hidden fin-only"><button class="btn sec sm" onclick="semanaAlejo()">＋ Semana de Alejo (mitad)</button><button class="btn sec sm" onclick="nuevoAbono()">＋ Abono</button></div></section>
-    </div>
-    <section class="card hidden fin-only"><h3>💸 Cierre del viernes</h3><p class="muted">Paga lo que falta y cierra la semana. Si queda saldo, pasa a la semana siguiente como "Saldo anterior".</p><button class="btn" onclick="abrirCierre()">💸 Pagar y cerrar la semana</button></section>
-    <section class="card"><h3>📁 Semanas cerradas</h3><div id="cortes"></div></section>
-  </div>
+  <div class="hidden"><div id="ladoGF"></div><div id="ladoTecni"></div><div id="cortes"></div></div>
 
   <div id="tab-mes" class="hidden">
     <section class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between"><h3>Impresiones del mes</h3><select id="mesSel" style="width:auto"></select></div><div class="sum" id="mesSum"></div><div id="mesList"></div></section>
   </div>
 
   <div id="tab-clientes" class="hidden">
-    <section class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h3>👥 Mis clientes</h3><p class="muted" style="margin:4px 0 0">Tus otros clientes (intermediarios). No cruzan cuenta con Tecni: solo les cobras.</p></div><button class="btn" onclick="nuevoCliente()">＋ Cliente nuevo</button></div><div class="sum" id="clSum"></div></section>
+    <section class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h3>🧾 Clientes y abonos</h3><p class="muted" style="margin:4px 0 0">Cada cliente con su cuenta: lo que le has cobrado, los abonos con su fecha y lo que te debe.</p></div><button class="btn" onclick="nuevoCliente()">＋ Cliente nuevo</button></div><div class="sum" id="clSum"></div></section>
     <div class="cl-grid"><section class="card"><input id="clSearch" placeholder="Buscar cliente…"><div id="clList" style="margin-top:8px"></div></section><section class="card" id="clDetail"><div class="empty">Escoge un cliente para ver su cuenta.</div></section></div>
   </div>
 
@@ -263,7 +255,7 @@ details summary{cursor:pointer;font-weight:600;margin-top:8px;font-family:var(--
   <div class="g2"><div><label for="pAmount">Valor</label><input id="pAmount" type="number" min="1" step="1" required inputmode="numeric"></div><div><label for="pDate">Fecha</label><input id="pDate" type="date" required></div></div>
   <label>¿Cómo pagó?</label><div class="seg" id="pMethods"><button type="button" class="chip on" data-m="Efectivo">Efectivo</button><button type="button" class="chip" data-m="Nequi">Nequi</button><button type="button" class="chip" data-m="Transferencia">Transferencia</button><button type="button" class="chip" data-m="Otro">Otro</button></div>
   <label for="pNote">Nota (opcional)</label><input id="pNote">
-  <div class="actions"><button type="button" class="btn sec" onclick="cerrarModal('mPago')">Cancelar</button><button class="btn" type="submit" id="pSave">✓ Guardar pago</button></div>
+  <div class="actions"><button type="button" class="btn sec" onclick="cerrarModal('mPago')">Cancelar</button><button class="btn" type="submit" id="pSave">✓ Guardar abono</button></div>
 </form></div></div>
 
 <button class="dfab" id="dFab" title="Pregúntale a Don Fer" aria-label="Pregúntale a Don Fer"></button>
@@ -315,8 +307,7 @@ async function cargar(){
   for(const x of[r,p,e,c,ro,cl,cb,cp,ci,od,oi])if(x.error)throw x.error;S.costs=ci.data||[];S.orders=od.data||[];S.oitems=oi.data||[];S.rolls=ro.data||[];S.clients=cl.data||[];S.bals=new Map((cb.data||[]).map(b=>[b.client_id,b]));S.pays=cp.data||[];
   S.rates=r.data||[];S.entries=e.data||[];S.cuts=c.data||[];
   const open=new Set(S.entries.filter(x=>x.source==="prints").map(x=>x.id));
-  S.prints=(p.data||[]);S.tecniWeek=S.prints.filter(x=>!x.client_id&&x.entry_id&&open.has(x.entry_id));
-  const mon=lunes();S.week=S.prints.filter(x=>(!x.client_id&&x.entry_id&&open.has(x.entry_id))||(x.client_id&&x.print_date>=mon));
+  S.prints=(p.data||[]);const mon=lunes();S.week=S.prints.filter(x=>x.print_date>=mon);
   if(!S.mat)S.mat=(S.rates.find(x=>x.kind==="material")||{}).code;
   pintarTodo();
 }
@@ -325,13 +316,14 @@ const cname=id=>S.clients.find(c=>c.id===id)?.name||"Cliente";
 function totales(){const s=k=>S.entries.filter(x=>x.side===k).reduce((t,x)=>t+Number(x.amount||0),0),gf=s("gf"),te=s("tecni");return{gf,te,bal:Math.round(gf-te)}}
 function desde(){const d=S.entries.map(x=>x.entry_date).sort()[0]||S.tecniWeek.map(x=>x.print_date).sort()[0];return d}
 
-function pintarTodo(){pintarClienteSel();pintarResumen();pintarChips();precio();pintarSemana();pintarCuenta();pintarMeses();pintarTarifas();pintarInv();pintarClientes();pintarCostos()}
+function pintarTodo(){pintarClienteSel();pintarResumen();pintarChips();precio();pintarSemana();pintarMeses();pintarTarifas();pintarInv();pintarClientes();pintarCostos()}
 
 function pintarResumen(){
-  const t=totales(),imp=S.tecniWeek.reduce((a,x)=>a+Number(x.total||0),0),d=desde();
-  const big=t.bal>0?`<div class="big"><span>El viernes Tecni le paga a gran formato</span><strong>${cop(t.bal)}</strong></div>`:t.bal<0?`<div class="big debe">Gran formato le debe a Tecni <strong>${cop(-t.bal)}</strong><br><small>Pasa a la próxima semana si no se cruza.</small></div>`:`<div class="big paz">Están a paz y salvo ✅</div>`;
-  $("resumen").innerHTML=`<img class="don" src="donfer-saluda.webp" alt=""><h2>Cuenta con Tecni esta semana${d?` <span class="muted">· desde el ${esc(fshort(d))}</span>`:""}</h2>
-  <div class="sum"><div><span>Impresiones para Tecni (${S.tecniWeek.length})</span><strong>${cop(imp)}</strong></div><div><span>Todo lo que Tecni debe</span><strong>${cop(t.gf)}</strong></div><div><span>Abonos de Tecni</span><strong>${cop(t.te)}</strong></div></div>${big}`;
+  const mon=lunes(),imp=S.week.reduce((a,x)=>a+Number(x.total||0),0),pag=S.pays.filter(x=>x.paid_on>=mon).reduce((a,x)=>a+Number(x.amount||0),0);
+  const deben=S.clients.filter(c=>c.active).map(c=>({c,b:Number(S.bals.get(c.id)?.balance||0)})).filter(x=>x.b>0).sort((a,b)=>b.b-a.b),tot=deben.reduce((a,x)=>a+x.b,0);
+  const big=tot>0?`<div class="big"><span>Te deben en total</span><strong>${cop(tot)}</strong><span style="flex-basis:100%;font-size:13px;opacity:.85">${deben.slice(0,3).map(x=>`${esc(x.c.name)} ${cop(x.b)}`).join(" · ")}${deben.length>3?` · y ${deben.length-3} más`:""}</span></div>`:`<div class="big paz">Nadie te debe: todos al día ✅</div>`;
+  $("resumen").innerHTML=`<img class="don" src="donfer-saluda.webp" alt=""><h2>Esta semana <span class="muted">· desde el ${esc(fshort(mon))}</span></h2>
+  <div class="sum"><div><span>Trabajos (${S.week.length})</span><strong>${cop(imp)}</strong></div><div><span>Te han abonado</span><strong>${cop(pag)}</strong></div><div><span>Clientes que deben</span><strong>${deben.length}</strong></div></div>${big}`;
 }
 
 function pintarChips(){
@@ -356,8 +348,8 @@ function precio(){
   $("pMin").classList.toggle("hidden",!r.min);$("pMin").textContent=`Se cobra el mínimo (${cop(minimo())})`;
 }
 ["fQty","fBase","fAlto","fFinQty","fPrice"].forEach(id=>$(id).addEventListener("input",precio));
-function pintarClienteSel(){const v=$("fClient").value;$("fClient").innerHTML=`<option value="">🔁 Tecnigráficas (cuenta cruzada)</option>`+S.clients.filter(c=>c.active||c.id===v).map(c=>`<option value="${c.id}">👤 ${esc(c.name)}</option>`).join("")+`<option value="__new">＋ Cliente nuevo…</option>`;$("fClient").value=S.clients.some(c=>c.id===v)?v:"";$("fPriceWrap").classList.toggle("hidden",!$("fClient").value)}
-$("fClient").addEventListener("change",()=>{if($("fClient").value==="__new"){$("fClient").value="";nuevoCliente(true);return}$("fPriceWrap").classList.toggle("hidden",!$("fClient").value);if(!$("fClient").value)$("fPrice").value="";precio()});
+function pintarClienteSel(){const v=$("fClient").value;let last="";try{last=localStorage.getItem("gfLastClient")||""}catch(e){}$("fClient").innerHTML=`<option value="">Escoge el cliente…</option>`+S.clients.filter(c=>c.active||c.id===v).map(c=>`<option value="${c.id}">👤 ${esc(c.name)}</option>`).join("")+`<option value="__new">＋ Cliente nuevo…</option>`;$("fClient").value=S.clients.some(c=>c.id===v)?v:(S.clients.some(c=>c.id===last&&c.active)?last:"")}
+$("fClient").addEventListener("change",()=>{if($("fClient").value==="__new"){$("fClient").value="";nuevoCliente(true);return}precio()});
 
 function filaTrabajo(x,tap){
   const fin=x.finish_code&&x.finish_code!=="sin"?` · ${esc(x.finish_name)}${Number(x.finish_qty)?" "+Number(x.finish_qty):""}`:"";
@@ -372,18 +364,18 @@ function pintarSemana(){
 }
 $("weekList").addEventListener("click",e=>{const r=e.target.closest("[data-id]");if(r)editar(r.dataset.id)});
 
-function limpiar(){S.editId=null;const keepC=$("fClient").value;$("f").reset();$("fClient").value=keepC;$("fClient").disabled=false;$("fPrice").value="";$("fPriceWrap").classList.toggle("hidden",!keepC);$("fQty").value=1;$("fFinQty").value=0;$("fDate").value=today();S.fin_code="sin";$("formTitle").textContent="Anotar un trabajo";$("fSave").textContent="✓ Guardar trabajo";$("editActions").classList.add("hidden");$("formCard").classList.remove("editing");pintarChips();precio()}
-function editar(id){const x=S.week.find(p=>p.id===id);if(!x)return;S.editId=id;$("fDetail").value=x.detail;$("fQty").value=x.quantity;$("fBase").value=Number(x.base_cm);$("fAlto").value=Number(x.height_cm);$("fFinQty").value=Number(x.finish_qty)||0;$("fDate").value=x.print_date;$("fClient").value=x.client_id||"";$("fClient").disabled=true;$("fPrice").value=x.price_override?Number(x.price_override):"";$("fPriceWrap").classList.toggle("hidden",!x.client_id);S.mat=x.material_code;S.fin_code=x.finish_code||"sin";$("formTitle").textContent="Corregir trabajo";$("fSave").textContent="✓ Guardar cambios";$("editActions").classList.remove("hidden");$("formCard").classList.add("editing");pintarChips();precio();$("formCard").scrollIntoView({behavior:"smooth",block:"start"})}
+function limpiar(){S.editId=null;const keepC=$("fClient").value;$("f").reset();$("fClient").value=keepC;$("fPrice").value="";$("fQty").value=1;$("fFinQty").value=0;$("fDate").value=today();S.fin_code="sin";$("formTitle").textContent="Anotar un trabajo";$("fSave").textContent="✓ Guardar trabajo";$("editActions").classList.add("hidden");$("formCard").classList.remove("editing");pintarChips();precio()}
+function editar(id){const x=S.week.find(p=>p.id===id);if(!x)return;S.editId=id;$("fDetail").value=x.detail;$("fQty").value=x.quantity;$("fBase").value=Number(x.base_cm);$("fAlto").value=Number(x.height_cm);$("fFinQty").value=Number(x.finish_qty)||0;$("fDate").value=x.print_date;$("fClient").value=x.client_id||"";$("fPrice").value=x.price_override?Number(x.price_override):"";S.mat=x.material_code;S.fin_code=x.finish_code||"sin";$("formTitle").textContent="Corregir trabajo";$("fSave").textContent="✓ Guardar cambios";$("editActions").classList.remove("hidden");$("formCard").classList.add("editing");pintarChips();precio();$("formCard").scrollIntoView({behavior:"smooth",block:"start"})}
 $("fCancel").addEventListener("click",limpiar);
 $("fDelete").addEventListener("click",async()=>{if(!S.editId||!confirm("¿Borrar este trabajo?"))return;const r=await db.from("gf_prints").delete().eq("id",S.editId);if(r.error)return alert(r.error.message);toast("Trabajo borrado");limpiar();await cargar()});
 $("f").addEventListener("submit",async e=>{
   e.preventDefault();if(!S.mat)return alert("Escoge el material");
   const f=rate(S.fin_code),p={detail:$("fDetail").value.trim(),quantity:Math.round(num($("fQty").value)),base_cm:num($("fBase").value),height_cm:num($("fAlto").value),material_code:S.mat,finish_code:S.fin_code,finish_qty:f&&f.code!=="sin"?num($("fFinQty").value):0,print_date:$("fDate").value||today()};
-  const cid=$("fClient").value;if(!S.editId)p.client_id=cid||null;p.price_override=cid&&num($("fPrice").value)>0?Math.round(num($("fPrice").value)):null;
+  const cid=$("fClient").value;if(!cid)return alert("Escoge para qué cliente es el trabajo.");p.client_id=cid;try{localStorage.setItem("gfLastClient",cid)}catch(e){}p.price_override=num($("fPrice").value)>0?Math.round(num($("fPrice").value)):null;
   if(!p.detail||!(p.quantity>0&&p.base_cm>0&&p.height_cm>0))return alert("Revisa el nombre, la cantidad y las medidas.");
   $("fSave").disabled=true;
   try{const r=S.editId?await db.from("gf_prints").update(p).eq("id",S.editId):await db.from("gf_prints").insert(p);if(r.error)throw r.error;
-    toast(S.editId?"Cambios guardados":(p.client_id?`Anotado a ${cname(p.client_id)} ✓`:"Trabajo anotado ✓"));const keep=S.mat;limpiar();S.mat=keep;await cargar();$("fDetail").focus()}
+    toast(S.editId?"Cambios guardados":`Anotado a ${cname(p.client_id)} ✓`);const keep=S.mat;limpiar();S.mat=keep;await cargar();$("fDetail").focus()}
   catch(err){alert(err.message)}finally{$("fSave").disabled=false}
 });
 
@@ -423,7 +415,7 @@ function pintarMeses(){
   sel.innerHTML=months.map(m=>{const [y,mm]=m.split("-").map(Number);return `<option value="${m}"${m===cur?" selected":""}>${new Date(y,mm-1,1).toLocaleDateString("es-CO",{month:"long",year:"numeric"})}</option>`}).join("")||`<option value="">Sin trabajos</option>`;
   const list=S.prints.filter(x=>x.print_date.slice(0,7)===sel.value),tot=list.reduce((a,x)=>a+Number(x.total||0),0),pz=list.reduce((a,x)=>a+Number(x.quantity||0),0),mins=list.filter(x=>x.minimum_applied).length;
   const tt=list.filter(x=>!x.client_id).reduce((a,x)=>a+Number(x.total||0),0);
-  $("mesSum").innerHTML=`<div><span>Total del mes</span><strong>${cop(tot)}</strong></div><div><span>Para Tecni · otros clientes</span><strong>${cop(tt)} · ${cop(tot-tt)}</strong></div><div><span>Trabajos · piezas · con mínimo</span><strong>${list.length} · ${pz} · ${mins}</strong></div>`;
+  $("mesSum").innerHTML=`<div><span>Total del mes</span><strong>${cop(tot)}</strong></div><div><span>Clientes atendidos</span><strong>${new Set(list.map(x=>x.client_id)).size}</strong></div><div><span>Trabajos · piezas · con mínimo</span><strong>${list.length} · ${pz} · ${mins}</strong></div>`;
   const m2=list.reduce((a,x)=>a+Number(x.quantity)*Number(x.base_cm)*Number(x.height_cm)/10000,0),fp=Number(rate("fondo_maquina")?.price||0);
   $("mesSum").insertAdjacentHTML("beforeend",`<div><span>Metros cuadrados impresos</span><strong>${mfmt(m2)} m²</strong></div><div><span>Promedio cobrado</span><strong>${m2>0?cop(tot/m2):"$0"}/m²</strong></div><div><span>🔧 Guarda para la máquina (${mfmt(fp)} %)</span><strong>${cop(tot*fp/100)}</strong></div>`);
   let h="",last="";for(const x of list){if(x.print_date!==last){last=x.print_date;h+=`<div class="day">${esc(fdate(last))}</div>`}h+=filaTrabajo(x,false)}
@@ -454,7 +446,7 @@ const bal=id=>Number(S.bals.get(id)?.balance||0);
 function pintarClientes(){
   const act=S.clients.filter(c=>c.active),q=($("clSearch").value||"").toLowerCase().trim();
   const debe=act.reduce((a,c)=>a+Math.max(0,bal(c.id)),0),mon=lunes(),semana=S.prints.filter(x=>x.client_id&&x.print_date>=mon).reduce((a,x)=>a+Number(x.total||0),0);
-  $("clSum").innerHTML=`<div><span>Te deben en total</span><strong>${cop(debe)}</strong></div><div><span>Cobrado a clientes esta semana</span><strong>${cop(semana)}</strong></div><div><span>Clientes</span><strong>${act.length}</strong></div>`;
+  $("clSum").innerHTML=`<div><span>Te deben en total</span><strong>${cop(debe)}</strong></div><div><span>Trabajos de esta semana</span><strong>${cop(semana)}</strong></div><div><span>Clientes</span><strong>${act.length}</strong></div>`;
   const list=act.filter(c=>!q||c.name.toLowerCase().includes(q)).sort((a,b)=>bal(b.id)-bal(a.id)||a.name.localeCompare(b.name));
   $("clList").innerHTML=list.map(c=>{const b=bal(c.id);return `<div class="row tap${S.clientSel===c.id?" sel":""}" data-cid="${c.id}"><span><b>${esc(c.name)}</b><small>${c.phone?esc(c.phone):"Sin celular"}</small></span><span class="bal ${b>0?"debe":"ok"}">${b>0?cop(b):b<0?"A favor "+cop(-b):"Al día ✅"}</span></div>`}).join("")||`<div class="empty">${q?"No encontré ese cliente.":"Todavía no tienes clientes. Toca \"＋ Cliente nuevo\"."}</div>`;
   const arch=S.clients.filter(c=>!c.active);if(arch.length&&!q)$("clList").insertAdjacentHTML("beforeend",`<details style="margin-top:8px"><summary class="muted">Archivados (${arch.length})</summary>${arch.map(c=>`<div class="row tap" data-cid="${c.id}"><span><b>${esc(c.name)}</b></span><span class="muted">${cop(bal(c.id))}</span></div>`).join("")}</details>`);
@@ -471,13 +463,13 @@ function pintarDetalle(){
   const b=S.bals.get(c.id)||{billed:0,paid:0,balance:0},mv=movsCliente(c.id);
   $("clDetail").innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap"><div><h2>${esc(c.name)}${c.active?"":' <span class="tag">Archivado</span>'}</h2><p class="muted" style="margin:4px 0 0">${c.phone?"📱 "+esc(c.phone):"Sin celular"}${c.notes?" · "+esc(c.notes):""}</p></div><button class="btn sec sm" onclick="editarCliente('${c.id}')">✏️ Editar</button></div>
   <div class="sum"><div><span>Le has cobrado</span><strong>${cop(b.billed)}</strong></div><div><span>Te ha pagado</span><strong>${cop(b.paid)}</strong></div><div><span>${Number(b.balance)<0?"Tiene a favor":"Te debe"}</span><strong style="color:${Number(b.balance)>0?"#b42318":"#067647"}">${cop(Math.abs(b.balance))}</strong></div></div>
-  <div class="actions"><button class="btn sm" onclick="anotarPara('${c.id}')">🖨️ Anotar trabajo</button><button class="btn sm" onclick="nuevoPago('${c.id}')">💵 Registrar pago</button>${c.phone?`<button class="btn sec sm" onclick="mandarEstado('${c.id}')">📲 Mandar estado de cuenta</button>`:""}</div>
+  <div class="actions"><button class="btn sm" onclick="anotarPara('${c.id}')">🖨️ Anotar trabajo</button><button class="btn sm" onclick="nuevoPago('${c.id}')">💵 Registrar abono</button>${c.phone?`<button class="btn sec sm" onclick="mandarEstado('${c.id}')">📲 Mandar estado de cuenta</button>`:""}</div>
   <div class="day" style="margin-top:16px">Movimientos</div>
-  ${mv.map(m=>m.k==="job"?filaTrabajoCliente(m):`<div class="row"><span><b>💵 Pago${m.x.method?" · "+esc(m.x.method):""}</b><small>${esc(fshort(m.d))}${m.x.note?" · "+esc(m.x.note):""} · saldo ${cop(m.run)}</small></span><span style="display:flex;gap:8px;align-items:center"><span class="amt" style="color:#067647">−${cop(m.x.amount)}</span><button class="btn red sm" onclick="borrarPago('${m.x.id}')">✕</button></span></div>`).join("")||`<div class="empty">Todavía no hay movimientos.</div>`}`;
+  ${mv.map(m=>m.k==="job"?filaTrabajoCliente(m):`<div class="row"><span><b>💵 Abono${m.x.method?" · "+esc(m.x.method):""}</b><small>${esc(fshort(m.d))}${m.x.note?" · "+esc(m.x.note):""} · saldo ${cop(m.run)}</small></span><span style="display:flex;gap:8px;align-items:center"><span class="amt" style="color:#067647">−${cop(m.x.amount)}</span><button class="btn red sm" onclick="borrarPago('${m.x.id}')">✕</button></span></div>`).join("")||`<div class="empty">Todavía no hay movimientos.</div>`}`;
 }
 function filaTrabajoCliente(m){const x=m.x;return `<div class="row tap" onclick="editarDesdeCliente('${x.id}')"><span><b>${esc(x.detail)}</b><small>${esc(fshort(m.d))} · ${x.quantity} × ${Number(x.base_cm)}×${Number(x.height_cm)} cm · ${esc(x.material_name)}${x.price_override?" · precio especial":""} · saldo ${cop(m.run)}</small></span><span class="amt">${cop(x.total)}</span></div>`}
 function irAnotar(){document.querySelector('#tabs button[data-tab="anotar"]').click();$("formCard").scrollIntoView({behavior:"smooth",block:"start"})}
-window.anotarPara=id=>{if(S.editId)limpiar();irAnotar();$("fClient").value=id;$("fPriceWrap").classList.remove("hidden");precio();$("fDetail").focus()};
+window.anotarPara=id=>{if(S.editId)limpiar();irAnotar();$("fClient").value=id;precio();$("fDetail").focus()};
 window.editarDesdeCliente=id=>{const x=S.prints.find(p=>p.id===id);if(!x)return;if(!S.week.some(w=>w.id===id))S.week.push(x);irAnotar();editar(id)};
 window.nuevoCliente=(fromForm)=>{S.clientEdit=null;S.clientFromForm=!!fromForm;$("fCliente").reset();$("mClienteTitle").textContent="Cliente nuevo";$("cArchive").classList.add("hidden");$("mCliente").classList.remove("hidden");$("cName").focus()};
 window.editarCliente=id=>{const c=S.clients.find(x=>x.id===id);if(!c)return;S.clientEdit=id;S.clientFromForm=false;$("mClienteTitle").textContent="Editar cliente";$("cName").value=c.name;$("cPhone").value=c.phone||"";$("cNotes").value=c.notes||"";$("cArchive").textContent=c.active?"Archivar":"Volver a activar";$("cArchive").classList.remove("hidden");$("mCliente").classList.remove("hidden")};
@@ -486,17 +478,17 @@ $("fCliente").addEventListener("submit",async e=>{e.preventDefault();const p={na
   $("cSave").disabled=true;try{let id=S.clientEdit;
     if(id){const r=await db.from("gf_clients").update(p).eq("id",id);if(r.error)throw r.error}
     else{const r=await db.from("gf_clients").insert({...p,created_by:S.session.user.id}).select("id").single();if(r.error)throw r.error;id=r.data.id}
-    cerrarModal("mCliente");S.clientSel=id;await cargar();toast("Cliente guardado ✓");if(S.clientFromForm){$("fClient").value=id;$("fPriceWrap").classList.remove("hidden");precio()}}
+    cerrarModal("mCliente");S.clientSel=id;await cargar();toast("Cliente guardado ✓");if(S.clientFromForm){$("fClient").value=id;precio()}}
   catch(err){alert(err.message)}finally{$("cSave").disabled=false}});
 $("cArchive").addEventListener("click",async()=>{const c=S.clients.find(x=>x.id===S.clientEdit);if(!c)return;if(c.active&&bal(c.id)>0&&!confirm(`${c.name} todavía te debe ${cop(bal(c.id))}. ¿Archivarlo igual?`))return;
   const r=await db.from("gf_clients").update({active:!c.active,updated_at:new Date().toISOString()}).eq("id",c.id);if(r.error)return alert(r.error.message);cerrarModal("mCliente");toast(c.active?"Cliente archivado":"Cliente activo de nuevo");cargar()});
-window.nuevoPago=id=>{S.clientSel=id;const c=S.clients.find(x=>x.id===id);$("fPago").reset();$("mPagoTitle").textContent=`Pago de ${c?.name||""}`;$("pDate").value=today();const b=bal(id);$("pAmount").value=b>0?Math.round(b):"";S.payMethod="Efectivo";marcarMetodo();$("mPago").classList.remove("hidden");$("pAmount").focus()};
+window.nuevoPago=id=>{S.clientSel=id;const c=S.clients.find(x=>x.id===id);$("fPago").reset();$("mPagoTitle").textContent=`Abono de ${c?.name||""}`;$("pDate").value=today();const b=bal(id);$("pAmount").value=b>0?Math.round(b):"";S.payMethod="Efectivo";marcarMetodo();$("mPago").classList.remove("hidden");$("pAmount").focus()};
 function marcarMetodo(){$("pMethods").querySelectorAll("[data-m]").forEach(b=>b.classList.toggle("on",b.dataset.m===S.payMethod))}
 $("pMethods").addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(!b)return;S.payMethod=b.dataset.m;marcarMetodo()});
 $("fPago").addEventListener("submit",async e=>{e.preventDefault();const a=Math.round(num($("pAmount").value));if(!(a>0))return;$("pSave").disabled=true;
-  try{const r=await db.from("gf_client_payments").insert({client_id:S.clientSel,amount:a,paid_on:$("pDate").value||today(),method:S.payMethod,note:$("pNote").value.trim()||null,created_by:S.session.user.id});if(r.error)throw r.error;cerrarModal("mPago");toast("Pago guardado ✓");await cargar();if(bal(S.clientSel)<=0)party("¡Quedó al día!")}
+  try{const r=await db.from("gf_client_payments").insert({client_id:S.clientSel,amount:a,paid_on:$("pDate").value||today(),method:S.payMethod,note:$("pNote").value.trim()||null,created_by:S.session.user.id});if(r.error)throw r.error;cerrarModal("mPago");toast("Abono guardado ✓");await cargar();if(bal(S.clientSel)<=0)party("¡Quedó al día!")}
   catch(err){alert(err.message)}finally{$("pSave").disabled=false}});
-window.borrarPago=async id=>{if(!confirm("¿Borrar este pago?"))return;const r=await db.from("gf_client_payments").delete().eq("id",id);if(r.error)return alert(r.error.message);toast("Pago borrado");cargar()};
+window.borrarPago=async id=>{if(!confirm("¿Borrar este abono?"))return;const r=await db.from("gf_client_payments").delete().eq("id",id);if(r.error)return alert(r.error.message);toast("Pago borrado");cargar()};
 window.mandarEstado=id=>{const c=S.clients.find(x=>x.id===id);if(!c?.phone)return;const b=bal(id),mv=movsCliente(id);
   // trabajos desde el último momento en que estuvo al día
   const pend=[];for(const m of mv){if(m.run<=0)break;if(m.k==="job")pend.push(m.x)}
@@ -637,8 +629,8 @@ $("nrAdd").addEventListener("click",async()=>{const name=$("nrName").value.trim(
   $("nrName").value="";$("nrPrice").value="";toast(`${name} agregado ✓`);cargar()});
 
 // ---------- Don Fer (solo consulta) ----------
-const DF={msgs:[],busy:false},DFSUG=["¿Cuánto me debe pagar Tecni el viernes?","¿Qué rollo se me está acabando?","¿Cuánto cobro por una lona de 100×70 con 4 ojales?","¿Qué cliente me debe más?","¿Cuánto me cuesta un rollo de banner de 1,60?","Explícame cómo funciona esta página"];
-function dfPintar(){const hi=`<div class="dm a">¡Hola! Soy Don Fer 🔥 Conozco tus tarifas, la cuenta con Tecni, tus clientes, el inventario, los costos y los pedidos. Solo consulto: no cambio nada. ¿Qué quieres saber?</div>`;
+const DF={msgs:[],busy:false},DFSUG=["¿Quién me debe y cuánto?","¿Qué rollo se me está acabando?","¿Cuánto cobro por una lona de 100×70 con 4 ojales?","¿Cuánto me debe Tecnigráficas?","¿Cuánto me cuesta un rollo de banner de 1,60?","Explícame cómo funciona esta página"];
+function dfPintar(){const hi=`<div class="dm a">¡Hola! Soy Don Fer 🔥 Conozco tus tarifas, tus clientes y sus cuentas, el inventario, los costos y los pedidos. Solo consulto: no cambio nada. ¿Qué quieres saber?</div>`;
   $("dMsgs").innerHTML=hi+DF.msgs.map(m=>`<div class="dm ${m.role==="user"?"u":"a"}">${esc(m.content)}</div>`).join("")+(DF.busy?`<div class="dm t">Don Fer está revisando…</div>`:"");
   $("dSug").innerHTML=DF.msgs.length?"":DFSUG.map(t=>`<button type="button">${esc(t)}</button>`).join("");$("dMsgs").scrollTop=$("dMsgs").scrollHeight}
 async function dfEnviar(t){t=String(t||"").trim();if(!t||DF.busy)return;DF.msgs.push({role:"user",content:t});DF.busy=true;$("dInput").value="";dfPintar();
@@ -653,7 +645,7 @@ $("dSug").addEventListener("click",e=>{const b=e.target.closest("button");if(b)d
 $("dForm").addEventListener("submit",e=>{e.preventDefault();dfEnviar($("dInput").value)});
 
 // ---------- pestañas ----------
-$("tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]");if(!b)return;document.querySelectorAll("#tabs button").forEach(x=>x.classList.toggle("on",x===b));["anotar","abonos","mes","clientes","inv","costos","tarifas"].forEach(t=>$("tab-"+t).classList.toggle("hidden",t!==b.dataset.tab))});
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]");if(!b)return;document.querySelectorAll("#tabs button").forEach(x=>x.classList.toggle("on",x===b));["anotar","mes","clientes","inv","costos","tarifas"].forEach(t=>$("tab-"+t).classList.toggle("hidden",t!==b.dataset.tab))});
 
 // ---------- inicio ----------
 (async()=>{
@@ -664,7 +656,7 @@ $("tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab
     if(!S.fin&&perms.get("gran_formato.manage")!==true){document.documentElement.classList.add("auth-ready");document.querySelector("main").innerHTML=`<section class="card"><h2>No tienes acceso a esta página</h2><p class="muted">Pídele a Luiza que te active el permiso "Manejar gran formato".</p></section>`;return}
     document.querySelectorAll(".fin-only").forEach(x=>x.classList.toggle("hidden",!S.fin));
     if(S.fin){const [a,c]=await Promise.all([db.from("finance_accounts").select("id,name").eq("active",true).order("sort_order").order("name"),db.from("app_settings").select("value").eq("key","gf_category_id").maybeSingle()]);S.accounts=a.data||[];S.cat=c.data?.value||null}
-    const me=await db.from("profiles").select("full_name").eq("id",session.user.id).maybeSingle();if(me.data?.full_name)$("who").textContent=`Hola, ${me.data.full_name.split(" ")[0]} · impresiones, abonos y pago de cada viernes`;
+    const me=await db.from("profiles").select("full_name").eq("id",session.user.id).maybeSingle();if(me.data?.full_name)$("who").textContent=`Hola, ${me.data.full_name.split(" ")[0]} · trabajos, clientes, inventario y pedidos`;
     $("fDate").value=today();await cargar();
   }catch(err){console.error(err);document.querySelector("main").insertAdjacentHTML("afterbegin",`<section class="card"><b>No pude cargar la página:</b> ${esc(err.message)}</section>`)}
   finally{document.documentElement.classList.add("auth-ready")}

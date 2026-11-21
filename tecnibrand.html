@@ -57,9 +57,9 @@ main{position:relative;z-index:2;max-width:620px;margin:0 auto;padding:26px 20px
 .step.out.bk>*{animation-name:outB}
 @keyframes outF{to{opacity:0;transform:translateX(-30px)}}
 @keyframes outB{to{opacity:0;transform:translateX(30px)}}
-.step.on .st{animation:stIn .5s cubic-bezier(.3,1.6,.5,1) backwards;animation-delay:calc(var(--k,0) * 45ms + 300ms)}
+.step.on .st{animation:stIn .5s cubic-bezier(.3,1.6,.5,1) backwards;animation-delay:calc(var(--n,0) * 45ms + 300ms)}
 @keyframes stIn{from{opacity:0;transform:scale(.4) rotate(-12deg)}to{opacity:1;transform:rotate(var(--r,0deg))}}
-.step.on .sw{animation:swIn .45s cubic-bezier(.3,1.5,.5,1) backwards;animation-delay:calc(var(--k,0) * 25ms + 280ms)}
+.step.on .sw{animation:swIn .45s cubic-bezier(.3,1.5,.5,1) backwards;animation-delay:calc(var(--n,0) * 25ms + 280ms)}
 @keyframes swIn{from{opacity:0;transform:translateY(14px) scale(.6)}to{opacity:1;transform:none}}
 .sec{font-family:var(--display);font-weight:600;font-size:1rem;color:var(--soft);margin:0 0 6px;text-transform:lowercase}
 h1{font-family:var(--display);font-weight:700;font-size:clamp(2rem,7.4vw,2.9rem);line-height:1.02;letter-spacing:-.01em;margin:0 0 22px;text-transform:lowercase;text-wrap:balance}
@@ -312,13 +312,13 @@ function paint(box,key,otherId){
   $(otherId).classList.toggle("hide",!S[key].includes("Otro"));
 }
 stickers("feel",FEEL,"feel","feelOther");stickers("uses",USES,"uses","usesOther");
-document.querySelectorAll(".stickers").forEach(b=>[...b.children].forEach((c,k)=>c.style.setProperty("--k",k)));
+document.querySelectorAll(".stickers").forEach(b=>[...b.children].forEach((c,k)=>c.style.setProperty("--n",k)));
 
 $("swatches").innerHTML=INKS.map(([n,v])=>`<button type="button" class="sw" data-n="${n}" data-s="0" aria-label="${n}"><span class="ink" style="--v:${v}"></span>${n}</button>`).join("");
 $("swatches").addEventListener("click",e=>{const b=e.target.closest(".sw");if(!b)return;const n=b.dataset.n,cur=S.sw[n]||0,nx=cur===0?1:cur===1?-1:0;
   if(nx)S.sw[n]=nx;else delete S.sw[n];paintSw();save();buzz();b.classList.remove("ping");void b.offsetWidth;b.classList.add("ping")});
 function paintSw(){$("swatches").querySelectorAll(".sw").forEach(b=>{const s=S.sw[b.dataset.n]||0;b.dataset.s=s;b.setAttribute("aria-label",b.dataset.n+(s===1?": me gusta":s===-1?": no me gusta":""))})}
-$("swatches").querySelectorAll(".sw").forEach((c,k)=>c.style.setProperty("--k",k));
+$("swatches").querySelectorAll(".sw").forEach((c,k)=>c.style.setProperty("--n",k));
 document.querySelectorAll(".step,.done").forEach(st=>[...st.children].forEach((c,k)=>c.style.setProperty("--i",k)));
 // Los cuadros de texto crecen solos
 function grow(t){t.style.height="auto";t.style.height=Math.max(t.scrollHeight+4,t.dataset.min||0)+"px"}

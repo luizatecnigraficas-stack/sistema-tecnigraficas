@@ -683,6 +683,68 @@
     .wo-boards{flex-wrap:wrap!important;overflow-x:visible!important;row-gap:6px}
     .wo-boards>*{flex:0 0 auto}
     .df-pend{position:absolute;top:-4px;right:-4px;min-width:22px;height:22px;border-radius:11px;background:#e5484d;color:#fff;font:800 12px/22px system-ui;text-align:center;box-shadow:0 0 0 2px #fff;animation:dfp 1.4s ease-in-out infinite}@keyframes dfp{50%{transform:scale(1.15)}}
+    /* V9.74 TecniBrand: tablero del brief para la diseñadora */
+    #tbModal .modal.tb-wide{width:min(1060px,100%)}
+    .tbb{--c:#00AEEF;--m:#EC008C;--y:#FFF200;--k:#1A1A1A;--fd:"Fredoka","Tondu Beta","Arial Rounded MT Bold",system-ui,sans-serif;color:var(--k)}
+    .tbb-hero{position:relative;overflow:hidden;background:var(--m);color:#fff;border-radius:26px;padding:26px 26px 22px;margin:0 0 16px}
+    .tbb-hero::after{content:"";position:absolute;right:-40px;top:-50px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--y) 0 22%,transparent 23%),radial-gradient(circle at 72% 40%,var(--c) 0 20%,transparent 21%),radial-gradient(circle at 45% 75%,#fff 0 14%,transparent 15%);opacity:.9}
+    .tbb-kick{font:600 .95rem var(--fd);opacity:.85;margin:0 0 2px}
+    .tbb-name{font:700 clamp(2.2rem,6vw,3.8rem)/.95 var(--fd);margin:0 0 10px;letter-spacing:-.01em;position:relative;z-index:1;max-width:80%;word-break:break-word}
+    .tbb-name.none{opacity:.9;font-size:clamp(1.6rem,4vw,2.4rem)}
+    .tbb-who{position:relative;z-index:1;font-size:.95rem;opacity:.92;margin:0 0 16px}
+    .tbb-bar{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .tbb-seg{display:flex;background:rgba(255,255,255,.18);border-radius:999px;padding:4px;gap:2px}
+    .tbb-seg button{border:0;background:transparent;color:#fff;font:600 .92rem var(--fd);padding:8px 14px;border-radius:999px;cursor:pointer}
+    .tbb-seg button.on{background:#fff;color:var(--m)}
+    .tbb-act{border:0;border-radius:999px;padding:10px 16px;font:600 .92rem var(--fd);cursor:pointer;background:var(--k);color:#fff;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
+    .tbb-act.lt{background:rgba(255,255,255,.18);color:#fff}
+    .tbb-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;margin:0 0 16px}
+    .tbb-col{display:grid;gap:16px;align-content:start}
+    .tbb-card{border-radius:24px;padding:20px 22px;background:#fff;border:1px solid #eee}
+    .tbb-h{font:700 1.25rem var(--fd);margin:0 0 12px;display:flex;align-items:center;gap:8px}
+    .tbb-quote{position:relative;padding:4px 0 4px 18px;margin:0 0 16px;border-left:5px solid var(--q,var(--m))}
+    .tbb-quote:last-child{margin-bottom:0}
+    .tbb-quote b{display:block;font:600 .88rem var(--fd);color:#777;margin:0 0 2px}
+    .tbb-quote p{margin:0;font-size:1.12rem;line-height:1.45;white-space:pre-wrap}
+    .tbb-yel{background:var(--y);border-color:var(--y)}
+    .tbb-stk{display:flex;flex-wrap:wrap;gap:10px}
+    .tbb-stk span{background:#fff;font:600 1.05rem var(--fd);padding:10px 16px;border-radius:999px;box-shadow:0 0 0 3px #fff,0 5px 0 3px rgba(0,0,0,.1);transform:rotate(var(--r,0deg))}
+    .tbb-stk span:nth-child(3n){--r:-3deg}.tbb-stk span:nth-child(3n+1){--r:2deg}.tbb-stk span:nth-child(4n+2){--r:-1.5deg}
+    .tbb-blk{background:var(--k);color:#fff;border-color:var(--k)}
+    .tbb-blk .tbb-sub{color:rgba(255,255,255,.65)}
+    .tbb-sub{font:600 .88rem var(--fd);color:#777;margin:14px 0 8px}
+    .tbb-sub:first-of-type{margin-top:0}
+    .tbb-inks{display:flex;flex-wrap:wrap;gap:14px}
+    .tbb-ink{display:grid;justify-items:center;gap:6px;font-size:.82rem}
+    .tbb-ink i{width:64px;height:64px;border-radius:50%;background:var(--v);box-shadow:inset 0 0 0 2px rgba(255,255,255,.3)}
+    .tbb-ink.no i{width:44px;height:44px;position:relative;filter:saturate(.7)}
+    .tbb-ink.no i::after{content:"";position:absolute;left:-4px;right:-4px;top:50%;height:4px;margin-top:-2px;background:#fff;border-radius:4px;transform:rotate(-40deg);box-shadow:0 0 0 2px var(--k)}
+    .tbb-note{font-size:1.02rem;margin:8px 0 0;white-space:pre-wrap}
+    .tbb-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 0 16px}
+    .tbb-cy{background:var(--c);border-color:var(--c)}
+    .tbb-chips{display:flex;flex-wrap:wrap;gap:8px}
+    .tbb-chips span{background:#f3f3f5;border-radius:999px;padding:8px 13px;font:600 .95rem var(--fd)}
+    .tbb-big{font-size:1.1rem;line-height:1.45;margin:0;white-space:pre-wrap}
+    .tbb-mood{columns:4 170px;column-gap:14px}
+    .tbb-mood a{display:block;break-inside:avoid;margin:0 0 14px;background:#fff;padding:8px 8px 10px;border-radius:6px;box-shadow:0 10px 24px rgba(0,0,0,.12);transform:rotate(var(--r,0deg));transition:transform .2s;cursor:zoom-in;color:var(--k);text-decoration:none}
+    .tbb-mood a:nth-child(odd){--r:-1.6deg}.tbb-mood a:nth-child(even){--r:1.4deg}.tbb-mood a:nth-child(3n){--r:.6deg}
+    .tbb-mood a:hover{transform:rotate(0) scale(1.03)}
+    .tbb-mood img{display:block;width:100%;border-radius:3px}
+    .tbb-pdf{display:grid;place-items:center;aspect-ratio:3/4;background:#f3f3f5;border-radius:3px;font:600 1rem var(--fd)}
+    .tbb-ig{display:inline-flex;align-items:center;gap:8px;font:600 1.05rem var(--fd);color:var(--m);text-decoration:none}
+    .tbb-lb{position:fixed;inset:0;z-index:9999;background:rgba(15,15,20,.88);display:grid;place-items:center;padding:24px;cursor:zoom-out}
+    .tbb-lb img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .tbb-in{animation:tbbIn .5s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 60ms)}
+    @keyframes tbbIn{from{opacity:0;transform:translateY(14px)}}
+    .tbb-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+    .tbb-li{text-align:left;border:0;cursor:pointer;border-radius:20px;padding:16px;background:#fff;box-shadow:0 0 0 1px #eee,0 8px 20px rgba(0,0,0,.05);font:inherit;color:#1A1A1A;transition:transform .15s,box-shadow .15s;border-top:6px solid var(--t,#EC008C)}
+    .tbb-li:hover{transform:translateY(-3px);box-shadow:0 0 0 1px #eee,0 14px 30px rgba(0,0,0,.1)}
+    .tbb-li strong{display:block;font:700 1.25rem/1.1 "Fredoka",system-ui,sans-serif;margin:0 0 4px}
+    .tbb-li small{color:#777}
+    .tbb-dots{display:flex;gap:4px;margin-top:10px}.tbb-dots i{width:16px;height:16px;border-radius:50%;background:var(--v);box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+    .tbb-st{display:inline-block;font-size:.78rem;font-weight:600;background:#f3f3f5;border-radius:999px;padding:3px 9px;margin-top:8px}
+    @media (max-width:760px){.tbb-grid,.tbb-row{grid-template-columns:1fr}.tbb-hero{padding:22px 18px}.tbb-name{max-width:100%}.tbb-hero::after{width:130px;height:130px;right:-55px;top:-55px;opacity:.75}}
+    @media (prefers-reduced-motion:reduce){.tbb-in{animation:none}}
     /* V9.19 Productos unificados */
     .pchips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
     .pchip{border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;font-weight:800;font-size:14px;cursor:pointer;min-height:44px}
@@ -3639,7 +3701,9 @@
       try{
         const {data,error}=await db.from("brand_briefs").select("*,client:clients!client_id(name,phone)").order("created_at",{ascending:false}).limit(100);
         if(error)throw error;tbList=data||[];
-        box.innerHTML=tbList.length?tbList.map(b=>`<div class="sv-item" style="cursor:pointer" data-tb="${b.id}"><div class="h"><strong>${escapeHTML(b.brand_name||"(sin nombre todavía)")} <small>· ${escapeHTML(b.client?.name||b.contact_name||"")}</small></strong><span>${escapeHTML(formatDate(b.created_at.slice(0,10)))}</span></div><div class="sv-tags">${TB_STATUS[b.status]||""} · ${(b.feelings||[]).map(escapeHTML).join(", ")}${(b.ref_files||[]).length?` · 📷 ${b.ref_files.length}`:""}</div></div>`).join(""):'<div class="empty">Todavía nadie ha llenado TecniBrand.</div>';
+        const tints=["#EC008C","#00AEEF","#FFF200","#1A1A1A"];
+        box.className=tbList.length?"tbb-list":"";
+        box.innerHTML=tbList.length?tbList.map((b,i)=>{const ink=tbSplitInks(b.colors_like).inks.slice(0,6);return `<button type="button" class="tbb-li" data-tb="${b.id}" style="--t:${tints[i%4]}"><strong>${escapeHTML(b.brand_name||"Sin nombre todavía")}</strong><small>${escapeHTML(b.client?.name||b.contact_name||"")} · ${escapeHTML(formatDate(b.created_at.slice(0,10)))}</small>${ink.length?`<div class="tbb-dots">${ink.map(n=>`<i style="--v:${TB_INKS[n]}"></i>`).join("")}</div>`:""}<div><span class="tbb-st">${TB_STATUS[b.status]||""}</span>${(b.ref_files||[]).length?` <span class="tbb-st">📌 ${b.ref_files.length}</span>`:""}</div></button>`}).join(""):'<div class="empty">Todavía nadie ha llenado TecniBrand.</div>';
       }catch(_){box.innerHTML='<div class="empty">No se pudo cargar la lista.</div>'}
     }
     function tbText(b){
@@ -3651,37 +3715,78 @@
       a("Elementos",b.elements);a("Dónde usará el logo",[...(b.uses||[]).filter(x=>x!=="Otro"),b.uses_other].filter(Boolean).join(", "));a("Instagram",b.instagram);
       return L.join("\n\n");
     }
+    const TB_INKS={"Rosado":"#F7A8C9","Fucsia":"#EC008C","Rojo":"#E3242B","Naranja":"#F7941D","Amarillo":"#FFE14D","Dorado":"#C9A24B","Verde limón":"#A6CE39","Verde":"#2E8B57","Menta":"#9EE2C9","Turquesa":"#1BC0C4","Azul cielo":"#7CC6F2","Azul":"#1F4FA8","Morado":"#6A2C91","Lila":"#C8A2E0","Café":"#7A4B2A","Beige":"#E8D9C0","Negro":"#1A1A1A","Gris":"#9A9A9A","Blanco":"#FFFFFF","Pastel":"linear-gradient(135deg,#F9C6D9,#C8E7F5,#FFF3B0)"};
+    const TB_EMO={"Elegancia":"🥂","Ternura":"🧸","Confianza":"🤝","Modernidad":"⚡","Diversión":"🎉","Exclusividad":"💎","Natural":"🌿","Creatividad":"🎨","Redes sociales":"📱","Empaques":"📦","Papelería":"📄","Uniformes":"👕","Página web":"💻"};
+    function tbSplitInks(t){const lines=String(t||"").split("\n");let inks=[];const rest=[];lines.forEach(l=>{const m=l.match(/^Tintas:\s*(.+)$/);if(m)inks=m[1].split(",").map(x=>x.trim()).filter(x=>TB_INKS[x]);else rest.push(l)});return {inks,text:rest.join("\n").trim()}}
+    function tbFont(){if(document.getElementById("tbFont"))return;const l=document.createElement("link");l.id="tbFont";l.rel="stylesheet";l.href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap";document.head.appendChild(l)}
     async function tbOpen(id){
-      const b=tbList.find(x=>x.id===id);if(!b)return;
-      const row=(t,v)=>v&&String(v).trim()?`<div style="margin:0 0 12px"><div style="font-weight:700;font-size:.85rem;color:var(--muted,#666)">${t}</div><div style="white-space:pre-wrap">${escapeHTML(String(v).trim())}</div></div>`:"";
-      const list=(arr,other)=>[...(arr||[]).filter(x=>x!=="Otro"),other].filter(Boolean).join(", ");
+      const b=tbList.find(x=>x.id===id);if(!b)return;tbFont();
+      const E=v=>escapeHTML(String(v??"").trim());
+      const has=v=>v&&String(v).trim();
+      const list=(arr,other)=>[...(arr||[]).filter(x=>x!=="Otro"),...(has(other)?[other.trim()]:[])];
       const name=b.client?.name||b.contact_name||"";
       let wa=String(b.phone||b.client?.phone||"").replace(/\D/g,"");if(wa.length===10)wa="57"+wa;
-      $("tbTitle").textContent="🎨 "+(b.brand_name||"Marca sin nombre todavía");
-      $("tbBody").innerHTML=`
-        <div class="sv-share" style="flex-wrap:wrap"><button type="button" class="btn secondary" id="tbBack">← Volver</button>
-          <select class="search" id="tbStatus" style="flex:0 0 160px">${Object.entries(TB_STATUS).map(([k,t])=>`<option value="${k}" ${b.status===k?"selected":""}>${t}</option>`).join("")}</select>
-          <button type="button" class="btn primary" id="tbCopy">📋 Copiar todo</button>${wa.length>=11?`<a class="btn secondary" href="https://wa.me/${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>`:""}</div>
-        <p style="margin:0 0 14px;color:var(--muted,#666);font-size:.9rem">${escapeHTML(name)}${b.phone?" · "+escapeHTML(b.phone):""} · ${escapeHTML(formatDate(b.created_at.slice(0,10)))}</p>
-        ${b.name_defined?"":`<p style="margin:0 0 12px"><b>⚠ Aún no tiene el nombre definido.</b></p>`}
-        ${row("Significado del nombre",b.meaning)}${row("¿Cómo nació? ¿Qué lo inspiró?",b.origin)}${row("¿Qué hace?",b.what_you_do)}
-        ${row("Quiere que la marca transmita",list(b.feelings,b.feelings_other))}${row("Cliente ideal",b.audience)}
-        ${row("Colores que le gustan",b.colors_like)}${row("⚠ Colores que NO le gustan",b.colors_dislike)}
-        ${row("Elementos para incluir",b.elements)}${row("Dónde usará el logo",list(b.uses,b.uses_other))}${row("Instagram o marca actual",b.instagram)}
-        ${(b.ref_files||[]).length?`<div style="font-weight:700;font-size:.85rem;color:var(--muted,#666);margin:0 0 6px">Referencias (toca para abrir en grande)</div><div id="tbRefs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px"><div class="empty">Cargando…</div></div>`:""}`;
+      const like=tbSplitInks(b.colors_like),no=tbSplitInks(b.colors_dislike);
+      const feel=list(b.feelings,b.feelings_other),uses=list(b.uses,b.uses_other);
+      const ig=String(b.instagram||"").trim(),igH=ig.replace(/^https?:\/\/(www\.)?instagram\.com\//i,"").replace(/^@/,"").replace(/[/?#].*$/,"");
+      const q=(t,v,c)=>has(v)?`<div class="tbb-quote" style="--q:${c}"><b>${t}</b><p>${E(v)}</p></div>`:"";
+      const ink=(n,cls)=>`<div class="tbb-ink ${cls||""}"><i style="--v:${TB_INKS[n]}"></i>${E(n)}</div>`;
+      let k=0;const I=()=>`style="--i:${k++}"`;
+      $("tbTitle").textContent="🎨 Brief de marca";
+      document.querySelector("#tbModal .modal").classList.add("tb-wide");
+      $("tbBody").innerHTML=`<div class="tbb">
+        <section class="tbb-hero tbb-in" ${I()}>
+          <p class="tbb-kick">la marca</p>
+          <h2 class="tbb-name ${b.brand_name?"":"none"}">${b.brand_name?E(b.brand_name):"Todavía sin nombre ✨"}</h2>
+          <p class="tbb-who">${E(name)}${b.phone?" · "+E(b.phone):""} · ${E(formatDate(b.created_at.slice(0,10)))}</p>
+          <div class="tbb-bar">
+            <div class="tbb-seg" id="tbSeg">${Object.entries(TB_STATUS).map(([s,t])=>`<button type="button" data-s="${s}" class="${b.status===s?"on":""}">${t}</button>`).join("")}</div>
+            <button type="button" class="tbb-act" id="tbCopy">📋 Copiar todo</button>
+            ${wa.length>=11?`<a class="tbb-act lt" href="https://wa.me/${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>`:""}
+            <button type="button" class="tbb-act lt" id="tbBack">← Todas</button>
+          </div>
+        </section>
+        <div class="tbb-grid">
+          <div class="tbb-col">
+            ${has(b.meaning)||has(b.origin)||has(b.what_you_do)?`<section class="tbb-card tbb-in" ${I()}><h3 class="tbb-h">📖 Su historia</h3>
+              ${q("El nombre significa",b.meaning,"var(--m)")}${q("Cómo nació",b.origin,"var(--c)")}${q("Qué hace",b.what_you_do,"var(--y)")}</section>`:""}
+            ${has(b.audience)?`<section class="tbb-card tbb-cy tbb-in" ${I()}><h3 class="tbb-h">🎯 Para quién es</h3><p class="tbb-big">${E(b.audience)}</p></section>`:""}
+          </div>
+          <div class="tbb-col">
+            ${feel.length?`<section class="tbb-card tbb-yel tbb-in" ${I()}><h3 class="tbb-h">✨ Lo que debe transmitir</h3><div class="tbb-stk">${feel.map(f=>`<span>${TB_EMO[f]?TB_EMO[f]+" ":""}${E(f)}</span>`).join("")}</div></section>`:""}
+            <section class="tbb-card tbb-blk tbb-in" ${I()}><h3 class="tbb-h">🎨 Paleta</h3>
+              ${like.inks.length||has(like.text)?`<div class="tbb-sub">Le encantan</div>${like.inks.length?`<div class="tbb-inks">${like.inks.map(n=>ink(n)).join("")}</div>`:""}${has(like.text)?`<p class="tbb-note">${E(like.text)}</p>`:""}`:""}
+              ${no.inks.length||has(no.text)?`<div class="tbb-sub">⚠ Ni de riesgos</div>${no.inks.length?`<div class="tbb-inks">${no.inks.map(n=>ink(n,"no")).join("")}</div>`:""}${has(no.text)?`<p class="tbb-note">${E(no.text)}</p>`:""}`:""}
+            </section>
+          </div>
+        </div>
+        <div class="tbb-row">
+          <section class="tbb-card tbb-in" ${I()}><h3 class="tbb-h">✏️ Elementos</h3><p class="tbb-big">${has(b.elements)?E(b.elements):"—"}</p></section>
+          <section class="tbb-card tbb-in" ${I()}><h3 class="tbb-h">📍 Dónde vivirá el logo</h3><div class="tbb-chips">${uses.length?uses.map(u=>`<span>${TB_EMO[u]?TB_EMO[u]+" ":""}${E(u)}</span>`).join(""):"—"}</div></section>
+          <section class="tbb-card tbb-in" ${I()}><h3 class="tbb-h">📸 Instagram</h3>${igH?`<a class="tbb-ig" href="https://instagram.com/${encodeURIComponent(igH)}" target="_blank" rel="noopener">@${E(igH)} ↗</a>`:(has(ig)?`<p class="tbb-big">${E(ig)}</p>`:"<p class='tbb-big'>—</p>")}</section>
+        </div>
+        ${(b.ref_files||[]).length?`<section class="tbb-card tbb-in" ${I()}><h3 class="tbb-h">📌 Moodboard <small style="font-weight:500;color:#777;font-size:.85rem">(toca para ver en grande)</small></h3><div class="tbb-mood" id="tbRefs"><div class="empty">Cargando…</div></div></section>`:""}
+        ${b.name_defined?"":`<p style="margin:4px 0 0;color:#777">⚠ El cliente todavía no tiene el nombre definido.</p>`}
+      </div>`;
       $("tbBack").addEventListener("click",openTecniBrand);
       $("tbCopy").addEventListener("click",()=>copySurveyText(tbText(b),"Resumen"));
-      $("tbStatus").addEventListener("change",async e=>{const v=e.target.value;const {error}=await db.from("brand_briefs").update({status:v}).eq("id",b.id);
-        if(error){showToast("No se pudo cambiar: "+error.message);e.target.value=b.status;return}b.status=v;showToast("Listo: "+TB_STATUS[v])});
+      $("tbSeg").addEventListener("click",async e=>{const btn=e.target.closest("button");if(!btn||btn.dataset.s===b.status)return;const v=btn.dataset.s,prev=b.status;
+        $("tbSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===btn));
+        const {error}=await db.from("brand_briefs").update({status:v}).eq("id",b.id);
+        if(error){showToast("No se pudo cambiar: "+error.message);$("tbSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x.dataset.s===prev));return}
+        b.status=v;showToast("Listo: "+TB_STATUS[v])});
+      $("tbBody").scrollIntoView?.({block:"start"});
       if((b.ref_files||[]).length){
         const {data,error}=await db.storage.from("brand-refs").createSignedUrls(b.ref_files,3600);
         const box=$("tbRefs");if(!box)return;
         if(error||!data){box.innerHTML='<div class="empty">No se pudieron cargar las imágenes.</div>';return}
-        box.innerHTML=data.map(d=>d.signedUrl?(/\.pdf$/i.test(d.path||"")?`<a href="${d.signedUrl}" target="_blank" rel="noopener" class="btn secondary" style="display:flex;align-items:center;justify-content:center;aspect-ratio:1">📄 PDF</a>`:`<a href="${d.signedUrl}" target="_blank" rel="noopener"><img src="${d.signedUrl}" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid var(--line,#eee)" alt=""></a>`):"").join("");
+        box.innerHTML=data.map(d=>d.signedUrl?(/\.pdf$/i.test(d.path||"")?`<a href="${d.signedUrl}" target="_blank" rel="noopener"><div class="tbb-pdf">📄 PDF</div></a>`:`<a href="${d.signedUrl}" data-lb="1" target="_blank" rel="noopener"><img src="${d.signedUrl}" loading="lazy" alt=""></a>`):"").join("");
+        box.addEventListener("click",e=>{const a=e.target.closest("a[data-lb]");if(!a)return;e.preventDefault();
+          const lb=document.createElement("div");lb.className="tbb-lb";lb.innerHTML=`<img src="${a.href}" alt="">`;lb.addEventListener("click",()=>lb.remove());document.body.appendChild(lb)});
       }
     }
     function openTecniBrand(){
-      ensureTbModal();$("tbTitle").textContent="🎨 TecniBrand · encuesta de logos";
+      ensureTbModal();$("tbTitle").textContent="🎨 TecniBrand · encuesta de logos";tbFont();document.querySelector("#tbModal .modal").classList.remove("tb-wide");
       $("tbBody").innerHTML=`
         <p style="margin:0 0 8px">Mándale este link al cliente que va a hacer su logo. Si todavía no está en Clientes, <b>se crea solo</b> con su nombre y WhatsApp.</p>
         <div class="sv-share"><input class="search" readonly value="${TB_URL}"><button type="button" class="btn primary" id="tbCopyMsg">Copiar mensaje</button><button type="button" class="btn secondary" id="tbCopyLink">Copiar link</button><a class="btn secondary" href="${TB_URL}" target="_blank" rel="noopener">Ver encuesta</a></div>

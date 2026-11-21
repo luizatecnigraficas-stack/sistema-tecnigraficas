@@ -94,7 +94,9 @@ details summary{cursor:pointer;font-weight:600;margin-top:8px;font-family:var(--
 .stk.ped{background:#fff8c9;color:#6b5d00}.stk.rec{background:#e7f8f0;color:#05603a}.stk.up{background:#fde8e8;color:var(--r)}.stk.down{background:#e7f8f0;color:#05603a}
 .qty{display:inline-flex;align-items:center;gap:6px}.qty button{width:30px;height:30px;border-radius:50%;border:0;background:#f3ecf2;font-size:17px;cursor:pointer;font-family:var(--fd);font-weight:600;color:var(--i)}.qty button:active{transform:scale(.9)}.qty b{min-width:22px;text-align:center;font-family:var(--fd)}
 .addc{width:36px;height:36px;border-radius:50%;border:0;background:var(--m);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 3px 0 rgba(236,0,140,.25);transition:transform .15s cubic-bezier(.3,1.6,.5,1)}.addc:active{transform:scale(.85)}
-.cart{position:sticky;top:76px}
+.co-side{position:sticky;top:76px;max-height:calc(100vh - 90px);overflow:auto;padding:2px}
+.cartfab{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:40;border:0;border-radius:999px;padding:13px 20px;background:var(--k);color:var(--y);font-family:var(--fd);font-weight:600;font-size:15px;box-shadow:0 8px 22px rgba(0,0,0,.25);display:none}
+#mPedTxt{width:100%;min-height:210px;border:1.5px solid #eadfe8;border-radius:16px;padding:12px;font:15px/1.45 inherit;background:var(--soft);resize:vertical;margin-top:10px}
 .total{display:flex;justify-content:space-between;align-items:center;background:var(--k);color:#fff;border-radius:18px;padding:12px 16px;margin-top:12px}.total strong{font-family:var(--fd);font-size:24px;color:var(--y)}
 .hidden{display:none!important}
 .modal{position:fixed;inset:0;background:rgba(40,20,45,.45);backdrop-filter:blur(3px);display:grid;place-items:center;z-index:50;padding:14px;overflow:auto}
@@ -108,7 +110,7 @@ details summary{cursor:pointer;font-weight:600;margin-top:8px;font-family:var(--
 .peek{position:fixed;right:-10px;bottom:-6px;z-index:75;display:flex;align-items:flex-end;gap:4px;pointer-events:none;animation:peek 3.4s cubic-bezier(.3,1.3,.5,1) forwards}
 .peek img{width:150px}.peek span{background:#fff;border-radius:18px 18px 4px 18px;padding:10px 14px;font-family:var(--fd);font-weight:600;box-shadow:0 8px 24px rgba(120,60,110,.2);margin-bottom:70px;max-width:200px}
 @keyframes peek{0%{transform:translateY(110%)}14%,84%{transform:none}100%{transform:translateY(110%)}}
-@media(max-width:860px){.grid,.two,.cl-grid,.co-grid{grid-template-columns:1fr}.sum{grid-template-columns:1fr 1fr}.sum div:last-child:nth-child(odd){grid-column:1/-1}.rate{grid-template-columns:1fr 100px 90px}.rate.mat{grid-template-columns:1fr 84px 96px}.cart{position:static}#resumen .don{width:64px}.logo{height:30px}.htitle span{display:none}}
+@media(max-width:860px){.grid,.two,.cl-grid,.co-grid{grid-template-columns:1fr}.sum{grid-template-columns:1fr 1fr}.sum div:last-child:nth-child(odd){grid-column:1/-1}.rate{grid-template-columns:1fr 100px 90px}.rate.mat{grid-template-columns:1fr 84px 96px}.co-side{position:static;max-height:none;overflow:visible;order:-1}.cartfab:not(.hidden){display:block}#resumen .don{width:64px}.logo{height:30px}.htitle span{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script><link rel="stylesheet" href="estilo-tecni.css">
@@ -179,9 +181,10 @@ details summary{cursor:pointer;font-weight:600;margin-top:8px;font-family:var(--
     <section class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h3>🛒 Costos y pedidos</h3><p class="muted" style="margin:4px 0 0">Los precios de tus proveedores. Toca ＋ para ir armando el pedido y saber cuánto vas a pagar.</p></div><button class="btn" onclick="nuevoCosto()">＋ Producto</button></div></section>
     <div class="co-grid">
       <section class="card"><input id="coSearch" placeholder="Buscar material o proveedor…"><div id="costList"></div></section>
-      <section class="card cart"><h3>🧺 Tu pedido</h3><div id="cartBox"></div></section>
+      <div class="co-side"><section class="card" id="cartCard"><h3>🧺 Tu pedido</h3><div id="cartBox"></div></section>
+      <section class="card" id="ordersCard"><h3>📦 Pedidos guardados</h3><div id="orders"></div></section></div>
     </div>
-    <section class="card"><h3>📦 Pedidos hechos</h3><div id="orders"></div></section>
+    <button class="cartfab hidden" id="cartFab" onclick="document.getElementById('cartCard').scrollIntoView({behavior:'smooth',block:'start'})"></button>
   </div>
 
   <div id="tab-tarifas" class="hidden">
@@ -224,6 +227,11 @@ details summary{cursor:pointer;font-weight:600;margin-top:8px;font-family:var(--
   <p class="muted" id="kHint" style="margin:6px 0 0"></p>
   <div class="actions"><button type="button" class="btn sec" onclick="cerrarModal('mCosto')">Cancelar</button><button type="button" class="btn red hidden" id="kDel">Quitar de la lista</button><button class="btn" type="submit" id="kSave">✓ Guardar</button></div>
 </form></div></div>
+
+<div class="modal hidden" id="mPedido"><div class="card"><h3 id="mPedTitle">Pedido guardado ✓</h3><p class="muted" style="margin:4px 0 0">Este es el mensaje para el proveedor. Lo puedes cambiar antes de copiarlo.</p>
+  <textarea id="mPedTxt"></textarea>
+  <div class="actions"><button class="btn" id="mPedCopy" type="button">📋 Copiar pedido</button><button class="btn sec" id="mPedWa" type="button">📲 Abrir WhatsApp</button><button class="btn sec" type="button" onclick="cerrarModal('mPedido')">Cerrar</button></div>
+  <p class="muted" style="margin:10px 0 0">Queda guardado en "📦 Pedidos guardados". Cuando llegue, toca "✓ Ya llegó".</p></div></div>
 
 <div class="modal hidden" id="mCliente"><div class="card"><h3 id="mClienteTitle">Cliente nuevo</h3><form id="fCliente" autocomplete="off">
   <label for="cName">Nombre</label><input id="cName" required placeholder="Ej: Publicidad La 5ta">
@@ -488,30 +496,34 @@ function pintarCostos(){
 $("coSearch").addEventListener("input",pintarCostos);
 function pintarCart(){
   const lines=Object.entries(S.cart).map(([id,q])=>({x:S.costs.find(c=>c.id===id),q})).filter(l=>l.x&&l.q>0);
+  $("cartFab").classList.toggle("hidden",!lines.length);
   if(!lines.length){$("cartBox").innerHTML=`<p class="muted" style="margin:10px 0 0">Está vacío. Toca el ＋ de lo que vas a pedir.</p>`;return}
   const tot=lines.reduce((a,l)=>a+l.q*Number(l.x.price),0),sups=[...new Set(lines.map(l=>l.x.supplier))];
   $("cartBox").innerHTML=lines.map(l=>`<div class="row"><span><b>${esc(l.x.name)}</b><small>${esc(l.x.supplier)} · ${esc(pres(l.x))}</small></span><span style="text-align:right"><span class="qty"><button onclick="alCarrito('${l.x.id}',-1)">−</button><b>${l.q}</b><button onclick="alCarrito('${l.x.id}',1)">＋</button></span><br><small>${cop(l.q*Number(l.x.price))}</small></span></div>`).join("")+
    `<div class="total"><span>Vas a pagar</span><strong>${cop(tot)}</strong></div>${sups.length>1?`<p class="muted" style="margin:8px 0 0">Son ${sups.length} proveedores: se guarda un pedido para cada uno.</p>`:""}
-   <div class="actions"><button class="btn" onclick="guardarPedido()">✓ Guardar pedido</button><button class="btn sec sm" onclick="vaciarCart()">Vaciar</button></div>`;
+   ${(()=>{const n=lines.reduce((a,l)=>a+l.q,0);$("cartFab").textContent=`🧺 Tu pedido: ${n} · ${cop(tot)} ↑`;return ""})()}<div class="actions"><button class="btn" onclick="guardarPedido()">✓ Guardar y copiar pedido</button><button class="btn sec sm" onclick="vaciarCart()">Vaciar</button></div>`;
 }
 window.alCarrito=(id,d)=>{const n=(S.cart[id]||0)+d;if(n<=0)delete S.cart[id];else S.cart[id]=n;guardarCart();pintarCart();if(d>0&&innerWidth<860)toast("Agregado al pedido")};
 window.vaciarCart=()=>{S.cart={};guardarCart();pintarCart()};
 window.guardarPedido=async()=>{const lines=Object.entries(S.cart).map(([id,q])=>({x:S.costs.find(c=>c.id===id),q})).filter(l=>l.x&&l.q>0);if(!lines.length)return;
-  try{for(const sup of [...new Set(lines.map(l=>l.x.supplier))]){const o=await db.from("gf_orders").insert({supplier:sup,order_date:today(),created_by:S.session.user.id}).select("id").single();if(o.error)throw o.error;
-      const it=await db.from("gf_order_items").insert(lines.filter(l=>l.x.supplier===sup).map(l=>({order_id:o.data.id,cost_item_id:l.x.id,name:l.x.name,kind:l.x.kind,width_m:l.x.width_m,length_m:l.x.length_m,unit:l.x.unit,quantity:l.q,unit_price:l.x.price})));if(it.error)throw it.error}
-    S.cart={};guardarCart();toast("Pedido guardado ✓");await cargar()}catch(err){alert(err.message)}};
+  const ids=[];try{for(const sup of [...new Set(lines.map(l=>l.x.supplier))]){const o=await db.from("gf_orders").insert({supplier:sup,order_date:today(),created_by:S.session.user.id}).select("id").single();if(o.error)throw o.error;
+      const it=await db.from("gf_order_items").insert(lines.filter(l=>l.x.supplier===sup).map(l=>({order_id:o.data.id,cost_item_id:l.x.id,name:l.x.name,kind:l.x.kind,width_m:l.x.width_m,length_m:l.x.length_m,unit:l.x.unit,quantity:l.q,unit_price:l.x.price})));if(it.error)throw it.error;ids.push(o.data.id)}
+    S.cart={};guardarCart();await cargar();abrirPedido(ids,"Pedido guardado ✓")}catch(err){alert(err.message)}};
 const oTotal=id=>S.oitems.filter(i=>i.order_id===id).reduce((a,i)=>a+Number(i.quantity)*Number(i.unit_price),0);
 function pintarPedidos(){
   $("orders").innerHTML=S.orders.map(o=>{const its=S.oitems.filter(i=>i.order_id===o.id),rec=o.status==="recibido";
     return `<div class="row" style="align-items:flex-start"><span><b>${esc(o.supplier)} <span class="stk ${rec?"rec":"ped"}">${rec?"✓ Llegó el "+esc(fshort(o.received_on)):"Pedido · falta que llegue"}</span></b><small>${esc(fshort(o.order_date))} · ${its.map(i=>`${mfmt(i.quantity)} × ${esc(i.name)}${i.kind==="rollo"&&i.width_m?" "+wfmt(i.width_m)+" m":""}`).join(" · ")}</small>
-    ${rec?"":`<div class="actions" style="margin-top:8px"><button class="btn k sm" onclick="llegoPedido('${o.id}')">✓ Ya llegó</button><button class="btn sec sm" onclick="mandarPedido('${o.id}')">📲 Mandar por WhatsApp</button><button class="btn red sm" onclick="borrarPedido('${o.id}')">Borrar</button></div>`}</span><span class="amt">${cop(oTotal(o.id))}</span></div>`}).join("")||`<div class="empty">Todavía no has guardado pedidos.</div>`;
+    ${rec?"":`<div class="actions" style="margin-top:8px"><button class="btn k sm" onclick="llegoPedido('${o.id}')">✓ Ya llegó</button><button class="btn sec sm" onclick="verPedido('${o.id}')">📋 Copiar / enviar</button><button class="btn red sm" onclick="borrarPedido('${o.id}')">Borrar</button></div>`}</span><span class="amt">${cop(oTotal(o.id))}</span></div>`}).join("")||`<div class="empty">Todavía no has guardado pedidos.</div>`;
 }
 window.llegoPedido=async id=>{const n=S.oitems.filter(i=>i.order_id===id&&i.kind==="rollo").reduce((a,i)=>a+Math.round(Number(i.quantity)),0);if(!confirm(n?`¿Ya llegó el pedido? Se agregan ${n} rollo${n===1?"":"s"} al inventario.`:"¿Marcar el pedido como recibido?"))return;
   const r=await db.rpc("gf_order_receive",{p_order:id});if(r.error)return alert(r.error.message);toast(n?`${n} rollo${n===1?"":"s"} al inventario ✓`:"Pedido recibido ✓");party("¡Llegó el pedido!");cargar()};
 window.borrarPedido=async id=>{if(!confirm("¿Borrar este pedido?"))return;const r=await db.from("gf_orders").delete().eq("id",id);if(r.error)return alert(r.error.message);toast("Pedido borrado");cargar()};
-window.mandarPedido=id=>{const o=S.orders.find(x=>x.id===id),its=S.oitems.filter(i=>i.order_id===id);if(!o)return;
-  const txt=`Hola, buen día 👋\nQuiero hacer este pedido:\n\n${its.map(i=>`• ${mfmt(i.quantity)} × ${i.name}${i.kind==="rollo"&&i.width_m?` (rollo ${wfmt(i.width_m)} × ${mfmt(i.length_m)} m)`:(i.unit?` (${i.unit})`:"")}`).join("\n")}\n\n¿Me confirmas el total y cuándo llega? Gracias.`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`,"_blank")};
+function textoPedido(id){const o=S.orders.find(x=>x.id===id),its=S.oitems.filter(i=>i.order_id===id);if(!o)return"";
+  return `Hola, buen día 👋\nPor favor me colabora con este pedido:\n\n${its.map(i=>`• ${mfmt(i.quantity)} ${i.kind==="rollo"?(Number(i.quantity)===1?"rollo de":"rollos de"):"×"} ${i.name}${i.kind==="rollo"&&i.width_m?` de ${wfmt(i.width_m)} × ${mfmt(i.length_m)} m`:(i.unit?` (${i.unit})`:"")}`).join("\n")}\n\n¿Me confirma el total y cuándo llega? Muchas gracias.`}
+function abrirPedido(ids,title){const many=ids.length>1;$("mPedTitle").textContent=title||"Pedido";$("mPedTxt").value=ids.map(id=>(many?`— ${S.orders.find(o=>o.id===id)?.supplier||""} —\n`:"")+textoPedido(id)).join("\n\n");$("mPedido").classList.remove("hidden")}
+window.verPedido=id=>abrirPedido([id],"Pedido a "+(S.orders.find(o=>o.id===id)?.supplier||""));
+$("mPedCopy").addEventListener("click",async()=>{const t=$("mPedTxt");try{await navigator.clipboard.writeText(t.value)}catch(e){t.select();try{document.execCommand("copy")}catch(_){}}toast("Pedido copiado ✓ Ya lo puedes pegar")});
+$("mPedWa").addEventListener("click",()=>window.open(`https://wa.me/?text=${encodeURIComponent($("mPedTxt").value)}`,"_blank"));
 function costoKind(k){S.costKind=k;$("kKinds").querySelectorAll("[data-k]").forEach(b=>b.classList.toggle("on",b.dataset.k===k));$("kRollWrap").classList.toggle("hidden",k!=="rollo");$("kUnitWrap").classList.toggle("hidden",k==="rollo");$("kPriceLabel").textContent=k==="rollo"?"Precio del rollo":"Precio";costoHint()}
 function costoHint(){const w=num($("kWidth").value),l=num($("kLen").value),p=num($("kPrice").value);$("kHint").textContent=S.costKind==="rollo"&&w>0&&l>0&&p>0?`El metro cuadrado te sale a ${cop(p/((w>10?w/100:w)*l))}.`:""}
 ["kWidth","kLen","kPrice"].forEach(id=>$(id).addEventListener("input",costoHint));

@@ -54,6 +54,13 @@ input,select{width:100%;border:1px solid #d0d5dd;border-radius:13px;padding:11px
 .stock div{background:var(--soft);border-radius:14px;padding:10px 12px}.stock b{display:block;font-size:14px}.stock span{font-size:13px;color:var(--u)}
 .seg{display:flex;gap:6px;flex-wrap:wrap}
 details summary{cursor:pointer;font-weight:700;margin-top:6px}
+.rate.mat{grid-template-columns:1fr 110px 120px}
+.mg{display:inline-block;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:700}.mg.ok{background:#e7f8f0;color:#05603a}.mg.bad{background:#fff4e5;color:#93370d}.mg.na{background:#f2f4f7;color:#667085}
+.ctag{display:inline-block;background:#e8f7fc;color:#06708c;border-radius:999px;padding:1px 8px;font-size:11px;font-weight:700;margin-left:6px;vertical-align:middle}
+.cl-grid{display:grid;grid-template-columns:330px 1fr;gap:14px;align-items:start}
+.bal{font-weight:800;white-space:nowrap}.bal.debe{color:#b42318}.bal.ok{color:var(--g)}
+.row.sel{background:#fff0f8}
+@media(max-width:860px){.cl-grid{grid-template-columns:1fr}}
 .hidden{display:none!important}
 .modal{position:fixed;inset:0;background:rgba(16,24,40,.45);display:grid;place-items:center;z-index:50;padding:14px}
 .modal .card{width:min(440px,100%);margin:0}
@@ -70,6 +77,7 @@ details summary{cursor:pointer;font-weight:700;margin-top:6px}
     <button data-tab="anotar" class="on">🖨️ Anotar trabajos</button>
     <button data-tab="abonos">🧾 Abonos y cuenta</button>
     <button data-tab="mes">📅 Por mes</button>
+    <button data-tab="clientes">👥 Mis clientes</button>
     <button data-tab="inv">📦 Inventario</button>
     <button data-tab="tarifas">⚙️ Tarifas</button>
   </div>
@@ -78,7 +86,9 @@ details summary{cursor:pointer;font-weight:700;margin-top:6px}
     <section class="card" id="formCard">
       <h3 id="formTitle">Anotar un trabajo</h3>
       <form id="f" autocomplete="off">
-        <label for="fDetail">¿Qué es? (cliente o nombre del archivo)</label>
+        <label for="fClient">¿Para quién es?</label>
+        <select id="fClient"></select>
+        <label for="fDetail">¿Qué es? (nombre del archivo o del trabajo)</label>
         <input id="fDetail" required placeholder="Ej: Lona Cisscol">
         <div class="g3">
           <div><label for="fQty">Cantidad</label><input id="fQty" type="number" min="1" step="1" value="1" required inputmode="numeric"></div>
@@ -88,6 +98,7 @@ details summary{cursor:pointer;font-weight:700;margin-top:6px}
         <label>Material</label><div class="chips" id="fMat"></div>
         <label>Acabado</label><div class="chips" id="fFin"></div>
         <div id="finQtyWrap" class="hidden"><label for="fFinQty" id="finQtyLabel">¿Cuántos?</label><input id="fFinQty" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+        <div id="fPriceWrap" class="hidden"><label for="fPrice">Precio especial por pieza (opcional)</label><input id="fPrice" type="number" min="1" step="1" inputmode="numeric" placeholder="Vacío = con las tarifas"></div>
         <label for="fDate">Fecha</label><input id="fDate" type="date">
         <div class="price"><div><small>Valor por pieza</small><span id="pUnit">$0</span><div id="pMin" class="minflag hidden"></div></div><div style="text-align:right"><small>Total</small><strong id="pTotal">$0</strong></div></div>
         <button class="btn full" type="submit" id="fSave">✓ Guardar trabajo</button>
@@ -108,6 +119,11 @@ details summary{cursor:pointer;font-weight:700;margin-top:6px}
 
   <div id="tab-mes" class="hidden">
     <section class="card"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between"><h3>Impresiones del mes</h3><select id="mesSel" style="width:auto"></select></div><div class="sum" id="mesSum"></div><div id="mesList"></div></section>
+  </div>
+
+  <div id="tab-clientes" class="hidden">
+    <section class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h3>👥 Mis clientes</h3><p class="muted" style="margin:4px 0 0">Tus otros clientes (intermediarios). No cruzan cuenta con Tecni: solo les cobras.</p></div><button class="btn" onclick="nuevoCliente()">＋ Cliente nuevo</button></div><div class="sum" id="clSum"></div></section>
+    <div class="cl-grid"><section class="card"><input id="clSearch" placeholder="Buscar cliente…"><div id="clList" style="margin-top:8px"></div></section><section class="card" id="clDetail"><div class="empty">Escoge un cliente para ver su cuenta.</div></section></div>
   </div>
 
   <div id="tab-inv" class="hidden">
@@ -145,13 +161,27 @@ details summary{cursor:pointer;font-weight:700;margin-top:6px}
   <div class="actions"><button type="button" class="btn sec" onclick="cerrarModal('mUso')">Cancelar</button><button type="button" class="btn sec" id="uEdit">✏️ Editar datos</button><button class="btn" type="submit">✓ Guardar</button></div>
 </form><div id="uHist" style="margin-top:10px"></div></div></div>
 
+<div class="modal hidden" id="mCliente"><div class="card"><h3 id="mClienteTitle">Cliente nuevo</h3><form id="fCliente" autocomplete="off">
+  <label for="cName">Nombre</label><input id="cName" required placeholder="Ej: Publicidad La 5ta">
+  <label for="cPhone">Celular / WhatsApp (opcional)</label><input id="cPhone" inputmode="tel" placeholder="Ej: 3001234567">
+  <label for="cNotes">Notas (opcional)</label><input id="cNotes" placeholder="Ej: paga los viernes">
+  <div class="actions"><button type="button" class="btn sec" onclick="cerrarModal('mCliente')">Cancelar</button><button type="button" class="btn red hidden" id="cArchive">Archivar</button><button class="btn" type="submit" id="cSave">✓ Guardar</button></div>
+</form></div></div>
+
+<div class="modal hidden" id="mPago"><div class="card"><h3 id="mPagoTitle">Registrar pago</h3><form id="fPago" autocomplete="off">
+  <div class="g2"><div><label for="pAmount">Valor</label><input id="pAmount" type="number" min="1" step="1" required inputmode="numeric"></div><div><label for="pDate">Fecha</label><input id="pDate" type="date" required></div></div>
+  <label>¿Cómo pagó?</label><div class="seg" id="pMethods"><button type="button" class="chip on" data-m="Efectivo">Efectivo</button><button type="button" class="chip" data-m="Nequi">Nequi</button><button type="button" class="chip" data-m="Transferencia">Transferencia</button><button type="button" class="chip" data-m="Otro">Otro</button></div>
+  <label for="pNote">Nota (opcional)</label><input id="pNote">
+  <div class="actions"><button type="button" class="btn sec" onclick="cerrarModal('mPago')">Cancelar</button><button class="btn" type="submit" id="pSave">✓ Guardar pago</button></div>
+</form></div></div>
+
 <div class="toast hidden" id="toast"></div>
 
 <script>
 const SUPABASE_URL="https://kqrfcdfygskzhsdzzcze.supabase.co",SUPABASE_KEY="sb_publishable_KfkIr6TlW6ivuT5cD0g9Kg_EuZwDKJ9";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=id=>document.getElementById(id);
-const S={session:null,fin:false,rates:[],prints:[],entries:[],cuts:[],accounts:[],cat:null,mat:null,fin_code:"sin",editId:null,abonoMode:null,monthPrints:[],rolls:[],rollId:null,usoMode:"uso"};
+const S={session:null,fin:false,rates:[],prints:[],entries:[],cuts:[],accounts:[],cat:null,mat:null,fin_code:"sin",editId:null,abonoMode:null,monthPrints:[],rolls:[],rollId:null,usoMode:"uso",clients:[],bals:new Map(),pays:[],clientSel:null,clientEdit:null,payMethod:"Efectivo"};
 const cop=n=>"$"+Math.round(Number(n)||0).toLocaleString("es-CO");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const today=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)};
@@ -172,29 +202,35 @@ function calc(qty,b,h,mat,fin,fq){
 
 // ---------- carga ----------
 async function cargar(){
-  const [r,p,e,c,ro]=await Promise.all([
+  const [r,p,e,c,ro,cl,cb,cp]=await Promise.all([
     db.from("gf_rates").select("*").eq("active",true).order("sort_order"),
     db.from("gf_prints").select("*").order("print_date",{ascending:false}).order("created_at",{ascending:false}).limit(600),
     db.from("gf_entries").select("*").is("settlement_id",null).order("entry_date").order("created_at"),
     db.from("gf_settlements").select("*").order("created_at",{ascending:false}).limit(12),
-    db.from("gf_rolls").select("*").order("bought_on",{ascending:false}).order("created_at",{ascending:false}).limit(400)]);
-  for(const x of[r,p,e,c,ro])if(x.error)throw x.error;S.rolls=ro.data||[];
+    db.from("gf_rolls").select("*").order("bought_on",{ascending:false}).order("created_at",{ascending:false}).limit(400),
+    db.from("gf_clients").select("*").order("name"),
+    db.from("gf_client_balances").select("*"),
+    db.from("gf_client_payments").select("*").order("paid_on",{ascending:false}).order("created_at",{ascending:false}).limit(1000)]);
+  for(const x of[r,p,e,c,ro,cl,cb,cp])if(x.error)throw x.error;S.rolls=ro.data||[];S.clients=cl.data||[];S.bals=new Map((cb.data||[]).map(b=>[b.client_id,b]));S.pays=cp.data||[];
   S.rates=r.data||[];S.entries=e.data||[];S.cuts=c.data||[];
   const open=new Set(S.entries.filter(x=>x.source==="prints").map(x=>x.id));
-  S.prints=(p.data||[]);S.week=S.prints.filter(x=>x.entry_id&&open.has(x.entry_id));
+  S.prints=(p.data||[]);S.tecniWeek=S.prints.filter(x=>!x.client_id&&x.entry_id&&open.has(x.entry_id));
+  const mon=lunes();S.week=S.prints.filter(x=>(!x.client_id&&x.entry_id&&open.has(x.entry_id))||(x.client_id&&x.print_date>=mon));
   if(!S.mat)S.mat=(S.rates.find(x=>x.kind==="material")||{}).code;
   pintarTodo();
 }
+function lunes(){const d=new Date();d.setDate(d.getDate()-((d.getDay()+6)%7));d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
+const cname=id=>S.clients.find(c=>c.id===id)?.name||"Cliente";
 function totales(){const s=k=>S.entries.filter(x=>x.side===k).reduce((t,x)=>t+Number(x.amount||0),0),gf=s("gf"),te=s("tecni");return{gf,te,bal:Math.round(gf-te)}}
-function desde(){const d=S.entries.map(x=>x.entry_date).sort()[0]||S.week.map(x=>x.print_date).sort()[0];return d}
+function desde(){const d=S.entries.map(x=>x.entry_date).sort()[0]||S.tecniWeek.map(x=>x.print_date).sort()[0];return d}
 
-function pintarTodo(){pintarResumen();pintarChips();precio();pintarSemana();pintarCuenta();pintarMeses();pintarTarifas();pintarInv()}
+function pintarTodo(){pintarClienteSel();pintarResumen();pintarChips();precio();pintarSemana();pintarCuenta();pintarMeses();pintarTarifas();pintarInv();pintarClientes()}
 
 function pintarResumen(){
-  const t=totales(),imp=S.week.reduce((a,x)=>a+Number(x.total||0),0),d=desde();
+  const t=totales(),imp=S.tecniWeek.reduce((a,x)=>a+Number(x.total||0),0),d=desde();
   const big=t.bal>0?`<div class="big">El viernes Tecni le paga a gran formato <strong>${cop(t.bal)}</strong></div>`:t.bal<0?`<div class="big debe">Gran formato le debe a Tecni <strong>${cop(-t.bal)}</strong><br><small>Pasa a la próxima semana si no se cruza.</small></div>`:`<div class="big">Están a paz y salvo ✅</div>`;
-  $("resumen").innerHTML=`<h2>Esta semana${d?` <span class="muted">· desde el ${esc(fshort(d))}</span>`:""}</h2>
-  <div class="sum"><div><span>Impresiones (${S.week.length})</span><strong>${cop(imp)}</strong></div><div><span>Todo lo que Tecni debe</span><strong>${cop(t.gf)}</strong></div><div><span>Abonos de Tecni</span><strong>${cop(t.te)}</strong></div></div>${big}`;
+  $("resumen").innerHTML=`<h2>Cuenta con Tecni esta semana${d?` <span class="muted">· desde el ${esc(fshort(d))}</span>`:""}</h2>
+  <div class="sum"><div><span>Impresiones para Tecni (${S.tecniWeek.length})</span><strong>${cop(imp)}</strong></div><div><span>Todo lo que Tecni debe</span><strong>${cop(t.gf)}</strong></div><div><span>Abonos de Tecni</span><strong>${cop(t.te)}</strong></div></div>${big}`;
 }
 
 function pintarChips(){
@@ -212,15 +248,20 @@ $("fFin").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)r
   if(f&&f.code==="roll_up"&&!num($("fFinQty").value))$("fFinQty").value=1;
   if(f&&f.code==="sin")$("fFinQty").value=0;pintarChips();precio()});
 function precio(){
+  const ov=$("fClient").value&&num($("fPrice").value)>0?num($("fPrice").value):0;
+  if(ov){const q=num($("fQty").value);$("pUnit").textContent=cop(ov);$("pTotal").textContent=cop(Math.round(ov*q));$("pMin").classList.add("hidden");return}
   const r=calc(num($("fQty").value),num($("fBase").value),num($("fAlto").value),S.mat,S.fin_code,num($("fFinQty").value));
   $("pUnit").textContent=cop(r.unit);$("pTotal").textContent=cop(r.total);
   $("pMin").classList.toggle("hidden",!r.min);$("pMin").textContent=`Se cobra el mínimo (${cop(minimo())})`;
 }
-["fQty","fBase","fAlto","fFinQty"].forEach(id=>$(id).addEventListener("input",precio));
+["fQty","fBase","fAlto","fFinQty","fPrice"].forEach(id=>$(id).addEventListener("input",precio));
+function pintarClienteSel(){const v=$("fClient").value;$("fClient").innerHTML=`<option value="">🔁 Tecnigráficas (cuenta cruzada)</option>`+S.clients.filter(c=>c.active||c.id===v).map(c=>`<option value="${c.id}">👤 ${esc(c.name)}</option>`).join("")+`<option value="__new">＋ Cliente nuevo…</option>`;$("fClient").value=S.clients.some(c=>c.id===v)?v:"";$("fPriceWrap").classList.toggle("hidden",!$("fClient").value)}
+$("fClient").addEventListener("change",()=>{if($("fClient").value==="__new"){$("fClient").value="";nuevoCliente(true);return}$("fPriceWrap").classList.toggle("hidden",!$("fClient").value);if(!$("fClient").value)$("fPrice").value="";precio()});
 
 function filaTrabajo(x,tap){
   const fin=x.finish_code&&x.finish_code!=="sin"?` · ${esc(x.finish_name)}${Number(x.finish_qty)?" "+Number(x.finish_qty):""}`:"";
-  return `<div class="row${tap?" tap":""}" ${tap?`data-id="${x.id}"`:""}><span><b>${esc(x.detail)}</b><small>${x.quantity} × ${Number(x.base_cm)}×${Number(x.height_cm)} cm · ${esc(x.material_name)}${fin}${x.minimum_applied?" · mínimo":""}</small></span><span class="amt">${cop(x.total)}</span></div>`;
+  const tag=x.client_id?`<span class="ctag">${esc(cname(x.client_id))}</span>`:"";
+  return `<div class="row${tap?" tap":""}" ${tap?`data-id="${x.id}"`:""}><span><b>${esc(x.detail)}${tag}</b><small>${x.quantity} × ${Number(x.base_cm)}×${Number(x.height_cm)} cm · ${esc(x.material_name)}${fin}${x.minimum_applied?" · mínimo":""}${x.price_override?" · precio especial":""}</small></span><span class="amt">${cop(x.total)}</span></div>`;
 }
 function pintarSemana(){
   $("weekCount").textContent=S.week.length?`${S.week.length} trabajo${S.week.length===1?"":"s"}`:"";
@@ -230,17 +271,18 @@ function pintarSemana(){
 }
 $("weekList").addEventListener("click",e=>{const r=e.target.closest("[data-id]");if(r)editar(r.dataset.id)});
 
-function limpiar(){S.editId=null;$("f").reset();$("fQty").value=1;$("fFinQty").value=0;$("fDate").value=today();S.fin_code="sin";$("formTitle").textContent="Anotar un trabajo";$("fSave").textContent="✓ Guardar trabajo";$("editActions").classList.add("hidden");$("formCard").classList.remove("editing");pintarChips();precio()}
-function editar(id){const x=S.week.find(p=>p.id===id);if(!x)return;S.editId=id;$("fDetail").value=x.detail;$("fQty").value=x.quantity;$("fBase").value=Number(x.base_cm);$("fAlto").value=Number(x.height_cm);$("fFinQty").value=Number(x.finish_qty)||0;$("fDate").value=x.print_date;S.mat=x.material_code;S.fin_code=x.finish_code||"sin";$("formTitle").textContent="Corregir trabajo";$("fSave").textContent="✓ Guardar cambios";$("editActions").classList.remove("hidden");$("formCard").classList.add("editing");pintarChips();precio();$("formCard").scrollIntoView({behavior:"smooth",block:"start"})}
+function limpiar(){S.editId=null;const keepC=$("fClient").value;$("f").reset();$("fClient").value=keepC;$("fClient").disabled=false;$("fPrice").value="";$("fPriceWrap").classList.toggle("hidden",!keepC);$("fQty").value=1;$("fFinQty").value=0;$("fDate").value=today();S.fin_code="sin";$("formTitle").textContent="Anotar un trabajo";$("fSave").textContent="✓ Guardar trabajo";$("editActions").classList.add("hidden");$("formCard").classList.remove("editing");pintarChips();precio()}
+function editar(id){const x=S.week.find(p=>p.id===id);if(!x)return;S.editId=id;$("fDetail").value=x.detail;$("fQty").value=x.quantity;$("fBase").value=Number(x.base_cm);$("fAlto").value=Number(x.height_cm);$("fFinQty").value=Number(x.finish_qty)||0;$("fDate").value=x.print_date;$("fClient").value=x.client_id||"";$("fClient").disabled=true;$("fPrice").value=x.price_override?Number(x.price_override):"";$("fPriceWrap").classList.toggle("hidden",!x.client_id);S.mat=x.material_code;S.fin_code=x.finish_code||"sin";$("formTitle").textContent="Corregir trabajo";$("fSave").textContent="✓ Guardar cambios";$("editActions").classList.remove("hidden");$("formCard").classList.add("editing");pintarChips();precio();$("formCard").scrollIntoView({behavior:"smooth",block:"start"})}
 $("fCancel").addEventListener("click",limpiar);
 $("fDelete").addEventListener("click",async()=>{if(!S.editId||!confirm("¿Borrar este trabajo?"))return;const r=await db.from("gf_prints").delete().eq("id",S.editId);if(r.error)return alert(r.error.message);toast("Trabajo borrado");limpiar();await cargar()});
 $("f").addEventListener("submit",async e=>{
   e.preventDefault();if(!S.mat)return alert("Escoge el material");
   const f=rate(S.fin_code),p={detail:$("fDetail").value.trim(),quantity:Math.round(num($("fQty").value)),base_cm:num($("fBase").value),height_cm:num($("fAlto").value),material_code:S.mat,finish_code:S.fin_code,finish_qty:f&&f.code!=="sin"?num($("fFinQty").value):0,print_date:$("fDate").value||today()};
+  const cid=$("fClient").value;if(!S.editId)p.client_id=cid||null;p.price_override=cid&&num($("fPrice").value)>0?Math.round(num($("fPrice").value)):null;
   if(!p.detail||!(p.quantity>0&&p.base_cm>0&&p.height_cm>0))return alert("Revisa el nombre, la cantidad y las medidas.");
   $("fSave").disabled=true;
   try{const r=S.editId?await db.from("gf_prints").update(p).eq("id",S.editId):await db.from("gf_prints").insert(p);if(r.error)throw r.error;
-    toast(S.editId?"Cambios guardados":"Trabajo anotado ✓");const keep=S.mat;limpiar();S.mat=keep;await cargar();$("fDetail").focus()}
+    toast(S.editId?"Cambios guardados":(p.client_id?`Anotado a ${cname(p.client_id)} ✓`:"Trabajo anotado ✓"));const keep=S.mat;limpiar();S.mat=keep;await cargar();$("fDetail").focus()}
   catch(err){alert(err.message)}finally{$("fSave").disabled=false}
 });
 
@@ -279,7 +321,10 @@ function pintarMeses(){
   const months=[...new Set(S.prints.map(x=>x.print_date.slice(0,7)))].sort().reverse(),sel=$("mesSel"),cur=sel.value||months[0];
   sel.innerHTML=months.map(m=>{const [y,mm]=m.split("-").map(Number);return `<option value="${m}"${m===cur?" selected":""}>${new Date(y,mm-1,1).toLocaleDateString("es-CO",{month:"long",year:"numeric"})}</option>`}).join("")||`<option value="">Sin trabajos</option>`;
   const list=S.prints.filter(x=>x.print_date.slice(0,7)===sel.value),tot=list.reduce((a,x)=>a+Number(x.total||0),0),pz=list.reduce((a,x)=>a+Number(x.quantity||0),0),mins=list.filter(x=>x.minimum_applied).length;
-  $("mesSum").innerHTML=`<div><span>Total del mes</span><strong>${cop(tot)}</strong></div><div><span>Trabajos · piezas</span><strong>${list.length} · ${pz}</strong></div><div><span>Con mínimo</span><strong>${mins}</strong></div>`;
+  const tt=list.filter(x=>!x.client_id).reduce((a,x)=>a+Number(x.total||0),0);
+  $("mesSum").innerHTML=`<div><span>Total del mes</span><strong>${cop(tot)}</strong></div><div><span>Para Tecni · otros clientes</span><strong>${cop(tt)} · ${cop(tot-tt)}</strong></div><div><span>Trabajos · piezas · con mínimo</span><strong>${list.length} · ${pz} · ${mins}</strong></div>`;
+  const m2=list.reduce((a,x)=>a+Number(x.quantity)*Number(x.base_cm)*Number(x.height_cm)/10000,0),fp=Number(rate("fondo_maquina")?.price||0);
+  $("mesSum").insertAdjacentHTML("beforeend",`<div><span>Metros cuadrados impresos</span><strong>${mfmt(m2)} m²</strong></div><div><span>Promedio cobrado</span><strong>${m2>0?cop(tot/m2):"$0"}/m²</strong></div><div><span>🔧 Guarda para la máquina (${mfmt(fp)} %)</span><strong>${cop(tot*fp/100)}</strong></div>`);
   let h="",last="";for(const x of list){if(x.print_date!==last){last=x.print_date;h+=`<div class="day">${esc(fdate(last))}</div>`}h+=filaTrabajo(x,false)}
   $("mesList").innerHTML=h||`<div class="empty">No hay trabajos en este mes.</div>`;
 }
@@ -288,12 +333,75 @@ $("mesSel").addEventListener("change",pintarMeses);
 // ---------- tarifas ----------
 function pintarTarifas(){
   const u={cm2:"por cm²",cm:"por cm",unidad:"c/u",valor:"por pieza"},hint=r=>r.unit==="cm2"?`m² = ${cop(Number(r.price)*10000)}`:"";
-  const sec=(t,k)=>`<div class="day">${t}</div>`+S.rates.filter(r=>r.kind===k).map(r=>`<div class="rate"><span><b>${esc(r.name)}</b><br><small>${hint(r)}</small></span><input type="number" min="0" step="any" data-code="${r.code}" value="${Number(r.price)}" ${r.code==="sin"?"disabled":""}><small>${u[r.unit]||""}</small></div>`).join("");
-  $("rates").innerHTML=sec("Mínimo","setting")+sec("Materiales","material")+sec("Acabados","finish");
+  const su={minimo:"por pieza",tinta_m2:"$ por m²",fondo_maquina:"%"};
+  const sec=(t,k)=>`<div class="day">${t}</div>`+S.rates.filter(r=>r.kind===k).map(r=>`<div class="rate"><span><b>${esc(r.name)}</b><br><small>${hint(r)}</small></span><input type="number" min="0" step="any" data-code="${r.code}" value="${Number(r.price)}" ${r.code==="sin"?"disabled":""}><small>${k==="setting"?(su[r.code]||""):(u[r.unit]||"")}</small></div>`).join("");
+  const tinta=Number(rate("tinta_m2")?.price||0);
+  const mats=`<div class="day">Materiales</div><div class="rate mat" style="border:0;padding-bottom:0"><span></span><small>Cobras por cm²</small><small>Te cuesta el m²</small></div>`+S.rates.filter(r=>r.kind==="material").map(r=>{const pm=Number(r.price)*10000,c=r.cost_m2==null?null:Number(r.cost_m2)+tinta,pc=c!=null&&pm>0?Math.round(100*c/pm):null;
+    const badge=pc==null?`<span class="mg na">Falta el costo</span>`:pc>45?`<span class="mg bad">Ojo: material y tinta se llevan el ${pc} %</span>`:`<span class="mg ok">Material y tinta: ${pc} % del precio</span>`;
+    return `<div class="rate mat"><span><b>${esc(r.name)}</b><br><small>m² = ${cop(pm)}</small> ${badge}</span><input type="number" min="0" step="any" data-code="${r.code}" value="${Number(r.price)}"><input type="number" min="0" step="1" data-cost="${r.code}" value="${r.cost_m2??""}" placeholder="$ por m²"></div>`}).join("");
+  const last=S.rates.map(r=>r.updated_at).filter(Boolean).sort().pop(),days=last?Math.floor((Date.now()-new Date(last))/864e5):0;
+  $("rates").innerHTML=(days>90?`<div class="big debe" style="font-size:14px">Hace ${days} días no revisas las tarifas. Revisa cuánto te están costando hoy los rollos y la tinta.</div>`:"")+sec("Ajustes","setting")+mats+sec("Acabados","finish")+`<p class="muted" style="margin-top:10px">El costo del m² lo ves en 📦 Inventario si anotas cuánto te costó cada rollo. En laminados suma el vinilo y la película. Si material y tinta pasan del 45 % del precio, queda muy poco para ayudante, energía y máquina.</p>`;
 }
 $("ratesSave").addEventListener("click",async()=>{const ch=[...$("rates").querySelectorAll("input[data-code]")].map(i=>({code:i.dataset.code,price:num(i.value)})).filter(x=>{const r=rate(x.code);return r&&Number(r.price)!==x.price&&x.price>=0});
-  if(!ch.length)return toast("No hay cambios");if(!confirm(`¿Guardar ${ch.length} cambio${ch.length===1?"":"s"} de tarifa? Aplica a los trabajos nuevos.`))return;
+  const cc=[...$("rates").querySelectorAll("input[data-cost]")].map(i=>({code:i.dataset.cost,cost_m2:i.value===""?null:num(i.value)})).filter(x=>{const r=rate(x.code);return r&&(r.cost_m2==null?null:Number(r.cost_m2))!==x.cost_m2});
+  for(const x of cc){const r=await db.from("gf_rates").update({cost_m2:x.cost_m2}).eq("code",x.code);if(r.error)return alert(r.error.message)}
+  if(!ch.length){if(cc.length){toast("Costos guardados ✓");await cargar()}else toast("No hay cambios");return}if(!confirm(`¿Guardar ${ch.length} cambio${ch.length===1?"":"s"} de tarifa? Aplica a los trabajos nuevos.`))return;
   try{for(const x of ch){const r=await db.from("gf_rates").update({price:x.price,updated_at:new Date().toISOString(),updated_by:S.session.user.id}).eq("code",x.code);if(r.error)throw r.error}toast("Tarifas guardadas ✓");await cargar()}catch(err){alert(err.message)}});
+
+// ---------- mis clientes ----------
+const bal=id=>Number(S.bals.get(id)?.balance||0);
+function pintarClientes(){
+  const act=S.clients.filter(c=>c.active),q=($("clSearch").value||"").toLowerCase().trim();
+  const debe=act.reduce((a,c)=>a+Math.max(0,bal(c.id)),0),mon=lunes(),semana=S.prints.filter(x=>x.client_id&&x.print_date>=mon).reduce((a,x)=>a+Number(x.total||0),0);
+  $("clSum").innerHTML=`<div><span>Te deben en total</span><strong>${cop(debe)}</strong></div><div><span>Cobrado a clientes esta semana</span><strong>${cop(semana)}</strong></div><div><span>Clientes</span><strong>${act.length}</strong></div>`;
+  const list=act.filter(c=>!q||c.name.toLowerCase().includes(q)).sort((a,b)=>bal(b.id)-bal(a.id)||a.name.localeCompare(b.name));
+  $("clList").innerHTML=list.map(c=>{const b=bal(c.id);return `<div class="row tap${S.clientSel===c.id?" sel":""}" data-cid="${c.id}"><span><b>${esc(c.name)}</b><small>${c.phone?esc(c.phone):"Sin celular"}</small></span><span class="bal ${b>0?"debe":"ok"}">${b>0?cop(b):b<0?"A favor "+cop(-b):"Al día ✅"}</span></div>`}).join("")||`<div class="empty">${q?"No encontré ese cliente.":"Todavía no tienes clientes. Toca \"＋ Cliente nuevo\"."}</div>`;
+  const arch=S.clients.filter(c=>!c.active);if(arch.length&&!q)$("clList").insertAdjacentHTML("beforeend",`<details style="margin-top:8px"><summary class="muted">Archivados (${arch.length})</summary>${arch.map(c=>`<div class="row tap" data-cid="${c.id}"><span><b>${esc(c.name)}</b></span><span class="muted">${cop(bal(c.id))}</span></div>`).join("")}</details>`);
+  pintarDetalle();
+}
+$("clSearch").addEventListener("input",pintarClientes);
+$("clList").addEventListener("click",e=>{const r=e.target.closest("[data-cid]");if(!r)return;S.clientSel=r.dataset.cid;pintarClientes();if(innerWidth<860)$("clDetail").scrollIntoView({behavior:"smooth"})});
+function movsCliente(id){
+  const jobs=S.prints.filter(x=>x.client_id===id).map(x=>({d:x.print_date,t:x.created_at,k:"job",x})),pays=S.pays.filter(x=>x.client_id===id).map(x=>({d:x.paid_on,t:x.created_at,k:"pay",x}));
+  const all=[...jobs,...pays].sort((a,b)=>a.d.localeCompare(b.d)||String(a.t).localeCompare(String(b.t)));let run=0;all.forEach(m=>{run+=m.k==="job"?Number(m.x.total):-Number(m.x.amount);m.run=run});return all.reverse();
+}
+function pintarDetalle(){
+  const c=S.clients.find(x=>x.id===S.clientSel);if(!c){$("clDetail").innerHTML=`<div class="empty">Escoge un cliente para ver su cuenta.</div>`;return}
+  const b=S.bals.get(c.id)||{billed:0,paid:0,balance:0},mv=movsCliente(c.id);
+  $("clDetail").innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap"><div><h2>${esc(c.name)}${c.active?"":' <span class="tag">Archivado</span>'}</h2><p class="muted" style="margin:4px 0 0">${c.phone?"📱 "+esc(c.phone):"Sin celular"}${c.notes?" · "+esc(c.notes):""}</p></div><button class="btn sec sm" onclick="editarCliente('${c.id}')">✏️ Editar</button></div>
+  <div class="sum"><div><span>Le has cobrado</span><strong>${cop(b.billed)}</strong></div><div><span>Te ha pagado</span><strong>${cop(b.paid)}</strong></div><div><span>${Number(b.balance)<0?"Tiene a favor":"Te debe"}</span><strong style="color:${Number(b.balance)>0?"#b42318":"#067647"}">${cop(Math.abs(b.balance))}</strong></div></div>
+  <div class="actions"><button class="btn sm" onclick="anotarPara('${c.id}')">🖨️ Anotar trabajo</button><button class="btn sm" onclick="nuevoPago('${c.id}')">💵 Registrar pago</button>${c.phone?`<button class="btn sec sm" onclick="mandarEstado('${c.id}')">📲 Mandar estado de cuenta</button>`:""}</div>
+  <div class="day" style="margin-top:16px">Movimientos</div>
+  ${mv.map(m=>m.k==="job"?filaTrabajoCliente(m):`<div class="row"><span><b>💵 Pago${m.x.method?" · "+esc(m.x.method):""}</b><small>${esc(fshort(m.d))}${m.x.note?" · "+esc(m.x.note):""} · saldo ${cop(m.run)}</small></span><span style="display:flex;gap:8px;align-items:center"><span class="amt" style="color:#067647">−${cop(m.x.amount)}</span><button class="btn red sm" onclick="borrarPago('${m.x.id}')">✕</button></span></div>`).join("")||`<div class="empty">Todavía no hay movimientos.</div>`}`;
+}
+function filaTrabajoCliente(m){const x=m.x;return `<div class="row tap" onclick="editarDesdeCliente('${x.id}')"><span><b>${esc(x.detail)}</b><small>${esc(fshort(m.d))} · ${x.quantity} × ${Number(x.base_cm)}×${Number(x.height_cm)} cm · ${esc(x.material_name)}${x.price_override?" · precio especial":""} · saldo ${cop(m.run)}</small></span><span class="amt">${cop(x.total)}</span></div>`}
+function irAnotar(){document.querySelector('#tabs button[data-tab="anotar"]').click();$("formCard").scrollIntoView({behavior:"smooth",block:"start"})}
+window.anotarPara=id=>{if(S.editId)limpiar();irAnotar();$("fClient").value=id;$("fPriceWrap").classList.remove("hidden");precio();$("fDetail").focus()};
+window.editarDesdeCliente=id=>{const x=S.prints.find(p=>p.id===id);if(!x)return;if(!S.week.some(w=>w.id===id))S.week.push(x);irAnotar();editar(id)};
+window.nuevoCliente=(fromForm)=>{S.clientEdit=null;S.clientFromForm=!!fromForm;$("fCliente").reset();$("mClienteTitle").textContent="Cliente nuevo";$("cArchive").classList.add("hidden");$("mCliente").classList.remove("hidden");$("cName").focus()};
+window.editarCliente=id=>{const c=S.clients.find(x=>x.id===id);if(!c)return;S.clientEdit=id;S.clientFromForm=false;$("mClienteTitle").textContent="Editar cliente";$("cName").value=c.name;$("cPhone").value=c.phone||"";$("cNotes").value=c.notes||"";$("cArchive").textContent=c.active?"Archivar":"Volver a activar";$("cArchive").classList.remove("hidden");$("mCliente").classList.remove("hidden")};
+$("fCliente").addEventListener("submit",async e=>{e.preventDefault();const p={name:$("cName").value.trim(),phone:$("cPhone").value.replace(/[^0-9+]/g,"")||null,notes:$("cNotes").value.trim()||null,updated_at:new Date().toISOString()};if(!p.name)return;
+  if(!S.clientEdit&&S.clients.some(c=>c.name.toLowerCase()===p.name.toLowerCase()))return alert("Ya tienes un cliente con ese nombre.");
+  $("cSave").disabled=true;try{let id=S.clientEdit;
+    if(id){const r=await db.from("gf_clients").update(p).eq("id",id);if(r.error)throw r.error}
+    else{const r=await db.from("gf_clients").insert({...p,created_by:S.session.user.id}).select("id").single();if(r.error)throw r.error;id=r.data.id}
+    cerrarModal("mCliente");S.clientSel=id;await cargar();toast("Cliente guardado ✓");if(S.clientFromForm){$("fClient").value=id;$("fPriceWrap").classList.remove("hidden");precio()}}
+  catch(err){alert(err.message)}finally{$("cSave").disabled=false}});
+$("cArchive").addEventListener("click",async()=>{const c=S.clients.find(x=>x.id===S.clientEdit);if(!c)return;if(c.active&&bal(c.id)>0&&!confirm(`${c.name} todavía te debe ${cop(bal(c.id))}. ¿Archivarlo igual?`))return;
+  const r=await db.from("gf_clients").update({active:!c.active,updated_at:new Date().toISOString()}).eq("id",c.id);if(r.error)return alert(r.error.message);cerrarModal("mCliente");toast(c.active?"Cliente archivado":"Cliente activo de nuevo");cargar()});
+window.nuevoPago=id=>{S.clientSel=id;const c=S.clients.find(x=>x.id===id);$("fPago").reset();$("mPagoTitle").textContent=`Pago de ${c?.name||""}`;$("pDate").value=today();const b=bal(id);$("pAmount").value=b>0?Math.round(b):"";S.payMethod="Efectivo";marcarMetodo();$("mPago").classList.remove("hidden");$("pAmount").focus()};
+function marcarMetodo(){$("pMethods").querySelectorAll("[data-m]").forEach(b=>b.classList.toggle("on",b.dataset.m===S.payMethod))}
+$("pMethods").addEventListener("click",e=>{const b=e.target.closest("[data-m]");if(!b)return;S.payMethod=b.dataset.m;marcarMetodo()});
+$("fPago").addEventListener("submit",async e=>{e.preventDefault();const a=Math.round(num($("pAmount").value));if(!(a>0))return;$("pSave").disabled=true;
+  try{const r=await db.from("gf_client_payments").insert({client_id:S.clientSel,amount:a,paid_on:$("pDate").value||today(),method:S.payMethod,note:$("pNote").value.trim()||null,created_by:S.session.user.id});if(r.error)throw r.error;cerrarModal("mPago");toast("Pago guardado ✓");await cargar()}
+  catch(err){alert(err.message)}finally{$("pSave").disabled=false}});
+window.borrarPago=async id=>{if(!confirm("¿Borrar este pago?"))return;const r=await db.from("gf_client_payments").delete().eq("id",id);if(r.error)return alert(r.error.message);toast("Pago borrado");cargar()};
+window.mandarEstado=id=>{const c=S.clients.find(x=>x.id===id);if(!c?.phone)return;const b=bal(id),mv=movsCliente(id);
+  // trabajos desde el último momento en que estuvo al día
+  const pend=[];for(const m of mv){if(m.run<=0)break;if(m.k==="job")pend.push(m.x)}
+  const lines=pend.slice(0,25).reverse().map(x=>`• ${fshort(x.print_date)} · ${x.detail} · ${x.quantity} × ${Number(x.base_cm)}×${Number(x.height_cm)} cm · ${cop(x.total)}`);
+  const txt=`Hola ${c.name} 👋\nEste es tu estado de cuenta de impresiones de gran formato:\n\n${lines.join("\n")||"Sin trabajos pendientes."}\n\n*Saldo: ${b>0?cop(b):"al día ✅"}*\n\n¡Gracias!`;
+  let ph=c.phone.replace(/[^0-9]/g,"");if(ph.length===10)ph="57"+ph;window.open(`https://wa.me/${ph}?text=${encodeURIComponent(txt)}`,"_blank")};
 
 // ---------- inventario ----------
 const MATS=["Lona","Lona blackout","Vinilo blanco brillante","Vinilo blanco mate","Vinilo transparente","Laminado brillante","Laminado mate","Lienzo","Reflectivo","Laminado reflectivo","Microperforado","Panaflex","Opalizado","Vinilo 3D / escarcha / holográfico","Polietileno"];
@@ -303,10 +411,10 @@ const wfmt=n=>Number(n||0).toLocaleString("es-CO",{minimumFractionDigits:2,maxim
 const low=r=>Number(r.remaining_m)<=Math.max(5,Number(r.length_m)*0.15);
 function pintarInv(){
   const act=S.rolls.filter(r=>r.status==="activo"),done=S.rolls.filter(r=>r.status!=="activo");
-  const g=new Map();act.forEach(r=>{const k=r.material.trim()+" · "+wfmt(r.width_m)+" m";const o=g.get(k)||{m:0,n:0,low:false};o.m+=Number(r.remaining_m);o.n++;g.set(k,o)});
-  $("stock").innerHTML=[...g.entries()].sort().map(([k,o])=>`<div><b>${esc(k)}</b><span>${mfmt(o.m)} m · ${o.n} rollo${o.n===1?"":"s"}</span></div>`).join("")||`<div class="empty" style="grid-column:1/-1;background:none">Todavía no hay rollos. Toca "＋ Rollo nuevo".</div>`;
+  const g=new Map();act.forEach(r=>{const k=r.material.trim()+" · "+wfmt(r.width_m)+" m";const o=g.get(k)||{m:0,n:0,low:false,cs:0,cn:0};o.m+=Number(r.remaining_m);o.n++;if(Number(r.cost)>0){o.cs+=Number(r.cost)/(Number(r.width_m)*Number(r.length_m));o.cn++}g.set(k,o)});
+  $("stock").innerHTML=[...g.entries()].sort().map(([k,o])=>`<div><b>${esc(k)}</b><span>${mfmt(o.m)} m · ${o.n} rollo${o.n===1?"":"s"}${o.cn?` · ≈ ${cop(o.cs/o.cn)}/m²`:""}</span></div>`).join("")||`<div class="empty" style="grid-column:1/-1;background:none">Todavía no hay rollos. Toca "＋ Rollo nuevo".</div>`;
   $("rolls").innerHTML=act.sort((a,b)=>a.material.localeCompare(b.material)||a.remaining_m-b.remaining_m).map(r=>{const pc=Math.max(0,Math.min(100,100*r.remaining_m/r.length_m));
-    return `<div class="roll${low(r)?" low":""}"><h4>${esc(r.material)} · ${wfmt(r.width_m)} m${low(r)?'<span class="tag">Se está acabando</span>':""}</h4><div class="meta">Comprado el ${esc(fshort(r.bought_on))}${r.supplier?" · "+esc(r.supplier):""}</div>
+    return `<div class="roll${low(r)?" low":""}"><h4>${esc(r.material)} · ${wfmt(r.width_m)} m${low(r)?'<span class="tag">Se está acabando</span>':""}</h4><div class="meta">Comprado el ${esc(fshort(r.bought_on))}${r.supplier?" · "+esc(r.supplier):""}${Number(r.cost)>0?" · te cuesta "+cop(Number(r.cost)/(Number(r.width_m)*Number(r.length_m)))+"/m²":""}</div>
     <div class="bar"><i style="width:${pc}%"></i></div><div class="left">${mfmt(r.remaining_m)} m <small>de ${mfmt(r.length_m)} m</small></div>
     <div class="actions"><button class="btn sm" onclick="usoRollo('${r.id}')">➖ Usé / quedan</button></div></div>`}).join("")||`<div class="empty" style="grid-column:1/-1">No hay rollos en uso.</div>`;
   $("doneWrap").classList.toggle("hidden",!done.length);
@@ -352,7 +460,7 @@ $("nrAdd").addEventListener("click",async()=>{const name=$("nrName").value.trim(
   $("nrName").value="";$("nrPrice").value="";toast(`${name} agregado ✓`);cargar()});
 
 // ---------- pestañas ----------
-$("tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]");if(!b)return;document.querySelectorAll("#tabs button").forEach(x=>x.classList.toggle("on",x===b));["anotar","abonos","mes","inv","tarifas"].forEach(t=>$("tab-"+t).classList.toggle("hidden",t!==b.dataset.tab))});
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-tab]");if(!b)return;document.querySelectorAll("#tabs button").forEach(x=>x.classList.toggle("on",x===b));["anotar","abonos","mes","clientes","inv","tarifas"].forEach(t=>$("tab-"+t).classList.toggle("hidden",t!==b.dataset.tab))});
 
 // ---------- inicio ----------
 (async()=>{

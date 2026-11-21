@@ -277,7 +277,7 @@ async function cargar(){
     db.from("gf_clients").select("*").order("name"),
     db.from("gf_client_balances").select("*"),
     db.from("gf_client_payments").select("*").order("paid_on",{ascending:false}).order("created_at",{ascending:false}).limit(1000),
-    db.from("gf_cost_items").select("*").eq("active",true).order("supplier").order("name"),
+    db.from("gf_cost_items").select("*").eq("active",true).order("supplier").order("name").order("width_m").limit(1000),
     db.from("gf_orders").select("*").order("created_at",{ascending:false}).limit(40),
     db.from("gf_order_items").select("*").limit(2000)]);
   for(const x of[r,p,e,c,ro,cl,cb,cp,ci,od,oi])if(x.error)throw x.error;S.costs=ci.data||[];S.orders=od.data||[];S.oitems=oi.data||[];S.rolls=ro.data||[];S.clients=cl.data||[];S.bals=new Map((cb.data||[]).map(b=>[b.client_id,b]));S.pays=cp.data||[];

@@ -272,7 +272,7 @@ async function cargar(){
     db.from("gf_rates").select("*").eq("active",true).order("sort_order"),
     db.from("gf_prints").select("*").order("print_date",{ascending:false}).order("created_at",{ascending:false}).limit(600),
     db.from("gf_entries").select("*").is("settlement_id",null).order("entry_date").order("created_at"),
-    db.from("gf_settlements").select("*").order("created_at",{ascending:false}).limit(12),
+    db.from("gf_settlements").select("*").eq("hidden",false).order("created_at",{ascending:false}).limit(12),
     db.from("gf_rolls").select("*").order("bought_on",{ascending:false}).order("created_at",{ascending:false}).limit(400),
     db.from("gf_clients").select("*").order("name"),
     db.from("gf_client_balances").select("*"),

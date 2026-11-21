@@ -4299,7 +4299,7 @@
     const finGF={rows:[],cuts:[],cat:null};
     async function loadFinGF(){
       const box=$("finGF");if(!box)return;
-      const [en,st,cs]=await Promise.all([db.from("gf_entries").select("*").is("settlement_id",null).order("entry_date").order("created_at"),db.from("gf_settlements").select("*").order("created_at",{ascending:false}).limit(8),db.from("app_settings").select("value").eq("key","gf_category_id").maybeSingle()]);
+      const [en,st,cs]=await Promise.all([db.from("gf_entries").select("*").is("settlement_id",null).order("entry_date").order("created_at"),db.from("gf_settlements").select("*").eq("hidden",false).order("created_at",{ascending:false}).limit(8),db.from("app_settings").select("value").eq("key","gf_category_id").maybeSingle()]);
       if(en.error){box.innerHTML=`<div class="empty">No pude cargar la cuenta: ${escapeHTML(en.error.message)}</div>`;return}
       finGF.rows=en.data||[];finGF.cuts=st.data||[];finGF.cat=cs.data?.value||(state.financeCategories||[]).find(c=>/^gran formato/i.test(c.name))?.id||null;renderFinGF();
     }

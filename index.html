@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sistema Tecnigráficas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --cyan:#00a6d6; --magenta:#e6007e; --yellow:#ffd500; --ink:#20222a;
@@ -991,6 +992,37 @@
     .df-panel.min .df-head{cursor:pointer;padding:8px 10px}.df-panel.min .df-head img{width:32px;height:32px}.df-panel.min .df-head small{display:none}
     .df-head #dfMin{font-weight:900}
     .df-head button+button{margin-left:6px}
+    /* V9.77 Producción con el estilo TecniBrand (piloto): letra redondita, stickers y celebraciones */
+    #view-production{--fd:"Fredoka","Tondu Beta","Arial Rounded MT Bold",system-ui,sans-serif}
+    #woShell{border-radius:22px}
+    #woShell .wo-bchip,#woShell .wo-tab{font-family:var(--fd);font-weight:600;border-radius:999px;transition:transform .2s cubic-bezier(.3,1.6,.5,1),background .15s}
+    #woShell .wo-bchip:hover{transform:translateY(-1px) rotate(-1deg)}
+    #woShell .wo-bchip.on{background:#fff;color:#EC008C;box-shadow:0 0 0 2px #fff,0 4px 0 2px rgba(43,50,69,.12);transform:rotate(-1.5deg)}
+    #woShell .wo-bchip.on b{background:#EC008C;color:#fff}
+    #woShell .wo-tab.on{color:#EC008C}
+    #productionBody .wo-col{border-radius:16px;box-shadow:0 2px 0 rgba(43,50,69,.06),0 1px 3px rgba(9,30,66,.08)}
+    #productionBody .wo-col header strong{font-family:var(--fd);font-weight:600!important;letter-spacing:.005em;display:flex;align-items:center;gap:6px}
+    #productionBody .wo-col header strong::before{content:"";flex:0 0 9px;height:9px;border-radius:50%;background:var(--ink-c,#9aa3b5);box-shadow:0 0 0 2px #fff}
+    #productionBody .wo-col.col-todo{--ink-c:#7c6cf0}#productionBody .wo-col.col-design{--ink-c:#EC008C}#productionBody .wo-col.col-client{--ink-c:#a35ad8}
+    #productionBody .wo-col.col-pause{--ink-c:#9aa3b5}#productionBody .wo-col.col-doing{--ink-c:#00AEEF}#productionBody .wo-col.col-ready{--ink-c:#f5c400}#productionBody .wo-col.col-done{--ink-c:#22a06b}
+    #productionBody .wo-col header b{font-family:var(--fd);background:#fff!important;border-radius:999px;padding:0 7px!important;color:#44546f;box-shadow:0 1px 0 rgba(0,0,0,.06)}
+    #productionBody .wo-card.tc{border-radius:9px;transition:transform .18s cubic-bezier(.3,1.5,.5,1),box-shadow .18s}
+    #productionBody .wo-card.tc:hover{background:#fff;transform:translateY(-2px);box-shadow:0 6px 14px rgba(43,50,69,.12),inset 0 0 0 1.5px rgba(236,0,140,.35)}
+    #productionBody .wo-add{font-family:var(--fd);font-weight:500}
+    #productionBody .wo-add:hover{transform:translateX(2px)}
+    .tc-qty{font-family:"Fredoka",system-ui,sans-serif;font-weight:700;background:#FFF200;color:#1A1A1A;box-shadow:0 0 0 1.5px #fff,0 1px 2px rgba(0,0,0,.18)}
+    .wo-ghost{transform:rotate(4deg) scale(1.05)!important;box-shadow:0 22px 44px rgba(43,50,69,.3)!important;transition:transform .15s}
+    .wo-card.wo-lifted{opacity:.22;outline:2px dashed rgba(236,0,140,.4);outline-offset:-2px}
+    #productionBody .wo-card.tc.wo-pop{animation:woPop .45s cubic-bezier(.3,1.7,.5,1)}
+    @keyframes woPop{0%{transform:scale(.9)}55%{transform:scale(1.06) rotate(-1deg)}100%{transform:none}}
+    .tc-check.on{animation:woPop .4s cubic-bezier(.3,1.7,.5,1)}
+    .wo-burst{position:fixed;z-index:10000;width:9px;height:9px;border-radius:50%;pointer-events:none;animation:woBurst .9s cubic-bezier(.15,.8,.3,1) forwards}
+    @keyframes woBurst{from{transform:translate(-50%,-50%) scale(1);opacity:1}to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.3) rotate(240deg);opacity:0}}
+    .wo-peek{position:fixed;z-index:10000;left:-6px;bottom:90px;width:92px;pointer-events:none;transform:translateX(-115%);transition:transform .55s cubic-bezier(.3,1.4,.5,1)}
+    .wo-peek.on{transform:none}
+    .wo-peek-b{position:fixed;z-index:10000;left:92px;bottom:160px;background:#fff;color:#1A1A1A;font:600 14px "Fredoka",system-ui,sans-serif;padding:9px 14px;border-radius:16px 16px 16px 4px;box-shadow:0 8px 22px rgba(0,0,0,.18);opacity:0;transform:scale(.6);transform-origin:0 100%;transition:opacity .25s,transform .4s cubic-bezier(.3,1.6,.5,1);pointer-events:none}
+    .wo-peek-b.on{opacity:1;transform:none;transition-delay:.3s}
+    @media (prefers-reduced-motion:reduce){#productionBody .wo-card.tc,#woShell .wo-bchip{transition:none}#productionBody .wo-card.tc.wo-pop,.tc-check.on{animation:none}.wo-burst,.wo-peek,.wo-peek-b{display:none}}
 </style>
 </head>
 <body>
@@ -3878,7 +3910,7 @@
       let pos=null,ups=[];if(idx!=null){const r=woPlace(rows,Math.max(0,Math.min(idx,rows.length)));pos=r.pos;ups=r.ups}
       if(isT)o.col=colKey;else o.status=newStatus;o.board_position=pos;ups.forEach(u=>u.r.board_position=u.pos);
       if(changed&&window.innerWidth<=900)woTab=colKey;
-      renderProduction();
+      renderProduction();woJuice(key,changed?colKey:null);
       const p={board_position:pos};if(isT){if(changed)p.col=colKey}else{p.updated_by=state.session.user.id;if(changed)p.status=newStatus}
       const res=await Promise.all([woUpdate(o,p),...ups.map(u=>woUpdate(u.r,{board_position:u.pos}))]);
       const bad=res.find(r=>r.error);if(bad){alert(bad.error.message);return loadProduction()}
@@ -3886,6 +3918,26 @@
       else if(changed){showToast(`✓ ${o.title}: ${col.t.replace(/^\S+\s/,"").toLowerCase()}`);if(o.work_order_id)await Promise.all([loadProduction(),loadDashboard()])}
     }
     function woMoveTo(key,k){woDrop(key,k,null)}
+    // V9.77: pequeños festejos en Producción (pop al soltar; confeti y Don Fer al pasar a Listo o Entregado)
+    const woRM=()=>matchMedia("(prefers-reduced-motion:reduce)").matches;
+    function woJuice(key,colKey){
+      const el=document.querySelector(`#productionBody [data-woid="${CSS.escape(String(key))}"]`);
+      if(el){el.classList.remove("wo-pop");void el.offsetWidth;el.classList.add("wo-pop")}
+      if(!colKey||woRM()||!["ready","done"].includes(colKey))return;
+      const r=el?el.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2,width:0,height:0};
+      const x=r.left+r.width/2,y=r.top+r.height/2,col=["#00AEEF","#EC008C","#FFF200","#1A1A1A","#22a06b"];
+      for(let i=0;i<26;i++){const d=document.createElement("i");d.className="wo-burst";const a=Math.PI*2*i/26+Math.random()*.4,rr=50+Math.random()*80;
+        d.style.left=x+"px";d.style.top=y+"px";d.style.background=col[i%5];d.style.setProperty("--dx",Math.cos(a)*rr+"px");d.style.setProperty("--dy",Math.sin(a)*rr+"px");
+        if(i%3===0){d.style.borderRadius="2px"}document.body.appendChild(d);setTimeout(()=>d.remove(),950)}
+      const msgs=colKey==="done"?["¡Entregado! 🙌","¡Uno menos! 🎉","¡Así se hace! 💪"]:["¡Listo para entregar! ✨","¡Quedó divino! 💖","¡Eso es! 🎨"];
+      let p=document.getElementById("woPeek"),b=document.getElementById("woPeekB");
+      if(!p){p=document.createElement("img");p.id="woPeek";p.className="wo-peek";p.src="donfer-asoma.webp";p.alt="";document.body.appendChild(p);
+        b=document.createElement("div");b.id="woPeekB";b.className="wo-peek-b";document.body.appendChild(b)}
+      clearTimeout(woJuice.t);b.textContent=msgs[Math.floor(Math.random()*msgs.length)];
+      requestAnimationFrame(()=>{p.classList.add("on");b.classList.add("on")});
+      woJuice.t=setTimeout(()=>{p.classList.remove("on");b.classList.remove("on")},2600);
+    }
+
     function woScroll(d){const b=$("productionBody");b.scrollBy({left:d*Math.max(240,b.clientWidth*.75),behavior:"smooth"})}
     async function woSetBoard(key,boardId){
       const f=woFind(key);if(!f.r)return;if(!hasPermission("work_orders.update"))return showToast("No tienes permiso");

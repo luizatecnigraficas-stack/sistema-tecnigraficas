@@ -9,176 +9,236 @@
 <meta property="og:description" content="Aquí comenzamos a construir la esencia de tu marca para diseñar tu logo.">
 <meta property="og:image" content="https://sistema.sastecnigraficas.com/donfer-salta.webp">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#E6007E">
+<meta name="theme-color" content="#EC008C">
 <link rel="icon" href="favicon-32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--m:#E6007E;--m2:#c4006b;--c:#00A0E3;--y:#FFD400;--k:#1d1d1f;--bg:#fff7fb;--line:#f1d4e4;--soft:#fde9f3;--mut:#6b6170}
+:root{
+  --c:#00AEEF;--m:#EC008C;--y:#FFF200;--k:#1A1A1A;--paper:#ffffff;
+  --display:"Fredoka","Tondu Beta","Arial Rounded MT Bold",system-ui,sans-serif;
+  --text:"Jost","Futura",system-ui,sans-serif;
+  --bg:var(--paper);--fg:var(--k);--soft:rgba(26,26,26,.62);--btn:var(--m);--btnfg:#fff;
+}
 *{box-sizing:border-box}
-html,body{margin:0}
-body{font-family:Montserrat,system-ui,sans-serif;background:var(--bg);color:var(--k);font-size:17px;line-height:1.45;min-height:100vh}
-.top{height:8px;background:linear-gradient(90deg,var(--c) 0 33%,var(--m) 33% 66%,var(--y) 66%)}
-.wrap{max-width:560px;margin:0 auto;padding:18px 16px 120px}
-.brand{display:flex;justify-content:center;margin:6px 0 10px}
-.brand img{height:44px}
-.prog{height:6px;background:var(--soft);border-radius:99px;overflow:hidden;margin:4px 0 18px}
-.prog i{display:block;height:100%;width:0;background:var(--m);transition:width .3s}
-.step{display:none;animation:in .25s ease}
-.step.on{display:block}
-@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.tag{display:inline-block;font-weight:800;font-size:.78rem;letter-spacing:.08em;color:var(--m);background:#fff;border:1px solid var(--line);border-radius:99px;padding:4px 12px;margin-bottom:6px}
-h1{font-size:1.55rem;line-height:1.15;margin:.2em 0 .35em;font-weight:800}
-.sub{color:var(--mut);margin:0 0 18px}
-.hero{text-align:center}
-.hero img{width:160px;max-width:50%;margin:4px auto 0;display:block;filter:drop-shadow(0 8px 14px rgba(230,0,126,.18))}
-.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin:0 0 14px}
-.card p{margin:.3em 0}
-label.q{display:block;font-weight:700;margin:0 0 4px}
-.hint{color:var(--mut);font-size:.9rem;margin:0 0 8px}
-.field{margin:0 0 18px}
-input[type=text],input[type=tel],textarea{width:100%;font:inherit;font-size:17px;padding:13px 14px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--k);outline:none}
-textarea{min-height:96px;resize:vertical}
-input:focus,textarea:focus{border-color:var(--m)}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{font:inherit;font-weight:600;border:2px solid var(--line);background:#fff;color:var(--k);border-radius:99px;padding:10px 16px;min-height:44px;cursor:pointer}
-.chip.sel{border-color:var(--m);background:var(--m);color:#fff}
-.check{display:flex;gap:12px;align-items:flex-start;padding:12px;border:2px solid var(--line);border-radius:12px;background:#fff;margin-bottom:10px;cursor:pointer}
-.check input{width:24px;height:24px;flex:0 0 24px;accent-color:var(--m);margin:1px 0 0}
-.check span{font-size:.92rem}
-.check small{display:block;color:var(--mut);font-size:.8rem;margin-top:4px}
-.drop{display:block;border:2px dashed var(--line);border-radius:14px;background:#fff;padding:18px;text-align:center;cursor:pointer;font-weight:600;color:var(--mut)}
-.drop b{color:var(--m)}
-.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
-.thumbs div{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;text-align:center;padding:2px}
+html,body{margin:0;height:100%}
+body{font-family:var(--text);font-size:18px;line-height:1.45;color:var(--fg);background:var(--bg);transition:background-color .5s,color .3s;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+/* Cada sección es una "plancha" de color */
+body[data-plate=m]{--bg:var(--m);--fg:#fff;--soft:rgba(255,255,255,.82);--btn:#fff;--btnfg:var(--m)}
+body[data-plate=c]{--bg:var(--c);--fg:var(--k);--soft:rgba(26,26,26,.72);--btn:var(--k);--btnfg:#fff}
+body[data-plate=y]{--bg:var(--y);--fg:var(--k);--soft:rgba(26,26,26,.7);--btn:var(--k);--btnfg:var(--y)}
+body[data-plate=k]{--bg:var(--k);--fg:#fff;--soft:rgba(255,255,255,.7);--btn:var(--y);--btnfg:var(--k)}
+.wipe{position:fixed;inset:0;z-index:0;pointer-events:none;clip-path:circle(0 at var(--wx,50%) var(--wy,100%))}
+.wipe.go{transition:clip-path .55s cubic-bezier(.6,0,.2,1);clip-path:circle(150% at var(--wx,50%) var(--wy,100%))}
+
+header{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;max-width:620px;margin:0 auto;padding:18px 20px 0}
+.logo{height:30px;display:block}
+.logo.w{display:none}
+body[data-plate=m] .logo.c,body[data-plate=k] .logo.c{display:none}
+body[data-plate=m] .logo.w,body[data-plate=k] .logo.w{display:block}
+.inks{display:flex;gap:6px;align-items:center}
+.inks i{width:12px;height:12px;border-radius:50%;background:var(--ink);opacity:.25;transition:opacity .3s,transform .3s;box-shadow:0 0 0 2px color-mix(in srgb,var(--fg) 22%,transparent)}
+.inks i.on{opacity:1}
+.inks i.now{transform:scale(1.35)}
+.count{font-family:var(--display);font-weight:600;font-size:.9rem;color:var(--soft);margin-left:6px;min-width:3ch;text-align:right}
+
+main{position:relative;z-index:2;max-width:620px;margin:0 auto;padding:26px 20px 140px}
+.step{display:none}
+.step.on{display:block;animation:rise .45s cubic-bezier(.2,.7,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.sec{font-family:var(--display);font-weight:600;font-size:1rem;color:var(--soft);margin:0 0 6px;text-transform:lowercase}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(2rem,7.4vw,2.9rem);line-height:1.02;letter-spacing:-.01em;margin:0 0 22px;text-transform:lowercase;text-wrap:balance}
+h2{font-family:var(--display);font-weight:600;font-size:1.35rem;line-height:1.15;margin:0 0 4px}
+.hint{color:var(--soft);margin:0 0 12px;font-size:1rem}
+.q{margin:0 0 30px}
+
+input[type=text],input[type=tel],textarea{width:100%;font:500 1.1rem/1.4 var(--text);padding:16px 18px;border:0;border-radius:20px;background:#fff;color:var(--k);outline:none;box-shadow:0 0 0 3px transparent;transition:box-shadow .2s}
+body[data-plate=""] input,body[data-plate=""] textarea,body:not([data-plate]) input{background:#f6f2f5}
+input:focus,textarea:focus{box-shadow:0 0 0 3px var(--k)}
+body[data-plate=k] input:focus,body[data-plate=k] textarea:focus{box-shadow:0 0 0 3px var(--y)}
+textarea{min-height:120px;resize:vertical}
+::placeholder{color:#9a929c}
+
+/* Bienvenida */
+.welcome{display:grid;gap:8px}
+.welcome .don{width:min(260px,62vw);margin:-6px 0 0 -10px;filter:drop-shadow(0 14px 22px rgba(236,0,140,.25));animation:hop 2.8s ease-in-out infinite}
+@keyframes hop{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+.big{font-family:var(--display);font-weight:700;font-size:clamp(3rem,15vw,5.2rem);line-height:.9;margin:0;letter-spacing:-.02em}
+.big span:nth-child(1){color:var(--c)}.big span:nth-child(2){color:var(--m)}
+.lead{font-size:1.15rem;margin:10px 0 18px;max-width:34ch}
+.notes{display:grid;gap:10px;margin:0 0 6px;padding:0;list-style:none}
+.notes li{display:flex;gap:12px;align-items:flex-start;font-size:1rem}
+.notes b{font-family:var(--display);font-weight:600}
+.dot{flex:0 0 14px;height:14px;border-radius:50%;margin-top:5px}
+
+/* Stickers de personalidad */
+.stickers{display:flex;flex-wrap:wrap;gap:12px 10px;padding:6px 0}
+.st{font:600 1.15rem var(--display);border:0;cursor:pointer;padding:14px 20px;border-radius:999px;background:#fff;color:var(--k);box-shadow:0 0 0 4px #fff,0 6px 0 4px rgba(0,0,0,.12);transform:rotate(var(--r,0deg));transition:transform .25s cubic-bezier(.3,1.6,.5,1),background .2s,color .2s}
+.st:nth-child(3n){--r:-3deg}.st:nth-child(3n+1){--r:2deg}.st:nth-child(4n+2){--r:-1.5deg}
+.st:hover{transform:rotate(0) scale(1.04)}
+.st.sel{background:var(--k);color:var(--y);transform:rotate(calc(var(--r) * -1.6)) scale(1.08)}
+.st .e{margin-right:6px}
+
+/* Muestras de tinta */
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:12px 10px;margin:4px 0 16px}
+.sw{border:0;background:none;padding:0;cursor:pointer;font:500 .78rem var(--text);color:var(--fg);display:grid;justify-items:center;gap:6px}
+.sw .ink{position:relative;width:56px;height:56px;border-radius:50%;background:var(--v);box-shadow:inset 0 0 0 2px rgba(255,255,255,.35),0 0 0 2px rgba(255,255,255,.25);transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
+.sw .ink::after{content:"";position:absolute;right:-4px;bottom:-4px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;background:#fff;color:var(--k);transform:scale(0);transition:transform .2s;line-height:24px;text-align:center}
+.sw[data-s="1"] .ink{transform:scale(1.08)}
+.sw[data-s="1"] .ink::after{content:"❤";color:var(--m);transform:scale(1)}
+.sw[data-s="-1"] .ink{transform:scale(.88);filter:grayscale(.2) brightness(.8)}
+.sw[data-s="-1"] .ink::after{content:"✕";background:var(--k);color:#fff;transform:scale(1)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.92rem;color:var(--soft);margin:0 0 10px}
+
+.drop{display:flex;align-items:center;gap:14px;border:2.5px dashed currentColor;border-radius:22px;padding:18px;cursor:pointer;font-family:var(--display);font-weight:600;font-size:1.1rem}
+.drop small{display:block;font:400 .9rem var(--text);color:var(--soft)}
+.drop .plus{flex:0 0 46px;height:46px;border-radius:50%;background:var(--y);color:var(--k);display:grid;place-items:center;font-size:1.6rem}
+.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.thumbs div{position:relative;aspect-ratio:1;border-radius:16px;overflow:hidden;background:#fff;color:var(--k);display:flex;align-items:center;justify-content:center;font-size:.75rem;text-align:center;padding:4px;transform:rotate(var(--r,0));box-shadow:0 0 0 3px #fff}
+.thumbs div:nth-child(odd){--r:-2deg}.thumbs div:nth-child(even){--r:1.5deg}
 .thumbs img{width:100%;height:100%;object-fit:cover}
-.thumbs button{position:absolute;top:3px;right:3px;border:0;background:rgba(0,0,0,.6);color:#fff;border-radius:99px;width:24px;height:24px;font-size:14px;cursor:pointer;line-height:1}
-.nav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,247,251,.95);backdrop-filter:blur(6px);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
-.nav .in{max-width:560px;margin:0 auto;display:flex;gap:10px}
-.btn{font:inherit;font-weight:800;font-size:1.05rem;border:0;border-radius:14px;padding:16px 18px;cursor:pointer;background:var(--m);color:#fff;flex:1;text-align:center;text-decoration:none}
-.btn:active{background:var(--m2)}
-.btn.sec{background:#fff;color:var(--k);border:2px solid var(--line);flex:0 0 auto}
+.thumbs button{position:absolute;top:4px;right:4px;border:0;background:var(--k);color:#fff;border-radius:99px;width:26px;height:26px;font-size:15px;cursor:pointer}
+
+.toggle{font:600 1rem var(--display);border:2.5px solid currentColor;background:transparent;color:var(--fg);border-radius:999px;padding:10px 16px;margin-top:10px;cursor:pointer}
+.toggle.sel{background:var(--fg);color:var(--bg)}
+.check{display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-size:.98rem}
+.check input{width:24px;height:24px;flex:0 0 24px;accent-color:var(--m);margin:2px 0 0}
+.check small{display:block;color:var(--soft);font-size:.82rem;margin-top:4px}
+
+.err{position:relative;z-index:3;max-width:580px;margin:12px auto 0;background:#fff;color:#b00020;border-radius:16px;padding:12px 16px;font-weight:600;font-size:.98rem;display:none;box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.err.on{display:block;animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+.nav{position:fixed;z-index:4;left:0;right:0;bottom:0;padding:14px 20px calc(16px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 38%)}
+.nav .in{max-width:580px;margin:0 auto;display:flex;gap:10px}
+.btn{font:700 1.15rem var(--display);border:0;border-radius:999px;padding:18px 24px;cursor:pointer;background:var(--btn);color:var(--btnfg);flex:1;text-align:center;text-decoration:none;transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn.back{flex:0 0 60px;padding:18px 0;background:transparent;color:var(--fg);box-shadow:inset 0 0 0 2.5px currentColor}
 .btn[disabled]{opacity:.6}
-.err{background:#fff0f0;color:#b00020;border:1px solid #ffc9cf;border-radius:12px;padding:10px 12px;font-weight:600;font-size:.92rem;margin:0 0 12px;display:none}
-.err.on{display:block}
+:focus-visible{outline:3px solid var(--fg);outline-offset:3px}
 .hide{display:none!important}
-.done{text-align:center;padding-top:10px}
-.done img{width:200px;max-width:62%}
-.foot{text-align:center;color:var(--mut);font-size:.8rem;margin-top:20px}
-.foot a{color:var(--m)}
+
+.done{text-align:left}
+.done .don{width:min(240px,60vw);display:block;margin:0 0 6px -10px;animation:hop 2.8s ease-in-out infinite}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+.confetti i{position:absolute;top:-20px;width:12px;height:12px;border-radius:50%;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+.foot{color:var(--soft);font-size:.85rem;margin-top:34px}
+.foot a{color:inherit}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
-<body>
-<div class="top"></div>
-<div class="wrap">
-  <div class="brand"><img src="logo-web.webp" alt="Tecnigráficas"></div>
-  <div class="prog" id="prog"><i></i></div>
-  <div class="err" id="err"></div>
+<body data-plate="">
+<div class="wipe" id="wipe"></div>
+<header>
+  <div><img class="logo c" src="logo-web.webp" alt="Tecnigráficas"><img class="logo w" src="logo-blanco.webp" alt="Tecnigráficas"></div>
+  <div class="inks" id="inks" aria-hidden="true"></div>
+</header>
+<div class="err" id="err" role="alert"></div>
 
+<main>
   <!-- 0 Bienvenida -->
-  <section class="step" data-s="0">
-    <div class="hero">
-      <img src="donfer-salta.webp" alt="Don Fer">
-      <span class="tag">💖✨ TECNIBRAND ✨💖</span>
-      <h1 id="hello">Bienvenid@ a TecniBrand ✨</h1>
-      <p class="sub">Gracias por confiar en nosotros para crear tu logo registrable 💼✨<br>Aquí comenzamos a construir la esencia de tu marca…</p>
-    </div>
-    <div class="card">
-      <p><b>Vamos a darle vida a una marca que realmente te represente y conecte con las personas correctas 🧠💡</b></p>
-      <p>Este espacio es para conocerte mejor, entender tu esencia, tus ideas y todo lo que sueñas para tu marca, y así diseñar un logo que realmente conecte contigo y con tu público ☺️</p>
-      <p>→ Puedes responder como prefieras: texto o imágenes… ¡todo es bienvenido! 🙌🏻</p>
-      <p>→ Tranquil@ si no tienes todo claro y definido aún… poco a poco lo vamos construyendo juntos, nosotros te guiamos ✨</p>
-      <p>💡 <b>RECUERDA:</b> entre más información nos compartas, más especial será el resultado final.</p>
+  <section class="step" data-s="0" data-plate="">
+    <div class="welcome">
+      <img class="don" src="donfer-salta.webp" alt="Don Fer, la mascota de Tecnigráficas">
+      <p class="big"><span>tecni</span><span>brand</span></p>
+      <p class="lead" id="hello">Gracias por confiar en nosotros para crear tu logo registrable 💼✨ Aquí empezamos a construir la esencia de tu marca.</p>
+      <ul class="notes">
+        <li><span class="dot" style="background:var(--c)"></span><span><b>Responde como prefieras.</b> Texto o imágenes, todo es bienvenido 🙌🏻</span></li>
+        <li><span class="dot" style="background:var(--m)"></span><span><b>No tienes que tenerlo todo claro.</b> Poco a poco lo construimos juntos, nosotros te guiamos ✨</span></li>
+        <li><span class="dot" style="background:var(--y);box-shadow:0 0 0 1.5px var(--k)"></span><span><b>Entre más nos cuentes,</b> más especial será el resultado 💡</span></li>
+      </ul>
     </div>
   </section>
 
-  <!-- 1 Quién eres (se salta con link personal) -->
-  <section class="step" data-s="1" id="whoStep">
-    <span class="tag">TÚ</span>
-    <h1>Primero, ¿quién eres? 👋</h1>
-    <p class="sub">Para saber a quién le estamos diseñando.</p>
-    <div class="field"><label class="q" for="name">Tu nombre completo *</label><input type="text" id="name" autocomplete="name" maxlength="120"></div>
-    <div class="field"><label class="q" for="phone">WhatsApp *</label><input type="tel" id="phone" autocomplete="tel" inputmode="tel" placeholder="300 123 4567" maxlength="20"></div>
-    <label class="check"><input type="checkbox" id="consent"><span><b>Autorizo a Tecnigráficas</b> a guardar mis datos para atender mi pedido y contactarme. *<small>Según la Ley 1581 de 2012. Puedes pedir que actualicemos o borremos tus datos cuando quieras escribiendo a contacto@sastecnigraficas.com.</small></span></label>
+  <!-- 1 Tú -->
+  <section class="step" data-s="1" data-plate="" id="whoStep">
+    <p class="sec">primero, tú</p>
+    <h1>¿a quién le estamos diseñando? 👋</h1>
+    <div class="q"><h2><label for="name">Tu nombre completo</label></h2><input type="text" id="name" autocomplete="name" maxlength="120" placeholder="Ej. Ana Pérez"></div>
+    <div class="q"><h2><label for="phone">Tu WhatsApp</label></h2><input type="tel" id="phone" autocomplete="tel" inputmode="tel" placeholder="300 123 4567" maxlength="20"></div>
+    <label class="check"><input type="checkbox" id="consent"><span><b>Autorizo a Tecnigráficas</b> a guardar mis datos para atender mi pedido y contactarme.<small>Según la Ley 1581 de 2012. Puedes pedir que actualicemos o borremos tus datos cuando quieras escribiendo a contacto@sastecnigraficas.com.</small></span></label>
   </section>
 
   <!-- 2 Tu marca -->
-  <section class="step" data-s="2">
-    <span class="tag">TU MARCA</span>
-    <h1>Vamos a empezar con lo más importante… tu marca 💖</h1>
-    <div class="field"><label class="q" for="brand">🔹 Nombre de la marca *</label><p class="hint">Cuéntanos, ¿cómo se llama? ✨</p>
-      <input type="text" id="brand" maxlength="120">
-      <div class="chips" style="margin-top:8px"><button type="button" class="chip" id="noName">Aún no lo tengo definido</button></div></div>
-    <div class="field"><label class="q" for="meaning">🔹 ¿Tiene algún significado especial? *</label><p class="hint">Historia, inspiración o por qué elegiste ese nombre 💭</p><textarea id="meaning" maxlength="3000"></textarea></div>
+  <section class="step" data-s="2" data-plate="m">
+    <p class="sec">tu marca</p>
+    <h1>empecemos por lo más importante 💖</h1>
+    <div class="q"><h2><label for="brand">¿Cómo se llama tu marca?</label></h2>
+      <input type="text" id="brand" maxlength="120" placeholder="El nombre de tu marca">
+      <button type="button" class="toggle" id="noName">Aún no lo tengo definido</button></div>
+    <div class="q" id="meaningQ"><h2><label for="meaning">¿Tiene algún significado especial?</label></h2><p class="hint">Historia, inspiración o por qué escogiste ese nombre 💭</p><textarea id="meaning" maxlength="3000"></textarea></div>
   </section>
 
   <!-- 3 Esencia -->
-  <section class="step" data-s="3">
-    <span class="tag">ESENCIA</span>
-    <h1>Aquí empezamos a entender el corazón de tu marca 👀</h1>
-    <div class="field"><label class="q" for="origin">🔹 ¿Cómo nació? ¿Qué te inspiró? *</label><textarea id="origin" maxlength="3000"></textarea></div>
-    <div class="field"><label class="q" for="what">🔹 ¿Qué haces? *</label><p class="hint">Cuéntanoslo como si fuéramos tus clientes 👀</p><textarea id="what" maxlength="3000"></textarea></div>
+  <section class="step" data-s="3" data-plate="c">
+    <p class="sec">esencia</p>
+    <h1>el corazón de tu marca 👀</h1>
+    <div class="q"><h2><label for="origin">¿Cómo nació? ¿Qué te inspiró?</label></h2><textarea id="origin" maxlength="3000"></textarea></div>
+    <div class="q"><h2><label for="what">¿Qué haces?</label></h2><p class="hint">Cuéntanoslo como si fuéramos tus clientes.</p><textarea id="what" maxlength="3000"></textarea></div>
   </section>
 
   <!-- 4 Personalidad -->
-  <section class="step" data-s="4">
-    <span class="tag">PERSONALIDAD</span>
-    <h1>Ahora vamos a darle personalidad a tu marca ✨</h1>
-    <div class="field"><label class="q">🔹 ¿Qué te gustaría que tu marca transmitiera? *</label><p class="hint">Escoge todas las que quieras.</p>
-      <div class="chips" id="feel"></div>
-      <input type="text" id="feelOther" class="hide" style="margin-top:10px" maxlength="200" placeholder="¿Qué otra cosa?"></div>
+  <section class="step" data-s="4" data-plate="y">
+    <p class="sec">personalidad</p>
+    <h1>¿qué quieres que transmita tu marca?</h1>
+    <p class="hint">Pega todos los stickers que quieras ✨</p>
+    <div class="stickers" id="feel"></div>
+    <input type="text" id="feelOther" class="hide" style="margin-top:14px" maxlength="200" placeholder="¿Qué otra cosa?">
   </section>
 
   <!-- 5 Cliente ideal -->
-  <section class="step" data-s="5">
-    <span class="tag">TU CLIENTE IDEAL</span>
-    <h1>Una buena marca conecta con las personas correctas 💡</h1>
-    <div class="field"><label class="q" for="aud">🔹 ¿A quién va dirigido tu producto o servicio? *</label><p class="hint">Edad, estilo de vida, tipo de cliente, etc.</p><textarea id="aud" maxlength="3000"></textarea></div>
+  <section class="step" data-s="5" data-plate="m">
+    <p class="sec">tu cliente ideal</p>
+    <h1>una buena marca conecta con las personas correctas 💡</h1>
+    <div class="q"><h2><label for="aud">¿A quién le vendes?</label></h2><p class="hint">Edad, estilo de vida, tipo de cliente… lo que se te ocurra.</p><textarea id="aud" maxlength="3000"></textarea></div>
   </section>
 
   <!-- 6 Estilo visual -->
-  <section class="step" data-s="6">
-    <span class="tag">ESTILO VISUAL</span>
-    <h1>Aquí empezamos a darle vida visual 🎨</h1>
-    <div class="field"><label class="q" for="cLike">🔹 Colores que te gustan *</label><p class="hint">Puedes describirlos o subir referencias abajo.</p><textarea id="cLike" maxlength="2000" style="min-height:72px"></textarea></div>
-    <div class="field"><label class="q" for="cNo">🔹 Colores que NO te gustan *</label><p class="hint"><b>SÚPER IMPORTANTE</b> → esto es clave para evitar errores 👀</p><textarea id="cNo" maxlength="2000" style="min-height:72px"></textarea></div>
-    <div class="field"><label class="q">🔹 Referencias visuales <span style="font-weight:500;color:var(--mut)">(opcional)</span></label><p class="hint">Sube imágenes de logos o estilos que te gusten 🎨 (hasta 8)</p>
-      <label class="drop" for="files">📷 <b>Toca aquí</b> para subir fotos o PDF</label>
+  <section class="step" data-s="6" data-plate="k">
+    <p class="sec">estilo visual</p>
+    <h1>ahora sí, a darle color 🎨</h1>
+    <h2>Toca las tintas</h2>
+    <div class="legend"><span>1 toque: ❤ me gusta</span><span>2 toques: ✕ no me gusta</span><span>3 toques: quitar</span></div>
+    <div class="swatches" id="swatches"></div>
+    <div class="q"><h2><label for="cLike">Colores que te gustan</label></h2><p class="hint">Si quieres, descríbelos mejor aquí.</p><textarea id="cLike" maxlength="2000" style="min-height:80px"></textarea></div>
+    <div class="q"><h2><label for="cNo">Colores que NO te gustan</label></h2><p class="hint">Súper importante: así evitamos errores 👀</p><textarea id="cNo" maxlength="2000" style="min-height:80px"></textarea></div>
+    <div class="q"><h2>Referencias <span style="font-weight:500;color:var(--soft)">(opcional)</span></h2><p class="hint">Logos o estilos que te gusten. Hasta 8.</p>
+      <label class="drop" for="files"><span class="plus">+</span><span>Subir fotos o PDF<small>Desde tu galería o tus archivos</small></span></label>
       <input type="file" id="files" accept="image/*,application/pdf" multiple class="hide">
       <div class="thumbs" id="thumbs"></div></div>
   </section>
 
   <!-- 7 Detalles -->
-  <section class="step" data-s="7">
-    <span class="tag">DETALLES DEL LOGO</span>
-    <h1>Afinemos los detalles finales 💎</h1>
-    <div class="field"><label class="q" for="elem">🔹 ¿Te gustaría incluir algún elemento? *</label><p class="hint">Símbolos, íconos, formas, etc. Si no se te ocurre nada, escribe "ninguno".</p><textarea id="elem" maxlength="3000"></textarea></div>
-    <div class="field"><label class="q">🔹 ¿Dónde usarás tu logo? *</label>
-      <div class="chips" id="uses"></div>
-      <input type="text" id="usesOther" class="hide" style="margin-top:10px" maxlength="200" placeholder="¿Dónde más?"></div>
+  <section class="step" data-s="7" data-plate="c">
+    <p class="sec">detalles del logo</p>
+    <h1>afinemos los detalles 💎</h1>
+    <div class="q"><h2><label for="elem">¿Quieres incluir algún elemento?</label></h2><p class="hint">Símbolos, íconos, formas… Si no se te ocurre nada, escribe "ninguno".</p><textarea id="elem" maxlength="3000"></textarea></div>
+    <div class="q"><h2>¿Dónde vas a usar tu logo?</h2><p class="hint">Escoge todos los que apliquen.</p>
+      <div class="stickers" id="uses"></div>
+      <input type="text" id="usesOther" class="hide" style="margin-top:14px" maxlength="200" placeholder="¿Dónde más?"></div>
   </section>
 
   <!-- 8 Extra -->
-  <section class="step" data-s="8">
-    <span class="tag">EXTRA</span>
-    <h1>Un último detalle para conocerte mejor 👀</h1>
-    <div class="field"><label class="q" for="ig">🔹 Instagram o marca actual <span style="font-weight:500;color:var(--mut)">(opcional)</span></label><p class="hint">Para conocer mejor tu estilo 💖</p><input type="text" id="ig" maxlength="200" placeholder="@tumarca"></div>
+  <section class="step" data-s="8" data-plate="y">
+    <p class="sec">un último detalle</p>
+    <h1>¿tienes instagram o una marca actual?</h1>
+    <div class="q"><p class="hint">Opcional. Nos ayuda a conocer tu estilo 💖</p><input type="text" id="ig" maxlength="200" placeholder="@tumarca"></div>
   </section>
 
-  <div class="done hide" id="doneBox">
-    <img src="donfer-pulgar.webp" alt="Don Fer">
-    <h1 id="thanks">¡Gracias por compartir tu marca y tu esencia con nosotros! 💖</h1>
-    <p class="sub">Estamos súper emocionados de trabajar contigo y hacer parte de tu proceso. Con toda esta información empezaremos a crear un diseño pensado 100% en tu marca.</p>
-    <p class="sub"><b>💖 ¡Juntos vamos a crear algo increíble! 🙌🏻</b></p>
-    <a class="btn" style="display:block;margin-top:10px" href="https://sastecnigraficas.com">Ver nuestros productos</a>
-  </div>
+  <section class="done hide" id="doneBox">
+    <img class="don" src="donfer-pulgar.webp" alt="Don Fer">
+    <h1 id="thanks">¡gracias por compartir tu marca con nosotros! 💖</h1>
+    <p class="lead">Estamos súper emocionados de hacer parte de tu proceso. Con todo esto empezamos a crear un diseño pensado 100 % en tu marca. Pronto te escribimos por WhatsApp.</p>
+    <a class="btn" style="display:block;margin-top:18px" href="https://sastecnigraficas.com">Conocer Tecnigráficas</a>
+  </section>
 
-  <div class="foot">Tecnigráficas · Popayán · <a href="https://sastecnigraficas.com">sastecnigraficas.com</a></div>
-</div>
+  <p class="foot">Tecnigráficas · Popayán · <a href="https://sastecnigraficas.com">sastecnigraficas.com</a></p>
+</main>
 
 <nav class="nav" id="nav"><div class="in">
-  <button class="btn sec hide" id="back" type="button">←</button>
-  <button class="btn" id="next" type="button">Empezar ✨</button>
+  <button class="btn back hide" id="back" type="button" aria-label="Atrás">←</button>
+  <button class="btn" id="next" type="button">Empezar</button>
 </div></nav>
 
 <script>
@@ -187,44 +247,54 @@ const BASE="https://kqrfcdfygskzhsdzzcze.supabase.co",KEY="sb_publishable_KfkIr6
 const API=BASE+"/rest/v1/rpc/";
 const $=id=>document.getElementById(id);
 const token=(new URLSearchParams(location.search).get("c")||"").trim()||null;
-const LS="tecniBrand.v1";
-const FEEL=["Elegancia","Ternura","Confianza","Modernidad","Diversión","Exclusividad","Natural","Creatividad","Otro"];
-const USES=["Redes sociales","Empaques","Papelería","Uniformes","Página web","Otro"];
-const S={step:0,known:false,noName:false,feel:[],uses:[],files:[]};
+const LS="tecniBrand.v2";
+const FEEL=[["Elegancia","🥂"],["Ternura","🧸"],["Confianza","🤝"],["Modernidad","⚡"],["Diversión","🎉"],["Exclusividad","💎"],["Natural","🌿"],["Creatividad","🎨"],["Otro","✏️"]];
+const USES=[["Redes sociales","📱"],["Empaques","📦"],["Papelería","📄"],["Uniformes","👕"],["Página web","💻"],["Otro","✏️"]];
+const INKS=[["Rosado","#F7A8C9"],["Fucsia","#EC008C"],["Rojo","#E3242B"],["Naranja","#F7941D"],["Amarillo","#FFE14D"],["Dorado","#C9A24B"],["Verde limón","#A6CE39"],["Verde","#2E8B57"],["Menta","#9EE2C9"],["Turquesa","#1BC0C4"],["Azul cielo","#7CC6F2"],["Azul","#1F4FA8"],["Morado","#6A2C91"],["Lila","#C8A2E0"],["Café","#7A4B2A"],["Beige","#E8D9C0"],["Negro","#1A1A1A"],["Gris","#9A9A9A"],["Blanco","#FFFFFF"],["Pastel","linear-gradient(135deg,#F9C6D9,#C8E7F5,#FFF3B0)"]];
+const S={step:0,known:false,noName:false,feel:[],uses:[],files:[],sw:{}};
 const LAST=8;
 
 async function rpc(fn,body){
   const r=await fetch(API+fn,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify(body)});
   const j=await r.json().catch(()=>null);
-  if(!r.ok)throw new Error((j&&j.message)||"No se pudo enviar, revisa tu internet");
+  if(!r.ok)throw new Error((j&&j.message)||"No se pudo enviar. Revisa tu internet e intenta otra vez.");
   return j;
 }
-function chips(box,list,key,otherId){
-  $(box).innerHTML=list.map(t=>`<button type="button" class="chip" data-v="${t}">${t}</button>`).join("");
-  $(box).addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
-    const v=b.dataset.v,a=S[key],i=a.indexOf(v);i<0?a.push(v):a.splice(i,1);paint(box,key,otherId);save()});
+function stickers(box,list,key,otherId){
+  $(box).innerHTML=list.map(([t,e])=>`<button type="button" class="st" data-v="${t}" aria-pressed="false"><span class="e">${e}</span>${t}</button>`).join("");
+  $(box).addEventListener("click",ev=>{const b=ev.target.closest("button");if(!b)return;
+    const v=b.dataset.v,a=S[key],i=a.indexOf(v);i<0?a.push(v):a.splice(i,1);paint(box,key,otherId);save();
+    if(v==="Otro"&&i<0)setTimeout(()=>$(otherId).focus(),50)});
 }
 function paint(box,key,otherId){
-  $(box).querySelectorAll("button").forEach(b=>b.classList.toggle("sel",S[key].includes(b.dataset.v)));
+  $(box).querySelectorAll("button").forEach(b=>{const on=S[key].includes(b.dataset.v);b.classList.toggle("sel",on);b.setAttribute("aria-pressed",on)});
   $(otherId).classList.toggle("hide",!S[key].includes("Otro"));
 }
-chips("feel",FEEL,"feel","feelOther");chips("uses",USES,"uses","usesOther");
-$("noName").addEventListener("click",()=>{S.noName=!S.noName;$("noName").classList.toggle("sel",S.noName);$("brand").placeholder=S.noName?"Si tienes ideas, escríbelas aquí":"";save()});
+stickers("feel",FEEL,"feel","feelOther");stickers("uses",USES,"uses","usesOther");
 
-// Guardar lo escrito en el celular, por si se cierra la página
+$("swatches").innerHTML=INKS.map(([n,v])=>`<button type="button" class="sw" data-n="${n}" data-s="0" aria-label="${n}"><span class="ink" style="--v:${v}"></span>${n}</button>`).join("");
+$("swatches").addEventListener("click",e=>{const b=e.target.closest(".sw");if(!b)return;const n=b.dataset.n,cur=S.sw[n]||0,nx=cur===0?1:cur===1?-1:0;
+  if(nx)S.sw[n]=nx;else delete S.sw[n];paintSw();save()});
+function paintSw(){$("swatches").querySelectorAll(".sw").forEach(b=>{const s=S.sw[b.dataset.n]||0;b.dataset.s=s;b.setAttribute("aria-label",b.dataset.n+(s===1?": me gusta":s===-1?": no me gusta":""))})}
+const swList=v=>Object.keys(S.sw).filter(k=>S.sw[k]===v);
+
+function setNoName(){$("noName").classList.toggle("sel",S.noName);$("meaningQ").classList.toggle("hide",S.noName);$("brand").placeholder=S.noName?"Si tienes ideas de nombre, escríbelas aquí":"El nombre de tu marca"}
+$("noName").addEventListener("click",()=>{S.noName=!S.noName;setNoName();save()});
+
+// Lo escrito se guarda en el celular por si se cierra la página
 const TXT=["name","phone","brand","meaning","origin","what","feelOther","aud","cLike","cNo","elem","usesOther","ig"];
-function save(){try{const o={noName:S.noName,feel:S.feel,uses:S.uses};TXT.forEach(k=>o[k]=$(k).value);localStorage.setItem(LS,JSON.stringify(o))}catch(_){}}
+function save(){try{const o={noName:S.noName,feel:S.feel,uses:S.uses,sw:S.sw};TXT.forEach(k=>o[k]=$(k).value);localStorage.setItem(LS,JSON.stringify(o))}catch(_){}}
 function load(){try{const o=JSON.parse(localStorage.getItem(LS)||"null");if(!o)return;TXT.forEach(k=>{if(o[k])$(k).value=o[k]});
-  S.noName=!!o.noName;$("noName").classList.toggle("sel",S.noName);S.feel=o.feel||[];S.uses=o.uses||[];paint("feel","feel","feelOther");paint("uses","uses","usesOther")}catch(_){}}
+  S.noName=!!o.noName;S.feel=o.feel||[];S.uses=o.uses||[];S.sw=o.sw||{}}catch(_){}}
 document.addEventListener("input",e=>{if(TXT.includes(e.target.id))save()});
-load();
+load();setNoName();paint("feel","feel","feelOther");paint("uses","uses","usesOther");paintSw();
 
 // Referencias: las fotos se achican a 1600 px antes de subir
 $("files").addEventListener("change",async e=>{
   const fs=[...e.target.files];e.target.value="";
   for(const f of fs){
-    if(S.files.length>=8){err("Máximo 8 referencias");break}
-    if(f.type==="application/pdf"){if(f.size>10e6){err("Ese PDF pesa mucho (máx. 10 MB)");continue}S.files.push({blob:f,ext:"pdf",name:f.name,url:null});continue}
+    if(S.files.length>=8){err("Puedes subir máximo 8 referencias.");break}
+    if(f.type==="application/pdf"){if(f.size>10e6){err("Ese PDF pesa más de 10 MB. Prueba con uno más liviano.");continue}S.files.push({blob:f,ext:"pdf",name:f.name,url:null});continue}
     if(!f.type.startsWith("image/"))continue;
     try{S.files.push(await shrink(f))}catch(_){if(f.size<=10e6)S.files.push({blob:f,ext:(f.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,""),name:f.name,url:URL.createObjectURL(f)})}
   }
@@ -234,39 +304,52 @@ function shrink(f){return new Promise((ok,no)=>{const img=new Image(),u=URL.crea
   const s=Math.min(1,1600/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
   const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);
   c.toBlob(b=>{URL.revokeObjectURL(u);b?ok({blob:b,ext:"jpg",name:f.name,url:URL.createObjectURL(b)}):no()},"image/jpeg",.85)};img.onerror=()=>{URL.revokeObjectURL(u);no()};img.src=u})}
-function thumbs(){
-  $("thumbs").innerHTML=S.files.map((f,i)=>`<div>${f.url?`<img src="${f.url}" alt="">`:`📄 ${f.name.slice(0,24)}`}<button type="button" data-i="${i}" aria-label="Quitar">×</button></div>`).join("");
-}
+function thumbs(){$("thumbs").innerHTML=S.files.map((f,i)=>`<div>${f.url?`<img src="${f.url}" alt="">`:`📄 ${f.name.slice(0,24)}`}<button type="button" data-i="${i}" aria-label="Quitar">×</button></div>`).join("")}
 $("thumbs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S.files.splice(+b.dataset.i,1);thumbs()});
 
-function err(msg){const e=$("err");e.textContent=msg||"";e.classList.toggle("on",!!msg);if(msg)window.scrollTo({top:0,behavior:"smooth"})}
+function err(msg){const e=$("err");e.textContent=msg||"";e.classList.remove("on");if(msg){void e.offsetWidth;e.classList.add("on");window.scrollTo({top:0,behavior:"smooth"})}}
 const digits=v=>String(v||"").replace(/\D/g,"");
 const need=(id,msg)=>$(id).value.trim().length<2?msg:"";
 function check(s){
-  if(s===1){if($("name").value.trim().length<3)return"Escribe tu nombre completo";const d=digits($("phone").value);if(d.length<7||d.length>13)return"Revisa tu número de WhatsApp";if(!$("consent").checked)return"Necesitamos tu autorización para guardar tus datos";}
-  if(s===2){if(!S.noName&&$("brand").value.trim().length<1)return"Escribe el nombre de tu marca (o toca \"Aún no lo tengo definido\")";if(!S.noName)return need("meaning","Cuéntanos si el nombre tiene algún significado");}
-  if(s===3)return need("origin","Cuéntanos cómo nació tu marca")||need("what","Cuéntanos qué haces");
-  if(s===4){if(!S.feel.length)return"Escoge al menos una opción";if(S.feel.includes("Otro")&&!$("feelOther").value.trim())return"Escribe qué otra cosa quieres transmitir";}
-  if(s===5)return need("aud","Cuéntanos a quién va dirigido");
-  if(s===6)return need("cLike","Cuéntanos qué colores te gustan")||need("cNo","Cuéntanos qué colores NO te gustan (si te gustan todos, escribe \"ninguno\")");
-  if(s===7){const m=need("elem","Cuéntanos si quieres algún elemento (o escribe \"ninguno\")");if(m)return m;if(!S.uses.length)return"Escoge dónde usarás tu logo";if(S.uses.includes("Otro")&&!$("usesOther").value.trim())return"Escribe dónde más usarás tu logo";}
+  if(s===1){if($("name").value.trim().length<3)return"Escribe tu nombre completo.";const d=digits($("phone").value);if(d.length<7||d.length>13)return"Revisa tu número de WhatsApp.";if(!$("consent").checked)return"Marca la autorización para que podamos guardar tus datos.";}
+  if(s===2){if(!S.noName&&!$("brand").value.trim())return"Escribe el nombre de tu marca o toca \"Aún no lo tengo definido\".";if(!S.noName)return need("meaning","Cuéntanos si el nombre tiene algún significado.");}
+  if(s===3)return need("origin","Cuéntanos cómo nació tu marca.")||need("what","Cuéntanos qué haces.");
+  if(s===4){if(!S.feel.length)return"Escoge al menos un sticker.";if(S.feel.includes("Otro")&&!$("feelOther").value.trim())return"Escribe qué otra cosa quieres transmitir.";}
+  if(s===5)return need("aud","Cuéntanos a quién le vendes.");
+  if(s===6){if(!swList(1).length&&$("cLike").value.trim().length<2)return"Toca las tintas que te gustan o descríbelas.";
+    if(!swList(-1).length&&$("cNo").value.trim().length<2)return"Cuéntanos qué colores NO te gustan (si te gustan todos, escribe \"ninguno\").";}
+  if(s===7){const m=need("elem","Cuéntanos si quieres algún elemento o escribe \"ninguno\".");if(m)return m;if(!S.uses.length)return"Escoge dónde vas a usar tu logo.";if(S.uses.includes("Otro")&&!$("usesOther").value.trim())return"Escribe dónde más vas a usar tu logo.";}
   return"";
 }
 function order(){return [0,...(S.known?[]:[1]),2,3,4,5,6,7,8]}
-function show(){
-  document.querySelectorAll(".step").forEach(x=>x.classList.toggle("on",+x.dataset.s===S.step));
+const INKCOL=["var(--c)","var(--m)","var(--y)","var(--k)"];
+function inks(){const o=order().slice(1);$("inks").innerHTML=o.map((s,i)=>`<i style="--ink:${INKCOL[i%4]}"></i>`).join("")+`<span class="count"></span>`}
+function show(from){
+  const sec=document.querySelector(`.step[data-s="${S.step}"]`),plate=sec.dataset.plate||"";
+  if(document.body.dataset.plate!==plate){
+    const w=$("wipe"),r=from&&from.getBoundingClientRect();
+    if(r){w.style.setProperty("--wx",(r.left+r.width/2)+"px");w.style.setProperty("--wy",(r.top+r.height/2)+"px")}
+    w.style.background=getComputedStyle(document.documentElement).getPropertyValue({m:"--m",c:"--c",y:"--y",k:"--k"}[plate]||"--paper");
+    w.classList.remove("go");void w.offsetWidth;w.classList.add("go");
+    clearTimeout(S.pt);S.pt=setTimeout(()=>{document.body.dataset.plate=plate;w.classList.remove("go")},matchMedia("(prefers-reduced-motion:reduce)").matches?0:520);
+    const tc={m:"#EC008C",c:"#00AEEF",y:"#FFF200",k:"#1A1A1A"}[plate]||"#ffffff";document.querySelector('meta[name=theme-color]').content=tc;
+  }
+  document.querySelectorAll(".step").forEach(x=>x.classList.toggle("on",x===sec));
   const o=order(),i=o.indexOf(S.step);
-  $("prog").firstElementChild.style.width=(i/(o.length-1)*100)+"%";
+  $("inks").querySelectorAll("i").forEach((d,k)=>{d.classList.toggle("on",k<i);d.classList.toggle("now",k===i-1)});
+  $("inks").querySelector(".count").textContent=i?`${i}/${o.length-1}`:"";
   $("back").classList.toggle("hide",i===0);
-  $("next").textContent=i===0?"Empezar ✨":S.step===LAST?"Enviar ✨":"Siguiente →";
+  $("next").textContent=i===0?"Empezar ✨":S.step===LAST?"Enviar mi marca ✨":"Siguiente";
   window.scrollTo({top:0});
+  const f=sec.querySelector("input:not([type=checkbox]):not([type=file]),textarea");if(f&&i>0&&matchMedia("(min-width:700px)").matches)setTimeout(()=>f.focus({preventScroll:true}),400);
 }
-$("back").addEventListener("click",()=>{err("");const o=order(),i=o.indexOf(S.step);if(i>0){S.step=o[i-1];show()}});
-$("next").addEventListener("click",async()=>{
+$("back").addEventListener("click",e=>{err("");const o=order(),i=o.indexOf(S.step);if(i>0){S.step=o[i-1];show(e.currentTarget)}});
+$("next").addEventListener("click",async e=>{
   const m=check(S.step);err(m);if(m)return;
-  if(S.step!==LAST){const o=order();S.step=o[o.indexOf(S.step)+1];show();return}
+  if(S.step!==LAST){const o=order();S.step=o[o.indexOf(S.step)+1];show(e.currentTarget);return}
   await send();
 });
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.matches("input[type=text],input[type=tel]")){e.preventDefault();$("next").click()}});
 
 async function upload(){
   const id=crypto.randomUUID?crypto.randomUUID():"10000000-1000-4000-8000-100000000000".replace(/[018]/g,c=>(c^Math.random()*16>>c/4).toString(16));
@@ -276,35 +359,41 @@ async function upload(){
     const ext=(f.ext||"jpg").slice(0,5)||"jpg",path=`tb/${id}/ref${i+1}.${ext}`;
     $("next").textContent=`Subiendo imagen ${i+1} de ${S.files.length}…`;
     const r=await fetch(`${BASE}/storage/v1/object/brand-refs/${path}`,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":f.blob.type||"application/octet-stream","x-upsert":"false"},body:f.blob});
-    if(!r.ok)throw new Error("No se pudo subir una imagen. Revisa tu internet o quítala e intenta otra vez.");
+    if(!r.ok)throw new Error("No se pudo subir una imagen. Revisa tu internet, o quítala e intenta otra vez.");
     f.path=path;paths.push(path);
   }
   return paths;
 }
+function confetti(){if(matchMedia("(prefers-reduced-motion:reduce)").matches)return;const box=document.createElement("div");box.className="confetti";
+  const col=["#00AEEF","#EC008C","#FFF200","#1A1A1A","#ffffff"];
+  for(let i=0;i<70;i++){const d=document.createElement("i");d.style.left=Math.random()*100+"vw";d.style.background=col[i%5];d.style.animationDuration=(1.6+Math.random()*1.8)+"s";d.style.animationDelay=Math.random()*.5+"s";const s=6+Math.random()*10;d.style.width=d.style.height=s+"px";box.appendChild(d)}
+  document.body.appendChild(box);setTimeout(()=>box.remove(),4200)}
 async function send(){
   $("next").disabled=true;$("back").disabled=true;
   try{
     const ref_files=await upload();
     $("next").textContent="Enviando…";
+    const join=(l,t)=>[l.length?"Tintas: "+l.join(", "):"",t.trim()].filter(Boolean).join("\n");
     const p={name:$("name").value.trim(),phone:$("phone").value.trim(),data_consent:$("consent").checked,
-      brand_name:$("brand").value.trim(),name_defined:!S.noName,meaning:$("meaning").value,origin:$("origin").value,what_you_do:$("what").value,
-      feelings:S.feel,feelings_other:$("feelOther").value,audience:$("aud").value,colors_like:$("cLike").value,colors_dislike:$("cNo").value,
+      brand_name:$("brand").value.trim(),name_defined:!S.noName,meaning:S.noName?"":$("meaning").value,origin:$("origin").value,what_you_do:$("what").value,
+      feelings:S.feel,feelings_other:$("feelOther").value,audience:$("aud").value,colors_like:join(swList(1),$("cLike").value),colors_dislike:join(swList(-1),$("cNo").value),
       ref_files,elements:$("elem").value,uses:S.uses,uses_other:$("usesOther").value,instagram:$("ig").value};
     const r=await rpc("brand_brief_submit",{p,p_token:S.known?token:null});
     try{localStorage.removeItem(LS)}catch(_){}
-    if(r&&r.name)$("thanks").textContent=`¡Gracias, ${r.name}, por compartir tu marca y tu esencia con nosotros! 💖`;
-    document.querySelectorAll(".step").forEach(x=>x.classList.remove("on"));$("prog").classList.add("hide");
-    $("nav").classList.add("hide");$("doneBox").classList.remove("hide");window.scrollTo({top:0});
-  }catch(e){err(e.message);$("next").disabled=false;$("back").disabled=false;$("next").textContent="Enviar ✨"}
+    if(r&&r.name)$("thanks").textContent=`¡gracias, ${r.name.toLowerCase()}! ya tenemos tu marca 💖`;
+    document.querySelectorAll(".step").forEach(x=>x.classList.remove("on"));
+    clearTimeout(S.pt);$("wipe").classList.remove("go");document.body.dataset.plate="y";$("inks").classList.add("hide");
+    $("nav").classList.add("hide");$("doneBox").classList.remove("hide");window.scrollTo({top:0});confetti();
+  }catch(e){err(e.message);$("next").disabled=false;$("back").disabled=false;$("next").textContent="Enviar mi marca ✨"}
 }
 
 // Link personal (?c=token): ya sabemos quién es
 (async()=>{
   if(token&&/^[0-9a-f-]{36}$/i.test(token)){
     try{const d=await rpc("survey_prefill",{p_token:token});
-      if(d&&d.name){S.known=true;$("hello").textContent=`¡Hola, ${String(d.name).split(" ")[0]}! Bienvenid@ a TecniBrand ✨`}}catch(_){}
+      if(d&&d.name){S.known=true;$("hello").textContent=`¡Hola, ${String(d.name).split(" ")[0]}! Gracias por confiar en nosotros para crear tu logo registrable 💼✨ Aquí empezamos a construir la esencia de tu marca.`}}catch(_){}
   }
-  show();
+  inks();show();
 })();
 })();
 </script>

@@ -1075,6 +1075,12 @@
     /* barra de desplazamiento delgada */
     *{scrollbar-width:thin;scrollbar-color:#e4c8dc transparent}
     ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#e4c8dc;border-radius:99px;border:3px solid transparent;background-clip:padding-box}
+    /* V9.81: Don Fer saluda en Inicio */
+    .today-head{display:flex;align-items:center;gap:12px}
+    .today-don{width:74px;height:auto;flex:0 0 74px;margin:-10px 0 -12px -6px;filter:drop-shadow(0 6px 10px rgba(236,0,140,.18));animation:tcDonIn .7s cubic-bezier(.3,1.5,.5,1) backwards}
+    @keyframes tcDonIn{from{opacity:0;transform:translateY(16px) scale(.6) rotate(-12deg)}}
+    @media (max-width:700px){.today-don{width:58px;flex-basis:58px}}
+    @media (prefers-reduced-motion:reduce){.today-don{animation:none}}
     /* V9.78b: Inicio, pestañas y subtítulos */
     .content h3,.content h4,.tt-label,.today-tile strong,.when{font-family:var(--fd)}
     .content h4{font-weight:600}
@@ -1142,7 +1148,7 @@
 
       <div class="content">
         <section class="view active" id="view-dashboard">
-          <div class="today-head"><h2 id="todayGreeting">¡Hola!</h2><p id="todayDate"></p></div>
+          <div class="today-head"><img class="today-don" src="donfer-saluda.webp" alt="" width="74" height="73"><div><h2 id="todayGreeting">¡Hola!</h2><p id="todayDate"></p></div></div>
           <div class="today-grid">
             <button type="button" class="today-tile in hidden" id="todayInTile" data-go="finance"><span class="tt-label">💵 Entró hoy</span><strong id="todayIn">—</strong><small id="todayOut">&nbsp;</small></button>
             <button type="button" class="today-tile deliver hidden" id="todayDeliverTile" data-go="production"><span class="tt-label">🚚 Para entregar hoy y mañana</span><strong id="todayDeliver">—</strong><small id="todayLate">&nbsp;</small></button>

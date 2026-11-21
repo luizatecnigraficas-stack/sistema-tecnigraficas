@@ -739,6 +739,10 @@
     .tbb-sumt{color:#777;font-size:.9rem;margin:0 0 10px}
     .tbb-sumx{box-sizing:border-box;width:100%;border:0;border-radius:16px;background:#fff;padding:16px 18px;font:500 .98rem/1.55 Inter,system-ui,sans-serif;color:#1A1A1A;resize:vertical;min-height:200px;box-shadow:inset 0 0 0 1px #f1d4e4;white-space:pre-wrap}
     .tbb-sumx:focus{outline:none;box-shadow:inset 0 0 0 2px #EC008C}
+    .tbb-don{position:absolute;right:14px;bottom:8px;width:190px;z-index:1;pointer-events:none;filter:drop-shadow(0 10px 18px rgba(0,0,0,.18))}
+    .tbb-hero .tbb-name,.tbb-hero .tbb-who,.tbb-hero .tbb-bar{max-width:calc(100% - 200px)}
+    .tbb-hero .tbb-name{word-break:normal;overflow-wrap:break-word}
+    @media (max-width:760px){.tbb-don{width:110px;right:4px;bottom:auto;top:8px;opacity:.95}.tbb-hero .tbb-name,.tbb-hero .tbb-who{max-width:calc(100% - 100px)}.tbb-hero .tbb-bar{max-width:100%}.tbb-hero .tbb-name{font-size:2rem}}
     .tbb-lb{position:fixed;inset:0;z-index:9999;background:rgba(15,15,20,.88);display:grid;place-items:center;padding:24px;cursor:zoom-out}
     .tbb-lb img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
     .tbb-in{animation:tbbIn .5s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 60ms)}
@@ -3919,6 +3923,7 @@
       document.querySelector("#tbModal .modal").classList.add("tb-wide");
       $("tbBody").innerHTML=`<div class="tbb">
         <section class="tbb-hero tbb-in" ${I()}>
+          <img class="tbb-don" src="donfer-disena.webp" alt="" aria-hidden="true">
           <p class="tbb-kick">la marca</p>
           <h2 class="tbb-name ${b.brand_name?"":"none"}">${b.brand_name?E(b.brand_name):"Todavía sin nombre ✨"}</h2>
           <p class="tbb-who">${E(name)}${b.phone?" · "+E(b.phone):""} · ${E(formatDate(b.created_at.slice(0,10)))}</p>

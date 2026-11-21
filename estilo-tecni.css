@@ -1,0 +1,16 @@
+/* Estilo TecniBrand compartido por las páginas aparte del sistema (V9.79).
+   Solo toca la pantalla de trabajo: nunca los documentos que se imprimen o se pasan a PDF. */
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap");
+@media screen{
+  :where(h1,h2,h3,h4,button,.btn,summary,legend,.tab,.chip):not(.preview-wrap *,.quote-page *,.reference-page *,.cdc-document *,.doc-back *,.rem-doc *,svg *){
+    font-family:"Fredoka","Tondu Beta","Arial Rounded MT Bold",system-ui,sans-serif!important;
+  }
+  :where(h1,h2,h3):not(.preview-wrap *,.quote-page *,.reference-page *,.cdc-document *,.doc-back *,.rem-doc *){font-weight:600!important;letter-spacing:-.005em}
+  :where(button,.btn):not(.preview-wrap *,.quote-page *,.cdc-document *){font-weight:600;transition:transform .15s cubic-bezier(.3,1.6,.5,1),filter .15s,box-shadow .15s,background-color .15s}
+  :where(button,.btn):not([disabled]):not(.preview-wrap *,.quote-page *,.cdc-document *):active{transform:scale(.95)}
+  :where(input,select,textarea):focus-visible{outline:none;box-shadow:0 0 0 4px rgba(236,0,140,.14)!important;border-color:#EC008C!important}
+  *{scrollbar-width:thin;scrollbar-color:#e4c8dc transparent}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#e4c8dc;border-radius:99px;border:3px solid transparent;background-clip:padding-box}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}

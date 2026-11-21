@@ -996,7 +996,7 @@
 
         <section class="view" id="view-clients">
           <div class="view-head"><div><h2>Clientes</h2><p>Empresas y personas naturales disponibles para todo el equipo.</p></div><button class="btn primary" id="addClientButton">+ Nuevo cliente</button></div>
-          <div class="toolbar"><input class="search" id="clientSearch" placeholder="Buscar por nombre, documento, teléfono o correo…" /><select id="clientKindFilter" class="search" style="flex:0 0 180px"><option value="">Todos</option><option value="company">Empresas</option><option value="person">Personas</option></select><button type="button" class="btn secondary" id="surveyButton" style="flex:0 0 auto">📋 Encuesta</button><button type="button" class="btn secondary" id="registroButton" style="flex:0 0 auto">📝 Pedir datos</button></div>
+          <div class="toolbar"><input class="search" id="clientSearch" placeholder="Buscar por nombre, documento, teléfono o correo…" /><select id="clientKindFilter" class="search" style="flex:0 0 180px"><option value="">Todos</option><option value="company">Empresas</option><option value="person">Personas</option></select><button type="button" class="btn secondary" id="surveyButton" style="flex:0 0 auto">📋 Encuesta</button><button type="button" class="btn secondary" id="registroButton" style="flex:0 0 auto">📝 Pedir datos</button><button type="button" class="btn secondary" id="tecnibrandButton" style="flex:0 0 auto">🎨 TecniBrand</button></div>
           <div class="table-wrap"><table class="table"><thead><tr><th>Cliente</th><th>Tipo</th><th>Documento</th><th>Contacto</th><th>Fecha especial</th><th>Ciudad</th><th>Acciones</th></tr></thead><tbody id="clientsBody"></tbody></table></div>
         </section>
 
@@ -3621,6 +3621,86 @@
       openModal("registroModal");loadRegistros();
     }
     document.addEventListener("click",e=>{if(e.target.closest("#registroButton"))openRegistro()});
+    // V9.71: TecniBrand (encuesta para diseñar logos; reemplaza el Tally)
+    const TB_URL="https://sistema.sastecnigraficas.com/tecnibrand";
+    const TB_STATUS={nuevo:"🆕 Nuevo",en_diseno:"🎨 En diseño",listo:"✅ Listo"};
+    function tbMessage(){return `¡Hola! 👋 Somos Tecnigráficas 💖\nPara diseñar tu logo queremos conocer tu marca. Llena esta encuesta cuando tengas un ratico (si no tienes todo claro, tranquil@, te guiamos) ✨\n👉 ${TB_URL}\n¡Gracias! 🙌🏻`}
+    function ensureTbModal(){
+      if($("tbModal"))return;
+      const el=document.createElement("div");el.className="modal-backdrop hidden";el.id="tbModal";
+      el.innerHTML='<div class="modal" style="width:min(760px,100%)"><div class="modal-head"><h3 id="tbTitle">🎨 TecniBrand · encuesta de logos</h3><button type="button" class="modal-close" id="tbClose">×</button></div><div id="tbBody"></div></div>';
+      document.body.appendChild(el);
+      $("tbClose").addEventListener("click",()=>closeModal("tbModal"));
+      el.addEventListener("click",e=>{if(e.target===el)closeModal("tbModal")});
+    }
+    let tbList=[];
+    async function tbLoad(){
+      const box=$("tbList");if(!box)return;
+      try{
+        const {data,error}=await db.from("brand_briefs").select("*,client:clients!client_id(name,phone)").order("created_at",{ascending:false}).limit(100);
+        if(error)throw error;tbList=data||[];
+        box.innerHTML=tbList.length?tbList.map(b=>`<div class="sv-item" style="cursor:pointer" data-tb="${b.id}"><div class="h"><strong>${escapeHTML(b.brand_name||"(sin nombre todavía)")} <small>· ${escapeHTML(b.client?.name||b.contact_name||"")}</small></strong><span>${escapeHTML(formatDate(b.created_at.slice(0,10)))}</span></div><div class="sv-tags">${TB_STATUS[b.status]||""} · ${(b.feelings||[]).map(escapeHTML).join(", ")}${(b.ref_files||[]).length?` · 📷 ${b.ref_files.length}`:""}</div></div>`).join(""):'<div class="empty">Todavía nadie ha llenado TecniBrand.</div>';
+      }catch(_){box.innerHTML='<div class="empty">No se pudo cargar la lista.</div>'}
+    }
+    function tbText(b){
+      const L=[];const a=(t,v)=>{if(v&&String(v).trim())L.push(`${t}: ${String(v).trim()}`)};
+      a("Marca",b.brand_name||(b.name_defined?"":"Aún no tiene nombre definido"));a("Cliente",(b.client?.name||b.contact_name||"")+(b.phone?` (${b.phone})`:""));
+      a("Significado del nombre",b.meaning);a("Cómo nació",b.origin);a("Qué hace",b.what_you_do);
+      a("Quiere transmitir",[...(b.feelings||[]).filter(x=>x!=="Otro"),b.feelings_other].filter(Boolean).join(", "));
+      a("Cliente ideal",b.audience);a("Colores que le gustan",b.colors_like);a("Colores que NO le gustan",b.colors_dislike);
+      a("Elementos",b.elements);a("Dónde usará el logo",[...(b.uses||[]).filter(x=>x!=="Otro"),b.uses_other].filter(Boolean).join(", "));a("Instagram",b.instagram);
+      return L.join("\n\n");
+    }
+    async function tbOpen(id){
+      const b=tbList.find(x=>x.id===id);if(!b)return;
+      const row=(t,v)=>v&&String(v).trim()?`<div style="margin:0 0 12px"><div style="font-weight:700;font-size:.85rem;color:var(--muted,#666)">${t}</div><div style="white-space:pre-wrap">${escapeHTML(String(v).trim())}</div></div>`:"";
+      const list=(arr,other)=>[...(arr||[]).filter(x=>x!=="Otro"),other].filter(Boolean).join(", ");
+      const name=b.client?.name||b.contact_name||"";
+      let wa=String(b.phone||b.client?.phone||"").replace(/\D/g,"");if(wa.length===10)wa="57"+wa;
+      $("tbTitle").textContent="🎨 "+(b.brand_name||"Marca sin nombre todavía");
+      $("tbBody").innerHTML=`
+        <div class="sv-share" style="flex-wrap:wrap"><button type="button" class="btn secondary" id="tbBack">← Volver</button>
+          <select class="search" id="tbStatus" style="flex:0 0 160px">${Object.entries(TB_STATUS).map(([k,t])=>`<option value="${k}" ${b.status===k?"selected":""}>${t}</option>`).join("")}</select>
+          <button type="button" class="btn primary" id="tbCopy">📋 Copiar todo</button>${wa.length>=11?`<a class="btn secondary" href="https://wa.me/${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>`:""}</div>
+        <p style="margin:0 0 14px;color:var(--muted,#666);font-size:.9rem">${escapeHTML(name)}${b.phone?" · "+escapeHTML(b.phone):""} · ${escapeHTML(formatDate(b.created_at.slice(0,10)))}</p>
+        ${b.name_defined?"":`<p style="margin:0 0 12px"><b>⚠ Aún no tiene el nombre definido.</b></p>`}
+        ${row("Significado del nombre",b.meaning)}${row("¿Cómo nació? ¿Qué lo inspiró?",b.origin)}${row("¿Qué hace?",b.what_you_do)}
+        ${row("Quiere que la marca transmita",list(b.feelings,b.feelings_other))}${row("Cliente ideal",b.audience)}
+        ${row("Colores que le gustan",b.colors_like)}${row("⚠ Colores que NO le gustan",b.colors_dislike)}
+        ${row("Elementos para incluir",b.elements)}${row("Dónde usará el logo",list(b.uses,b.uses_other))}${row("Instagram o marca actual",b.instagram)}
+        ${(b.ref_files||[]).length?`<div style="font-weight:700;font-size:.85rem;color:var(--muted,#666);margin:0 0 6px">Referencias (toca para abrir en grande)</div><div id="tbRefs" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px"><div class="empty">Cargando…</div></div>`:""}`;
+      $("tbBack").addEventListener("click",openTecniBrand);
+      $("tbCopy").addEventListener("click",()=>copySurveyText(tbText(b),"Resumen"));
+      $("tbStatus").addEventListener("change",async e=>{const v=e.target.value;const {error}=await db.from("brand_briefs").update({status:v}).eq("id",b.id);
+        if(error){showToast("No se pudo cambiar: "+error.message);e.target.value=b.status;return}b.status=v;showToast("Listo: "+TB_STATUS[v])});
+      if((b.ref_files||[]).length){
+        const {data,error}=await db.storage.from("brand-refs").createSignedUrls(b.ref_files,3600);
+        const box=$("tbRefs");if(!box)return;
+        if(error||!data){box.innerHTML='<div class="empty">No se pudieron cargar las imágenes.</div>';return}
+        box.innerHTML=data.map(d=>d.signedUrl?(/\.pdf$/i.test(d.path||"")?`<a href="${d.signedUrl}" target="_blank" rel="noopener" class="btn secondary" style="display:flex;align-items:center;justify-content:center;aspect-ratio:1">📄 PDF</a>`:`<a href="${d.signedUrl}" target="_blank" rel="noopener"><img src="${d.signedUrl}" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid var(--line,#eee)" alt=""></a>`):"").join("");
+      }
+    }
+    function openTecniBrand(){
+      ensureTbModal();$("tbTitle").textContent="🎨 TecniBrand · encuesta de logos";
+      $("tbBody").innerHTML=`
+        <p style="margin:0 0 8px">Mándale este link al cliente que va a hacer su logo. Si todavía no está en Clientes, <b>se crea solo</b> con su nombre y WhatsApp.</p>
+        <div class="sv-share"><input class="search" readonly value="${TB_URL}"><button type="button" class="btn primary" id="tbCopyMsg">Copiar mensaje</button><button type="button" class="btn secondary" id="tbCopyLink">Copiar link</button><a class="btn secondary" href="${TB_URL}" target="_blank" rel="noopener">Ver encuesta</a></div>
+        <p style="margin:0 0 6px"><b>O mándalo directo por WhatsApp:</b></p>
+        <div class="sv-share"><input class="search" id="tbPhone" type="tel" inputmode="tel" placeholder="WhatsApp del cliente, ej. 300 123 4567"><button type="button" class="btn primary" id="tbWa">💬 Enviar por WhatsApp</button></div>
+        <h4 style="margin:6px 0 8px;display:flex;justify-content:space-between;align-items:center">Respuestas (toca una para verla) <button type="button" class="btn secondary" id="tbRefresh" style="padding:4px 10px">↻ Actualizar</button></h4>
+        <div id="tbList"><div class="empty">Cargando…</div></div>`;
+      $("tbCopyMsg").addEventListener("click",()=>copySurveyText(tbMessage(),"Mensaje"));
+      $("tbCopyLink").addEventListener("click",()=>copySurveyText(TB_URL,"Link"));
+      $("tbWa").addEventListener("click",()=>{
+        let d=String($("tbPhone").value||"").replace(/\D/g,"");if(d.length===10)d="57"+d;
+        if(d.length<11){showToast("Escribe el WhatsApp del cliente");return}
+        window.open(`https://wa.me/${d}?text=${encodeURIComponent(tbMessage())}`,"_blank");
+      });
+      $("tbRefresh").addEventListener("click",tbLoad);
+      $("tbList").addEventListener("click",e=>{const it=e.target.closest("[data-tb]");if(it)tbOpen(it.dataset.tb)});
+      openModal("tbModal");tbLoad();
+    }
+    document.addEventListener("click",e=>{if(e.target.closest("#tecnibrandButton"))openTecniBrand()});
     // V9.37/V9.38: Producción tipo Trello (arrastrar, ordenar, archivar, tableros, tarjetas rápidas) y menú que se esconde
     let woLastCols=[],woBoard="",woOpenAll=false;const woOpen=new Set();
     try{woBoard=localStorage.getItem("tecniWoBoard")||"";woOpenAll=localStorage.getItem("tecniWoOpenAll")==="1"}catch(e){}

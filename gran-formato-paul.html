@@ -95,6 +95,7 @@ details summary{cursor:pointer;font-weight:600;margin-top:8px;font-family:var(--
 .qty{display:inline-flex;align-items:center;gap:6px}.qty button{width:30px;height:30px;border-radius:50%;border:0;background:#f3ecf2;font-size:17px;cursor:pointer;font-family:var(--fd);font-weight:600;color:var(--i)}.qty button:active{transform:scale(.9)}.qty b{min-width:22px;text-align:center;font-family:var(--fd)}
 .addc{width:36px;height:36px;border-radius:50%;border:0;background:var(--m);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 3px 0 rgba(236,0,140,.25);transition:transform .15s cubic-bezier(.3,1.6,.5,1)}.addc:active{transform:scale(.85)}
 .wd{flex:none;min-width:62px;text-align:center;background:var(--m);color:#fff;border-radius:14px;padding:7px 8px;font-family:var(--fd);font-weight:700;font-size:19px;line-height:1;box-shadow:0 3px 0 rgba(236,0,140,.25);transform:rotate(-2deg)}.wd small{display:block;font-size:10px;font-weight:500;color:#fff;opacity:.9;margin-top:2px}.wd.no{background:#f3ecf2;color:var(--u);box-shadow:none;font-size:15px}
+.grp{border:1.5px solid var(--l);border-radius:18px;margin:6px 0;overflow:hidden;background:#fff}.grp.open{border-color:#f3b6d6;background:#fffafd}.ghead{border-bottom:0!important;padding:13px 12px}.ghead b{font-family:var(--fd);font-size:16px}.chev{font-size:18px;color:var(--m);transition:transform .2s}.grp.open .chev{transform:rotate(180deg)}.gbody{padding:0 8px 6px;animation:rise .3s backwards}.row.sub{padding:8px 4px}
 .wdt{color:var(--m);font-family:var(--fd);font-weight:700;font-size:14px}
 .co-side{position:sticky;top:76px;max-height:calc(100vh - 90px);overflow:auto;padding:2px}
 .cartfab{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:40;border:0;border-radius:999px;padding:13px 20px;background:var(--k);color:var(--y);font-family:var(--fd);font-weight:600;font-size:15px;box-shadow:0 8px 22px rgba(0,0,0,.25);display:none}
@@ -260,7 +261,7 @@ details summary{cursor:pointer;font-weight:600;margin-top:8px;font-family:var(--
 const SUPABASE_URL="https://kqrfcdfygskzhsdzzcze.supabase.co",SUPABASE_KEY="sb_publishable_KfkIr6TlW6ivuT5cD0g9Kg_EuZwDKJ9";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=id=>document.getElementById(id);
-const S={session:null,fin:false,rates:[],prints:[],entries:[],cuts:[],accounts:[],cat:null,mat:null,fin_code:"sin",editId:null,abonoMode:null,monthPrints:[],rolls:[],rollId:null,usoMode:"uso",costs:[],orders:[],oitems:[],costEdit:null,costKind:"rollo",cart:{},clients:[],bals:new Map(),pays:[],clientSel:null,clientEdit:null,payMethod:"Efectivo"};
+const S={session:null,fin:false,rates:[],prints:[],entries:[],cuts:[],accounts:[],cat:null,mat:null,fin_code:"sin",editId:null,abonoMode:null,monthPrints:[],rolls:[],rollId:null,usoMode:"uso",openG:new Set(),costs:[],orders:[],oitems:[],costEdit:null,costKind:"rollo",cart:{},clients:[],bals:new Map(),pays:[],clientSel:null,clientEdit:null,payMethod:"Efectivo"};
 const cop=n=>"$"+Math.round(Number(n)||0).toLocaleString("es-CO");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const today=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)};
@@ -494,14 +495,19 @@ const pres=x=>x.kind==="rollo"&&x.width_m?`Rollo ${wfmt(x.width_m)} × ${mfmt(x.
 const m2cost=x=>x.kind==="rollo"&&x.width_m>0&&x.length_m>0?Number(x.price??x.unit_price)/(Number(x.width_m)*Number(x.length_m)):null;
 function pintarCostos(){
   const q=($("coSearch").value||"").toLowerCase().trim(),list=S.costs.filter(x=>!q||(x.name+" "+x.supplier).toLowerCase().includes(q));
-  let h="",last="";for(const x of list){if(x.supplier!==last){last=x.supplier;h+=`<div class="day">${esc(last)}</div>`}
-    const c2=m2cost(x),ch=x.prev_price&&Number(x.prev_price)>0&&Number(x.prev_price)!==Number(x.price)?Math.round(100*(Number(x.price)-Number(x.prev_price))/Number(x.prev_price)):0;
-    const wn=x.kind==="rollo"&&x.width_m?Number(x.width_m):(num(((x.name.match(/de (\d+[.,]\d+) m$/)||[])[1]||"").replace(",","."))||0);
-    h+=`<div class="row"><span class="wd${wn?"":" no"}">${wn?wfmt(wn)+"<small>m de ancho</small>":"—"}</span><span class="tap" style="cursor:pointer;flex:1" onclick="editarCosto('${x.id}')"><b>${esc(x.name)}${ch?` <span class="stk ${ch>0?"up":"down"}">${ch>0?"▲ subió":"▼ bajó"} ${Math.abs(ch)} %</span>`:""}</b><small>${(x.variants||[]).length?`${x.variants.length} opciones para escoger · `:x.ask?`Pregunta el color · `:""}${x.kind==="rollo"&&x.length_m?`Rollo de ${mfmt(x.length_m)} m`:esc(pres(x))}${c2?` · ${cop(c2)}/m²`:""}</small></span><span style="display:flex;gap:10px;align-items:center"><span class="amt">${cop(x.price)}</span><button class="addc" title="Agregar al pedido" onclick="alCarrito('${x.id}',1)">＋</button></span></div>`}
+  const fam=x=>x.name.replace(/ de \d+[.,]\d+ m$/,"").trim(),wOf=x=>x.kind==="rollo"&&x.width_m?Number(x.width_m):(num(((x.name.match(/de (\d+[.,]\d+) m$/)||[])[1]||"").replace(",","."))||0);
+  const groups=new Map();for(const x of list){const k=x.supplier+"|"+fam(x)+"|"+(x.kind==="rollo"?"r":(x.unit||""));if(!groups.has(k))groups.set(k,{k,sup:x.supplier,name:fam(x),items:[]});groups.get(k).items.push(x)}
+  const item=(x,inG)=>{const wn=wOf(x),c2=m2cost(x),ch=x.prev_price&&Number(x.prev_price)>0&&Number(x.prev_price)!==Number(x.price)?Math.round(100*(Number(x.price)-Number(x.prev_price))/Number(x.prev_price)):0;
+    return `<div class="row${inG?" sub":""}"><span class="wd${wn?"":" no"}">${wn?wfmt(wn)+"<small>m de ancho</small>":"—"}</span><span class="tap" style="cursor:pointer;flex:1" onclick="editarCosto('${x.id}')">${inG?"":`<b>${esc(x.name)}</b>`}${ch?`<span class="stk ${ch>0?"up":"down"}">${ch>0?"▲ subió":"▼ bajó"} ${Math.abs(ch)} %</span> `:""}<small>${x.kind==="rollo"&&x.length_m?`Rollo de ${mfmt(x.length_m)} m`:esc(pres(x))}${c2?` · ${cop(c2)}/m²`:""}</small></span><span style="display:flex;gap:10px;align-items:center"><span class="amt">${cop(x.price)}</span><button class="addc" title="Agregar al pedido" onclick="alCarrito('${x.id}',1)">＋</button></span></div>`};
+  let h="",last="";for(const g of groups.values()){if(g.sup!==last){last=g.sup;h+=`<div class="day">${esc(last)}</div>`}
+    if(g.items.length===1){h+=item(g.items[0],false);continue}
+    g.items.sort((a,b)=>wOf(a)-wOf(b));const open=!!q||S.openG.has(g.k),x0=g.items[0],opt=(x0.variants||[]).length?` · ${x0.variants.length} opciones`:x0.ask?" · pregunta el color":"",inCart=g.items.reduce((a,x)=>a+Object.entries(S.cart).filter(([k])=>k.split("|")[0]===x.id).reduce((t,[,n])=>t+n,0),0);
+    h+=`<div class="grp${open?" open":""}"><div class="row tap ghead" data-g="${esc(g.k)}"><span><b>${esc(g.name)}${inCart?` <span class="stk ped">🧺 ${inCart}</span>`:""}</b><small>${g.items.length} anchos · ${x0.kind==="rollo"?"rollo":"por "+esc(x0.unit||"")}${opt} · desde ${cop(Math.min(...g.items.map(x=>Number(x.price))))}</small></span><span class="chev">▾</span></div>${open?`<div class="gbody">${g.items.map(x=>item(x,true)).join("")}</div>`:""}</div>`}
   $("costList").innerHTML=h||`<div class="empty">${q?"No encontré nada con ese nombre.":"Todavía no hay precios. Toca \"＋ Producto\" para anotar el primero."}</div>`;
   pintarCart();pintarPedidos();
 }
 $("coSearch").addEventListener("input",pintarCostos);
+$("costList").addEventListener("click",e=>{const g=e.target.closest("[data-g]");if(!g)return;const k=g.dataset.g;S.openG.has(k)?S.openG.delete(k):S.openG.add(k);pintarCostos()});
 function cartLines(){return Object.entries(S.cart).map(([k,q])=>{const [id,...v]=k.split("|");return{k,x:S.costs.find(c=>c.id===id),q,v:v.join("|")}}).filter(l=>l.x&&l.q>0)}
 function pintarCart(){
   const lines=cartLines();
@@ -512,7 +518,7 @@ function pintarCart(){
    `<div class="total"><span>Vas a pagar</span><strong>${cop(tot)}</strong></div>${sups.length>1?`<p class="muted" style="margin:8px 0 0">Son ${sups.length} proveedores: se guarda un pedido para cada uno.</p>`:""}
    ${(()=>{const n=lines.reduce((a,l)=>a+l.q,0);$("cartFab").textContent=`🧺 Tu pedido: ${n} · ${cop(tot)} ↑`;return ""})()}<div class="actions"><button class="btn" onclick="guardarPedido()">✓ Guardar y copiar pedido</button><button class="btn sec sm" onclick="vaciarCart()">Vaciar</button></div>`;
 }
-function cartAdd(k,d){const n=(S.cart[k]||0)+d;if(n<=0)delete S.cart[k];else S.cart[k]=n;guardarCart();pintarCart();if(d>0&&innerWidth<860)toast("Agregado al pedido")}
+function cartAdd(k,d){const n=(S.cart[k]||0)+d;if(n<=0)delete S.cart[k];else S.cart[k]=n;guardarCart();pintarCostos();if(d>0&&innerWidth<860)toast("Agregado al pedido")}
 window.alCarrito=(id,d)=>{const x=S.costs.find(c=>c.id===id);if(d>0&&x&&((x.variants||[]).length||x.ask))return pedirVariante(x);cartAdd(id,d)};
 $("cartBox").addEventListener("click",e=>{const b=e.target.closest("[data-key]");if(b)cartAdd(b.dataset.key,Number(b.dataset.d))});
 function pedirVariante(x){S.varItem=x.id;$("mVarTitle").textContent=x.ask||"¿Cuál?";$("mVarSub").textContent=`${x.name} · ${pres(x)}`;$("mVarOpts").innerHTML=(x.variants||[]).map(v=>`<button type="button" class="chip" data-v="${esc(v)}">${esc(v)}</button>`).join("");$("mVarTxt").value="";$("mVarTxt").placeholder=(x.variants||[]).length?"Otro (escríbelo)":"Escríbelo aquí";$("mVar").classList.remove("hidden");if(!(x.variants||[]).length)$("mVarTxt").focus()}

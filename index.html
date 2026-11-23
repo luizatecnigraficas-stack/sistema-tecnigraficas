@@ -775,6 +775,18 @@
     .fin-person div{display:flex;flex-direction:column;gap:2px;min-width:0}.fin-person .fin-muted{font-size:11.5px}.fin-person>strong{white-space:nowrap}
     @media(max-width:640px){.ff-groups{grid-template-columns:1fr 1fr}.ff-actions{grid-template-columns:1fr}}
 
+    /* V9.96: Proveedores → Precios y pedidos */
+    .pl-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}.pl-chips:empty{display:none}.pl-chips button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 13px;font-weight:800;font-size:12px;cursor:pointer;color:var(--ink)}.pl-chips button.on{background:var(--ink);color:#fff;border-color:var(--ink)}.pl-chips .lbl{align-self:center;font-weight:800;font-size:12px;color:var(--muted)}
+    .pl-grp h3{margin:16px 0 8px;font-size:14px}.pl-grp h3 small{color:var(--muted);font-weight:700}
+    .pl-row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:13px;padding:9px 12px;margin-bottom:5px}
+    .pl-row .n{font-weight:800;font-size:13px}.pl-row .n small{display:block;color:var(--muted);font-weight:600;font-size:11px}.pl-row .p{font-weight:800;font-size:13px;white-space:nowrap}
+    .pl-row .add{border:1px solid #bfe6f2;background:#eaf7fb;border-radius:10px;padding:8px 11px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;min-width:74px}.pl-row .add.in{background:#ffe9f4;border-color:#f7b8d6}
+    .pl-more{display:block;margin:10px auto;border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 18px;font-weight:800;font-size:12px;cursor:pointer}
+    #plCartBar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:90;border:0;border-radius:999px;padding:13px 22px;font-weight:900;font-size:14px;color:#fff;cursor:pointer;background:linear-gradient(125deg,var(--cyan),var(--magenta));box-shadow:0 8px 24px rgba(0,0,0,.22);white-space:nowrap}
+    .pl-line{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}.pl-line .n{font-weight:800;font-size:13px}.pl-line .n small{display:block;color:var(--muted);font-weight:600}
+    .pl-line .q{display:flex;align-items:center;gap:4px}.pl-line .q button{width:32px;height:32px;border-radius:10px;border:1px solid var(--line);background:#fff;font-weight:900;font-size:16px;cursor:pointer}.pl-line .q input{width:48px;text-align:center;border:1px solid var(--line);border-radius:10px;padding:6px 2px;font-weight:800}
+    .pl-line .x{border:0;background:none;font-size:16px;cursor:pointer;color:var(--muted)}.pl-tot{display:flex;justify-content:space-between;font-weight:900;font-size:16px;margin:12px 0}.pl-sup{margin:10px 0 2px;font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase}
+    .pl-foot{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-top:8px}
     /* V9.19 Productos unificados */
     .pchips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
     .pchip{border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;font-weight:800;font-size:14px;cursor:pointer;min-height:44px}
@@ -1315,7 +1327,14 @@
 
 
         <section class="view" id="view-suppliers">
-          <div class="view-head"><div><h2>Proveedores · lo que debemos</h2><p>Lo que nos hacen el herrero, las lonas, la offset, el papel… y lo que les vamos abonando.</p></div></div>
+          <div class="view-head"><div><h2>Proveedores</h2><p id="spSub">Lo que les debemos, y sus listas de precios para hacer pedidos.</p></div></div>
+          <div class="fin-tabs" id="spTabs" style="margin-bottom:14px"><button type="button" data-sp-tab="debts" class="on">🧾 Lo que debemos</button><button type="button" data-sp-tab="prices">🏷 Precios y pedidos</button></div>
+          <div id="spPrices" class="hidden">
+            <div class="toolbar"><input class="search" id="plSearch" placeholder="🔎 Buscar: sello S-842, fechador, tinta…" /></div>
+            <div class="pl-chips" id="plSups"></div><div class="pl-chips" id="plCats"></div>
+            <div id="plList"><div class="pgrid-empty">Cargando…</div></div>
+          </div>
+          <div id="spDebts">
           <div class="today-grid">
             <div class="today-tile due"><span class="tt-label">🧾 Debemos a proveedores</span><strong id="spStatDue">$ 0</strong><small id="spStatDueNote">&nbsp;</small></div>
             <div class="today-tile in"><span class="tt-label">💰 Tenemos hoy</span><strong id="spStatHave">$ 0</strong><small>Suma de todas las cuentas</small></div>
@@ -1325,6 +1344,7 @@
           <div class="sp-money" id="spMoney"></div>
           <div class="toolbar"><input class="search" id="spSearch" placeholder="Buscar proveedor o cuenta…" /><select id="spFilter" class="search" style="flex:0 0 210px"><option value="due">Con saldo pendiente</option><option value="open">Todas las abiertas</option><option value="closed">Pagadas (historial)</option><option value="all">Todas</option></select><button class="btn primary" type="button" id="spNewButton">+ Nueva cuenta</button></div>
           <div class="ca-grid" id="spGrid"><div class="pgrid-empty">Cargando…</div></div>
+          </div>
         </section>
 
         <section class="view" id="view-finance">
@@ -2343,7 +2363,7 @@
       if(view!=="resources"){resourcePhotoObserver?.disconnect();resourceTab="";}
       if(view==="gfpaul"){if(!(hasPermission("gran_formato.manage")||canViewFinance()))return showToast("No tienes permiso para abrir Gran formato");window.location.href="gran-formato-paul.html";return;}
       if(view==="cdc"){if(!hasPermission("quotes.view"))return showToast("No tienes permiso para abrir cuentas de cobro");window.location.href="cuentas-cobro.html";return;}
-      if((view==="finance"||view==="suppliers")&&!canViewFinance()){showToast("No tienes permiso para abrir Finanzas");return}if(view==="costing"&&!hasPermission("quotes.create")){showToast("No tienes permiso para abrir Costeo rápido");return}
+      if((view==="finance"&&!canViewFinance())||(view==="suppliers"&&!canViewFinance()&&!canSeePriceLists())){showToast("No tienes permiso para abrir Finanzas");return}if(view==="costing"&&!hasPermission("quotes.create")){showToast("No tienes permiso para abrir Costeo rápido");return}
       const required=viewPermissions[view];
       if(required&&!hasPermission(required)){showToast("No tienes permiso para abrir este módulo");return}
       document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
@@ -2351,7 +2371,7 @@
       document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("active",x.dataset.view===view||(view==="costing"&&x.dataset.view==="calculators")));
       const [t,s]=titles[view]||["Sistema",""];
       $("pageTitle").textContent=t;$("pageSubtitle").textContent=s;$("sidebar").classList.remove("open");
-      if(view==="clients")loadClients();if(view==="quotes")loadQuotes();if(view==="remissions")loadRemissions();if(view==="products")loadProducts();if(view==="inventory")loadInventory();if(view==="production")loadProduction();if(view==="payments"){loadPayments();loadCartera()}if(view==="finance")loadFinance();if(view==="suppliers")loadSuppliersPay();if(view==="costing")loadCostings();if(view==="resources")loadResources();if(view==="users")loadUsers();if(view==="reports")loadReports();
+      if(view==="clients")loadClients();if(view==="quotes")loadQuotes();if(view==="remissions")loadRemissions();if(view==="products")loadProducts();if(view==="inventory")loadInventory();if(view==="production")loadProduction();if(view==="payments"){loadPayments();loadCartera()}if(view==="finance")loadFinance();if(view==="suppliers"){plEnter();loadSuppliersPay()}plBar();if(view==="costing")loadCostings();if(view==="resources")loadResources();if(view==="users")loadUsers();if(view==="reports")loadReports();
     }
 
     async function login(e){e.preventDefault();$("loginError").classList.add("hidden");$("loginButton").disabled=true;const {error}=await db.auth.signInWithPassword({email:$("loginEmail").value.trim(),password:$("loginPassword").value});$("loginButton").disabled=false;if(error){$("loginError").textContent=error.message==="Invalid login credentials"?"Correo o contraseña incorrectos.":error.message;$("loginError").classList.remove("hidden")}}
@@ -2365,7 +2385,7 @@
     function applyPermissionUI(){try{$("topProduction").classList.toggle("hidden",!hasPermission("work_orders.view"))}catch(e){}
       document.querySelectorAll("#nav button[data-view]").forEach(btn=>{const required=viewPermissions[btn.dataset.view];btn.classList.toggle("hidden",Boolean(required&&!hasPermission(required)))});$("gfPaulNav")?.classList.toggle("hidden",!(hasPermission("gran_formato.manage")||canViewFinance()));
       $("addRemissionButton").classList.toggle("hidden",!hasPermission("quotes.create"));
-      $("financeNav").classList.toggle("hidden",!canViewFinance());$("suppliersNav")?.classList.toggle("hidden",!canViewFinance());document.querySelector('#nav button[data-view="costing"]')?.classList.toggle("hidden",!hasPermission("quotes.create"));
+      $("financeNav").classList.toggle("hidden",!canViewFinance());$("suppliersNav")?.classList.toggle("hidden",!canViewFinance()&&!canSeePriceLists());document.querySelector('#nav button[data-view="costing"]')?.classList.toggle("hidden",!hasPermission("quotes.create"));
       $("topNewQuote").classList.toggle("hidden",!hasPermission("quotes.create"));
       $("addQuoteButton").classList.toggle("hidden",!hasPermission("quotes.create"));
       $("addClientButton").classList.toggle("hidden",!hasPermission("clients.create"));
@@ -4570,6 +4590,65 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       pmDates.reset();pmPaint();openModal("finPagoMesModal");setTimeout(()=>{$("pmAmount").focus();$("pmAmount").select()},60);
     }
     {const __qp=quickPayObligation;quickPayObligation=async function(oid,pid){const o=(state.financeObligations||[]).find(x=>x.id===oid);if(!o||o.obligation_type!=="recurring"||!canManageFinance())return __qp(oid,pid);finPagoMes(o,pid)};window.quickPayObligation=quickPayObligation}
+
+    // V9.96: Proveedores → Precios y pedidos. Listas de precios de proveedores (cost_catalog.price_list) con buscador y pedido para WhatsApp.
+    // Solo la ve quien tiene el permiso costs.suppliers (la base de datos también lo exige).
+    function canSeePriceLists(){return hasPermission("costs.suppliers")}
+    const pl={items:null,sup:"",cat:"",tab:"",limit:60,cart:{}};
+    try{pl.cart=JSON.parse(localStorage.getItem("tecniPedido")||"{}")||{}}catch(e){}
+    function plNorm(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
+    function plEnter(){const f=canViewFinance(),p=canSeePriceLists();$("spTabs").classList.toggle("hidden",!(f&&p));if(!pl.tab||(pl.tab==="debts"&&!f)||(pl.tab==="prices"&&!p))pl.tab=f?"debts":"prices";plTab(pl.tab)}
+    function plTab(t){pl.tab=t;document.querySelectorAll("#spTabs [data-sp-tab]").forEach(b=>b.classList.toggle("on",b.dataset.spTab===t));$("spDebts").classList.toggle("hidden",t!=="debts");$("spPrices").classList.toggle("hidden",t!=="prices");if(t==="prices")plLoad();plBar()}
+    async function plLoad(force){if(pl.items&&!force){plRender();return}
+      const {data,error}=await db.from("cost_catalog").select("id,category,name,detail,supplier,price,updated_on,pack_qty,unit_kind").eq("price_list",true).eq("active",true).order("sort_order").order("name").limit(5000);
+      if(error){$("plList").innerHTML='<div class="pgrid-empty">No pude cargar las listas de precios: '+escapeHTML(error.message)+'</div>';return}
+      pl.items=data||[];plRender()}
+    function plById(id){return (pl.items||[]).find(i=>i.id===id)}
+    function plAge(d){if(!d)return"";const [y,m,dd]=d.split("-").map(Number),days=Math.floor((Date.now()-new Date(y,m-1,dd))/864e5);return days<=45?"":" · lista de hace "+Math.max(2,Math.round(days/30))+" meses"}
+    function plRender(){const all=pl.items||[],sups=[...new Set(all.map(i=>i.supplier||"Sin proveedor"))];if(pl.sup&&!sups.includes(pl.sup))pl.sup="";
+      $("plSups").innerHTML=sups.length>1?'<span class="lbl">Proveedor:</span>'+[""].concat(sups).map(s=>`<button type="button" data-pl-sup="${escapeHTML(s)}"${pl.sup===s?' class="on"':""}>${s?escapeHTML(s):"Todos"}</button>`).join(""):"";
+      const bySup=all.filter(i=>!pl.sup||(i.supplier||"Sin proveedor")===pl.sup),cats=[...new Set(bySup.map(i=>i.category))];if(pl.cat&&!cats.includes(pl.cat))pl.cat="";
+      $("plCats").innerHTML=cats.length>1?[""].concat(cats).map(c=>`<button type="button" data-pl-cat="${escapeHTML(c)}"${pl.cat===c?' class="on"':""}>${c?escapeHTML(c.split(" · ").pop()):"Todo ("+bySup.length+")"}</button>`).join(""):"";
+      const words=plNorm($("plSearch").value).split(/\s+/).filter(Boolean);
+      const list=bySup.filter(i=>(!pl.cat||i.category===pl.cat)&&(!words.length||(h=>words.every(w=>h.includes(w)))(plNorm([i.supplier,i.category,i.name,i.detail].join(" ")))));
+      if(!all.length){$("plList").innerHTML='<div class="pgrid-empty">Todavía no hay listas de precios cargadas.</div>';return}
+      if(!list.length){$("plList").innerHTML='<div class="pgrid-empty">No encontré nada con eso.</div>';return}
+      const shown=list.slice(0,pl.limit),groups=[...new Set(shown.map(i=>i.category))];
+      $("plList").innerHTML=groups.map(g=>{const rows=shown.filter(i=>i.category===g);return `<div class="pl-grp"><h3>${escapeHTML(g)} <small>${list.filter(i=>i.category===g).length}</small></h3>${rows.map(i=>`<div class="pl-row"><div class="n">${escapeHTML(i.name)}${i.detail?" "+escapeHTML(i.detail):""}<small>${escapeHTML(i.supplier||"")}${plAge(i.updated_on)}</small></div><div class="p">${formatCOP(i.price)}</div><button type="button" class="add${pl.cart[i.id]?" in":""}" data-pl-add="${i.id}">${pl.cart[i.id]?"🛒 "+pl.cart[i.id]:"＋ Pedir"}</button></div>`).join("")}</div>`}).join("")+(list.length>shown.length?`<button type="button" class="pl-more" id="plMore">Ver más (${list.length-shown.length} más)</button>`:"");
+      plBar()}
+    function plSave(){try{localStorage.setItem("tecniPedido",JSON.stringify(pl.cart))}catch(e){}plBar()}
+    function plLines(){return Object.keys(pl.cart).map(id=>({it:plById(id),q:pl.cart[id]})).filter(l=>l.it&&l.q>0)}
+    function plBar(){let b=$("plCartBar");const on=pl.tab==="prices"&&$("view-suppliers").classList.contains("active"),ls=on?plLines():[];if(!ls.length){if(b)b.remove();return}
+      if(!b){b=document.createElement("button");b.id="plCartBar";b.type="button";b.onclick=plOpenCart;document.body.appendChild(b)}
+      b.textContent=`🛒 Ver pedido · ${ls.reduce((a,l)=>a+l.q,0)} · ${formatCOP(ls.reduce((a,l)=>a+l.q*numberValue(l.it.price),0))}`}
+    function plText(sup,note){const ls=plLines().filter(l=>(l.it.supplier||"")===sup),tot=ls.reduce((a,l)=>a+l.q*numberValue(l.it.price),0);
+      return ["Hola, buen día 👋 Les escribo de Tecnigráficas. Quiero hacer este pedido:",""].concat(ls.map(l=>`• ${l.q} × ${l.it.name}${l.it.detail?" "+l.it.detail:""} — ${formatCOP(l.it.price)} c/u`),["",`Total aprox.: ${formatCOP(tot)}`],note?["",note]:[],["","¿Me confirman disponibilidad y valor total? ¡Gracias!"]).join("\n")}
+    function plOpenCart(){
+      const b=document.createElement("div");b.className="modal-backdrop";b.id="plCartModal";let note="";const close=()=>{b.remove();plRender()};
+      const paint=()=>{const ls=plLines(),sups=[...new Set(ls.map(l=>l.it.supplier||""))];if(!ls.length){close();return}
+        b.innerHTML=`<div class="modal" style="width:min(560px,100%)"><div class="modal-head"><div><h3>🛒 Pedido</h3></div><button type="button" class="btn secondary" data-pl-close>✕</button></div>${sups.map(su=>{const r=ls.filter(l=>(l.it.supplier||"")===su),t=r.reduce((a,l)=>a+l.q*numberValue(l.it.price),0);return `<div class="pl-sup">${escapeHTML(su)}</div>${r.map(l=>`<div class="pl-line" data-id="${l.it.id}"><div class="n">${escapeHTML(l.it.name)}<small>${formatCOP(l.it.price)} c/u · ${formatCOP(l.q*numberValue(l.it.price))}</small></div><div class="q"><button type="button" data-d="-1">−</button><input inputmode="numeric" value="${l.q}"><button type="button" data-d="1">＋</button></div><button type="button" class="x" title="Quitar">✕</button></div>`).join("")}
+          <div class="pl-tot"><span>Total ${escapeHTML(su)}</span><span>${formatCOP(t)}</span></div>
+          <div class="pl-foot"><button type="button" class="btn secondary" data-pl-copy="${escapeHTML(su)}">📋 Copiar texto</button><button type="button" class="btn primary" data-pl-wa="${escapeHTML(su)}">Enviar por WhatsApp</button></div>`}).join("")}
+          <label style="display:block;margin-top:14px;font-weight:800;font-size:12px">Nota para el proveedor (opcional)<input class="search" id="plNote" style="width:100%;margin-top:4px" value="${escapeHTML(note)}" placeholder="Ej. Para recoger el martes"></label>
+          <div class="pl-foot" style="margin-top:14px"><button type="button" class="btn secondary" data-pl-clear>🗑 Vaciar pedido</button><button type="button" class="btn secondary" data-pl-close>Seguir agregando</button></div></div>`};
+      paint();document.body.appendChild(b);
+      b.addEventListener("input",e=>{if(e.target.id==="plNote"){note=e.target.value;return}const l=e.target.closest(".pl-line");if(l){const v=Number(String(e.target.value).replace(/\D/g,""))||0;if(v>0){pl.cart[l.dataset.id]=v;plSave()}}});
+      b.addEventListener("change",e=>{if(e.target.closest(".pl-line"))paint()});
+      b.addEventListener("click",async e=>{if(e.target===b||e.target.closest("[data-pl-close]"))return close();
+        const l=e.target.closest(".pl-line"),d=e.target.closest("[data-d]");
+        if(l&&d){const v=(pl.cart[l.dataset.id]||0)+Number(d.dataset.d);if(v<=0)delete pl.cart[l.dataset.id];else pl.cart[l.dataset.id]=v;plSave();return paint()}
+        if(l&&e.target.closest(".x")){delete pl.cart[l.dataset.id];plSave();return paint()}
+        if(e.target.closest("[data-pl-clear]")){if(await tcConfirmSafe("¿Vaciar todo el pedido?")){pl.cart={};plSave();close()}return}
+        const cp=e.target.closest("[data-pl-copy]"),wa=e.target.closest("[data-pl-wa]");
+        if(cp){const t=plText(cp.dataset.plCopy,note.trim());try{await navigator.clipboard.writeText(t);showToast("📋 Pedido copiado")}catch(x){window.prompt("Copia el pedido:",t)}}
+        if(wa)window.open("https://wa.me/?text="+encodeURIComponent(plText(wa.dataset.plWa,note.trim())),"_blank")});
+    }
+    function tcConfirmSafe(t){return Promise.resolve(window.confirm(t))}
+    $("spTabs").addEventListener("click",e=>{const b=e.target.closest("[data-sp-tab]");if(b)plTab(b.dataset.spTab)});
+    $("plSearch").addEventListener("input",()=>{pl.limit=60;plRender()});
+    $("plSups").addEventListener("click",e=>{const b=e.target.closest("[data-pl-sup]");if(!b)return;pl.sup=b.dataset.plSup;pl.cat="";pl.limit=60;plRender()});
+    $("plCats").addEventListener("click",e=>{const b=e.target.closest("[data-pl-cat]");if(!b)return;pl.cat=b.dataset.plCat;pl.limit=60;plRender()});
+    $("plList").addEventListener("click",e=>{if(e.target.closest("#plMore")){pl.limit+=120;return plRender()}const a=e.target.closest("[data-pl-add]");if(!a)return;pl.cart[a.dataset.plAdd]=(pl.cart[a.dataset.plAdd]||0)+1;plSave();a.classList.add("in");a.textContent="🛒 "+pl.cart[a.dataset.plAdd]});
 
     // V9.09: venta rápida, comprobantes y niveles de acceso
     function financePermsInstalled(){return state.permissions instanceof Map&&state.permissions.has("finance.view")}

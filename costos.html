@@ -244,7 +244,7 @@ async function load(){
     db.rpc("has_permission",{requested_permission:"calculators.manage"}),
     db.rpc("has_permission",{requested_permission:"products.manage"})]);
   if(a.error){$("setup").innerHTML=`<div class="setup">⚠ Todavía no está creada la lista de costos en la base de datos. Hay que correr una sola vez el archivo <b>costos.sql</b> en Supabase → SQL Editor.<br><small style="font-weight:600">${esc(a.error.message)}</small></div>`;S.items=[];}
-  else S.items=a.data||[];
+  else S.items=(a.data||[]).filter(i=>!i.price_list); // V9.96: las listas de precios de proveedores viven en Dinero → Proveedores
   S.rules={};(b.data||[]).forEach(r=>S.rules[r.code]=r);
   S.canManage=!!(p1.data||p2.data);
   S.ready=true;fillSelects();renderAll();

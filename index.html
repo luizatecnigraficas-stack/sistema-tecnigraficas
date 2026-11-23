@@ -2406,7 +2406,7 @@
       document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("active",x.dataset.view===view||(view==="costing"&&x.dataset.view==="calculators")));
       const [t,s]=titles[view]||["Sistema",""];
       $("pageTitle").textContent=t;$("pageSubtitle").textContent=s;$("sidebar").classList.remove("open");
-      if(view==="clients")loadClients();if(view==="quotes")loadQuotes();if(view==="remissions")loadRemissions();if(view==="products")loadProducts();if(view==="inventory")loadInventory();if(view==="production")loadProduction();if(view==="payments"){loadPayments();loadCartera()}if(view==="finance")loadFinance();if(view==="suppliers"){plEnter();loadSuppliersPay()}plBar();if(view==="costing")loadCostings();if(view==="resources")loadResources();if(view==="users")loadUsers();if(view==="reports")loadReports();
+      if(view==="clients")loadClients();if(view==="quotes")loadQuotes();if(view==="remissions")loadRemissions();if(view==="products")loadProducts();if(view==="inventory")loadInventory();if(view==="production")state.prodLoading=loadProduction();if(view==="payments"){loadPayments();loadCartera()}if(view==="finance")loadFinance();if(view==="suppliers"){plEnter();loadSuppliersPay()}plBar();if(view==="costing")loadCostings();if(view==="resources")loadResources();if(view==="users")loadUsers();if(view==="reports")loadReports();
     }
 
     async function login(e){e.preventDefault();$("loginError").classList.add("hidden");$("loginButton").disabled=true;const {error}=await db.auth.signInWithPassword({email:$("loginEmail").value.trim(),password:$("loginPassword").value});$("loginButton").disabled=false;if(error){$("loginError").textContent=error.message==="Invalid login credentials"?"Correo o contraseña incorrectos.":error.message;$("loginError").classList.remove("hidden")}}
@@ -2462,7 +2462,7 @@
         const late=dated.filter(o=>o.promised_date<today),soon=dated.filter(o=>o.promised_date>=today&&o.promised_date<=tomorrow);
         $("todayDeliver").textContent=soon.length;$("todayLate").textContent=late.length?`⚠️ ${late.length} atrasada${late.length===1?"":"s"}`:"Nada atrasado 🎉";$("todayDeliverTile").classList.toggle("alert",late.length>0);
         const list=[...late,...dated.filter(o=>o.promised_date>=today)].slice(0,6),label=d=>d<today?"Atrasada":d===today?"Hoy":d===tomorrow?"Mañana":formatDate(d);
-        $("todayDeliveries").innerHTML=list.length?list.map(o=>`<button type="button" class="today-row" data-go="production"><span class="when ${o.promised_date<today?"late":o.promised_date<=tomorrow?"soon":""}">${label(o.promised_date)}</span><span><strong>${escapeHTML(o.client_name||"Cliente")}</strong><small>${escapeHTML(o.order_number||"")} · ${escapeHTML(workOrderStatusLabel(o.status))}</small></span></button>`).join(""):'<div class="empty">No hay entregas con fecha. ¡Todo al día! 🎉</div>';
+        $("todayDeliveries").innerHTML=list.length?list.map(o=>`<button type="button" class="today-row" data-go="production" data-wo="${o.id}" title="Abrir la tarjeta de este pedido"><span class="when ${o.promised_date<today?"late":o.promised_date<=tomorrow?"soon":""}">${label(o.promised_date)}</span><span><strong>${escapeHTML(o.client_name||"Cliente")}</strong><small>${escapeHTML(o.order_number||"")} · ${escapeHTML(workOrderStatusLabel(o.status))}</small></span></button>`).join(""):'<div class="empty">No hay entregas con fecha. ¡Todo al día! 🎉</div>';
       }
       $("todayDueTile").classList.toggle("hidden",!canPay);
       if(canPay){
@@ -2480,7 +2480,14 @@
       const rows=(state.financeObligationPeriods||[]).filter(p=>obligationStatus(p)!=="paid"&&String(p.due_date)<=limit),total=rows.reduce((a,p)=>a+Math.max(0,Number(p.amount_due||0)-Number(p.paid_amount||0)),0);
       $("todayPay").textContent=String(rows.length);$("todayPayNote").textContent=rows.length?"en los próximos 7 días · toca para verlos":"Nada por pagar esta semana";$("todayPayTile").classList.toggle("alert",rows.some(p=>String(p.due_date)<localISO(now)));
     }
-    document.addEventListener("click",e=>{const g=e.target.closest&&e.target.closest("#view-dashboard [data-go]");if(g)navigate(g.dataset.go)});
+    document.addEventListener("click",e=>{const g=e.target.closest&&e.target.closest("#view-dashboard [data-go]");if(g){if(g.dataset.wo)dashOpenOrder(g.dataset.wo);else navigate(g.dataset.go)}});
+    async function dashOpenOrder(id){ /* V10.01: desde Inicio se abre la tarjeta de ese pedido, no solo el tablero */
+      navigate("production");try{await state.prodLoading}catch(e){}
+      const o=(state.workOrders||[]).find(x=>x.id===id);if(!o)return;
+      try{const b=o.board_id&&woBoardById(o.board_id)&&!woBoardById(o.board_id).archived_at?o.board_id:"";if(b!==woBoard)woOpenBoard(b)}catch(e){console.error(e)}
+      woOpenCard(id);
+      try{document.querySelector(`#view-production [data-woid="${id}"]`)?.scrollIntoView({block:"center",inline:"center"})}catch(e){}
+    }
     function renderDashboardInventoryAlerts(result,variantResult){
       const card=$("dashboardInventoryCard"),box=$("dashboardInventoryAlerts");if(!hasPermission("inventory.view")){card.classList.add("hidden");return}
       card.classList.remove("hidden");if(result?.error||variantResult?.error){box.innerHTML='<div class="empty">No se pudieron cargar las alertas de inventario. Recarga la página.</div>';return}

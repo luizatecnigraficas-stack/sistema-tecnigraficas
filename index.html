@@ -756,6 +756,25 @@
     .tbb-st{display:inline-block;font-size:.78rem;font-weight:600;background:#f3f3f5;border-radius:999px;padding:3px 9px;margin-top:8px}
     @media (max-width:760px){.tbb-grid,.tbb-row{grid-template-columns:1fr}.tbb-hero{padding:22px 18px}.tbb-name{max-width:100%}.tbb-hero::after{width:130px;height:130px;right:-55px;top:-55px;opacity:.75}}
     @media (prefers-reduced-motion:reduce){.tbb-in{animation:none}}
+    /* V9.95 Registrar plata fácil */
+    .ff .ff-l{display:block;margin:14px 0 6px;font-weight:900;font-size:13px}.ff .ff-l small{font-weight:600;color:var(--muted)}
+    .ff-amount-wrap{display:flex;align-items:center;gap:8px;border:2px solid #d9dde6;border-radius:14px;padding:6px 14px;background:#fff}.ff-amount-wrap:focus-within{border-color:var(--ink)}
+    .ff-amount-wrap span{font-size:24px;font-weight:900;color:var(--muted)}
+    .ff-amount{border:0!important;outline:0;box-shadow:none!important;background:transparent;font-size:30px;font-weight:900;width:100%;padding:6px 0;min-width:0}
+    #ffAmountHint,#pmAmountHint{margin-top:6px}
+    .ff-groups{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .ff-group{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1px solid #d9dde6;background:#fff;border-radius:12px;padding:10px;cursor:pointer;min-height:76px;border-top:4px solid var(--cc);font:inherit}
+    .ff-group span{font-size:20px;line-height:1}.ff-group strong{font-size:12.5px}.ff-group small{font-size:10px;color:var(--muted);line-height:1.25}
+    .ff-group.on{background:#f4f6fa;border-color:var(--ink);border-top-color:var(--cc);box-shadow:0 0 0 1px var(--ink)}
+    .ff-concept{width:100%;margin-top:8px;font-size:15px;padding:12px}
+    .ff-note{margin:8px 0 0;font-size:11.5px;color:var(--muted);line-height:1.4}
+    .ff-date{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}.ff-date input{width:auto;min-height:40px;padding:6px 10px;font-size:13px}
+    .ff-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}.ff-actions .btn{min-height:50px;font-size:15px}.ff-actions .fin-link{grid-column:1/-1;justify-self:center;padding:8px}
+    #finPagoMesForm .ff-actions{grid-template-columns:1fr}
+    .fin-person{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 4px;border-top:1px solid var(--line)}.fin-person:first-child{border-top:0}
+    .fin-person div{display:flex;flex-direction:column;gap:2px;min-width:0}.fin-person .fin-muted{font-size:11.5px}.fin-person>strong{white-space:nowrap}
+    @media(max-width:640px){.ff-groups{grid-template-columns:1fr 1fr}.ff-actions{grid-template-columns:1fr}}
+
     /* V9.19 Productos unificados */
     .pchips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
     .pchip{border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;font-weight:800;font-size:14px;cursor:pointer;min-height:44px}
@@ -1320,7 +1339,7 @@
               <button type="button" onclick="document.getElementById('financeClosingsButton').click()">Cierres</button>
               <button type="button" class="row-menu-btn" aria-haspopup="menu" onclick="window.toggleRowMenu(this)">Más ▾</button>
               <div class="row-menu-source" hidden>
-                <button type="button" onclick="document.getElementById('financeObligationsButton').click()">Egresos fijos y créditos (configurar)</button>
+                <button type="button" onclick="document.getElementById('financeObligationsButton').click()">Pagos del mes y créditos (configurar)</button>
                 <button type="button" onclick="document.getElementById('financeVariableExpensesButton').click()">Egresos variables (conceptos)</button>
                 <button type="button" onclick="document.getElementById('financePayrollButton').click()">Nómina (personas y tarifas)</button>
                 <button type="button" onclick="document.getElementById('financeProvidersButton').click()">Proveedores</button>
@@ -1341,10 +1360,9 @@
           <div id="finTab-resumen" class="fin-panel">
             <div class="fin-accounts-grid" id="finAccounts"></div>
             <div class="fin-actions">
-              <button type="button" class="fin-act in" id="finActIncome" onclick="window.finOpen('income')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Ingreso</button>
-              <button type="button" class="fin-act out" id="finActExpense" onclick="window.finOpen('expense')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>Egreso</button>
+              <button type="button" class="fin-act in" id="finActIncome" onclick="window.finFacil('income')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Entró plata</button>
+              <button type="button" class="fin-act out" id="finActExpense" onclick="window.finFacil('expense')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>Salió plata</button>
               <button type="button" class="fin-act out" id="finActDelivery" onclick="window.finDomicilio()"><span style="font-size:22px;line-height:1">🛵</span>Domicilio</button>
-              <button type="button" class="fin-act" id="finActTransfer" onclick="window.finTransfer()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h12l-3-3M17 17H5l3 3"/></svg>Transferir</button>
               <button type="button" class="fin-act close" id="finActClose" onclick="window.finCloseCash()"><span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Cerrar caja</span><small id="finCloseBadge"></small></button>
             </div>
             <div class="fin-two">
@@ -1360,6 +1378,10 @@
                 <div class="fin-legend" id="finMonthLegend"></div>
               </section>
             </div>
+            <section class="fin-card" aria-labelledby="finPeopleTitle">
+              <div class="fin-card-head"><h3 id="finPeopleTitle">¿A quién le ha salido plata este mes?</h3><span class="fin-muted">Se suma solo, según el nombre que anotan</span></div>
+              <div id="finPeople"></div>
+            </section>
             <section class="fin-card" aria-labelledby="finRecentTitle">
               <div class="fin-card-head"><h3 id="finRecentTitle">Últimos movimientos</h3><button type="button" class="fin-link" onclick="window.finSetTab('movimientos')">Ver todos →</button></div>
               <div class="fin-recent" id="finRecent"></div>
@@ -1369,10 +1391,10 @@
           <div id="finTab-granformato" class="fin-panel hidden"><div id="finGF"><div class="empty">Calculando…</div></div></div>
           <div id="finTab-balance" class="fin-panel hidden"><div id="finBalance"><div class="empty">Calculando…</div></div></div>
           <div id="finTab-porpagar" class="fin-panel hidden">
-            <div class="fin-card-head"><p class="fin-muted" style="margin:0">Todo lo que se repite, en un solo lugar. Lo que vence en 3 días o menos aparece en rojo y en el número de la pestaña.</p><button type="button" class="btn primary" id="finAddObligation" onclick="document.getElementById('financeObligationsButton').click()">+ Agregar egreso fijo o crédito</button></div>
+            <div class="fin-card-head"><p class="fin-muted" style="margin:0">Todo lo que se repite, en un solo lugar. Lo que vence en 3 días o menos aparece en rojo y en el número de la pestaña.</p><button type="button" class="btn primary" id="finAddObligation" onclick="document.getElementById('financeObligationsButton').click()">+ Agregar pago del mes o crédito</button></div>
             <h3 class="fin-h3">Créditos</h3>
             <div class="fin-credits" id="finCredits"></div>
-            <section class="fin-card"><div class="fin-card-head"><h3>Egresos fijos del mes</h3><span class="fin-muted" id="finFixedSummary"></span></div><div id="finFixed"></div></section>
+            <section class="fin-card"><div class="fin-card-head"><h3>Pagos del mes</h3><span class="fin-muted" id="finFixedSummary"></span></div><div id="finFixed"></div></section>
             <section class="fin-card"><div class="fin-card-head"><h3>Variables que siempre están</h3><span class="fin-muted">Sin fecha fija: se registran cada vez que pasan</span></div><div class="fin-vars" id="finVariables"></div></section>
           </div>
 
@@ -4397,6 +4419,158 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
     }
     document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&woRT)woRTRefresh()});
     db.auth.onAuthStateChange((_e,s)=>{if(!s&&woRT){try{db.removeChannel(woRT)}catch(e){}woRT=null}});
+    // ===== V9.95: registrar plata fácil (Entró / Salió), 8 grupos, pagos del mes y "a quién" =====
+    const FIN_GROUPS=[
+      {id:"produccion",name:"Producción",emoji:"🏭",hint:"Cali, DTF, herrero, terceros",color:"#7a2cbf",cat:"Producción tercerizada",cats:["Producción tercerizada","Mano de obra extra","Gran formato (por cobrar a Paul)"],cls:"outsourced_production",ph:"Ej. Trabajos Cali · Don Fernando"},
+      {id:"materiales",name:"Materiales",emoji:"📦",hint:"Papel, vinilo, tintas, insumos",color:"#00a6d6",cat:"Insumos y materiales",cats:["Insumos y materiales","Papel e insumos"],cls:"other",ph:"Ej. Proadhesivos, papel, vinilo"},
+      {id:"nomina",name:"Nómina",emoji:"👥",hint:"Pagos al equipo y planilla",color:"#e6007e",cat:"Nómina",cats:["Nómina","Nómina y salarios","Egresos especiales"],cls:"other",ph:"Ej. Pago · Alejo"},
+      {id:"familia",name:"Familia",emoji:"🏠",hint:"Adelantos y gastos personales",color:"#f08a24",cat:"Fondos / retiros de dueños",cats:["Fondos / retiros de dueños"],cls:"other",ph:"Ej. Préstamo · Luiza"},
+      {id:"local",name:"Local y día a día",emoji:"💡",hint:"Aseo, almuerzos, servicios",color:"#16835f",cat:"Administrativos",cats:["Administrativos","Servicios públicos","Servicios y suscripciones","Software y suscripciones","Aseo y mantenimiento"],cls:"other",ph:"Ej. Almuerzos, aseo, celular"},
+      {id:"transporte",name:"Transporte",emoji:"🛵",hint:"Domicilios, fletes, Hermel",color:"#e0a800",cat:"Transporte y domicilios",cats:["Transporte y domicilios","Transporte y envíos"],cls:"other",ph:"Ej. Domi · Unicauca, Hermel"},
+      {id:"deudas",name:"Deudas",emoji:"🏦",hint:"Créditos, cuotas, intereses",color:"#20222a",cat:"Financieros",cats:["Financieros"],cls:"other",ph:"Ej. Cuota laminadora"},
+      {id:"otros",name:"Otro",emoji:"❓",hint:"Lo que no encaje arriba",color:"#8a8f99",cat:"Otros",cats:["Otros","Otros egresos","Egresos variables","Transferencias internas"],cls:"other",ph:"¿Qué fue?"}
+    ];
+    function finGroupInfo(id){return FIN_GROUPS.find(g=>g.id===id)||FIN_GROUPS[FIN_GROUPS.length-1]}
+    function finCatName(id){return (state.financeCategories||[]).find(c=>c.id===id)?.name||""}
+    function finGroupOf(m){const n=finCatName(m.category_id);if(n==="Egresos fijos")return /cr[eé]dito|tarjeta|cuota|inamix|pr[eé]stamo/i.test(m.concept||"")?"deudas":"local";const g=FIN_GROUPS.find(x=>x.cats.includes(n));if(g)return g.id;return ({payroll:"nomina",supplies_purchase:"materiales",outsourced_production:"produccion"})[finMovementClass(m)]||"otros"}
+    function finPlain(v){return String(v||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}
+    const FIN_PEOPLE=[["Don Fernando",/don fer|fernando|\bpapi\b|\bpapa\b/],["Luiza",/luiza/],["Mara",/\bmara\b/],["Alejo",/alejo|alejandro/],["Mavy",/mav[yi]/],["Paul / gran formato",/paul|gran formato|\bgf\b/],["Hermel",/hermel/],["Sofi",/\bsofi/],["Gisela",/gis+ela/],["Doña Martha",/marth?a\b|martis/],["Rubi",/\brub[iy]\b/],["Doña Lucy",/lucy/],["DTF Shark",/shark|\bdtf\b/],["Enny",/enny/],["Herrero",/herrero/],["Calvo",/calvo|edinson/]];
+    function finPersonOf(concept){const t=finPlain(concept);const p=FIN_PEOPLE.find(([,re])=>re.test(t));return p?p[0]:""}
+    function finDigits(v){return Number(String(v||"").replace(/\D/g,""))||0}
+    function finMiles(n){return n?new Intl.NumberFormat("es-CO").format(n):""}
+    function finBindAmount(input,hint){input.addEventListener("input",()=>{const n=finDigits(input.value);input.value=finMiles(n);if(hint){hint.innerHTML=n>0&&n<1000?`<button type="button" class="fin-chip-btn" data-x1000="1">¿Son ${formatCOP(n*1000)}? Tócame</button>`:""}});if(hint)hint.addEventListener("click",e=>{if(!e.target.closest("[data-x1000]"))return;input.value=finMiles(finDigits(input.value)*1000);hint.innerHTML="";input.focus()})}
+    function finDateChips(box,input){const iso=off=>{const d=new Date();d.setDate(d.getDate()-off);const p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`};const paint=()=>box.querySelectorAll("[data-ffd]").forEach(b=>b.classList.toggle("on",iso(+b.dataset.ffd)===input.value));box.addEventListener("click",e=>{const b=e.target.closest("[data-ffd]");if(!b)return;input.value=iso(+b.dataset.ffd);paint()});input.addEventListener("change",paint);return {reset(){input.value=iso(0);paint()}}}
+    let ffState={type:"expense",group:"",account:"",incomeKind:"venta"},ffDates=null;
+    function ffEnsure(){
+      if($("finFacilModal"))return;
+      const w=document.createElement("div");w.className="modal-backdrop hidden";w.id="finFacilModal";
+      w.innerHTML=`<form class="modal ff" id="finFacilForm" style="width:min(540px,100%)" autocomplete="off">
+        <div class="modal-head"><h3 id="ffTitle">Salió plata</h3><button type="button" class="modal-close" id="ffClose" aria-label="Cerrar">×</button></div>
+        <div class="fin-type" id="ffType"><button type="button" data-fft="income">＋ Entró plata</button><button type="button" data-fft="expense">− Salió plata</button></div>
+        <label class="ff-l" for="ffAmount">¿Cuánto?</label>
+        <div class="ff-amount-wrap"><span>$</span><input id="ffAmount" class="ff-amount" inputmode="numeric" placeholder="0" aria-label="Valor"/></div><div id="ffAmountHint" class="fin-chips"></div>
+        <label class="ff-l" id="ffAccLabel">¿De qué cuenta salió?</label><div class="fin-accounts" id="ffAccounts"></div>
+        <div id="ffGroupsWrap"><label class="ff-l">¿En qué se fue?</label><div class="ff-groups" id="ffGroups"></div></div>
+        <div id="ffIncomeWrap"><label class="ff-l">¿Qué entró?</label><div class="fin-chips" id="ffIncomeKinds"><button type="button" class="fin-chip-btn" data-ffi="venta">Venta o trabajo</button><button type="button" class="fin-chip-btn" data-ffi="otro">Me devolvieron plata / préstamo / otro</button></div><p class="ff-note">Si es un abono de un cliente que tiene cuenta en <b>Cartera</b>, regístralo allá: el ingreso queda anotado solo.</p></div>
+        <label class="ff-l" id="ffConceptLabel" for="ffConcept">¿Qué fue o a quién? <small>(opcional)</small></label>
+        <div class="fin-chips" id="ffFrequent"></div>
+        <input id="ffConcept" class="ff-concept" placeholder="¿Qué fue?" maxlength="140"/>
+        <div class="ff-date" id="ffDateBox"><button type="button" class="fin-chip-btn" data-ffd="0">Hoy</button><button type="button" class="fin-chip-btn" data-ffd="1">Ayer</button><input type="date" id="ffDate" aria-label="Fecha"/></div>
+        <div class="ff-actions"><button type="submit" class="btn primary" id="ffSave">Guardar</button><button type="submit" class="btn secondary" id="ffSaveMore" data-again="1">Guardar y anotar otro</button><button type="button" class="fin-link" id="ffMore">Con foto, proveedor u orden →</button></div>
+      </form>`;
+      document.body.appendChild(w);
+      finBindAmount($("ffAmount"),$("ffAmountHint"));ffDates=finDateChips($("ffDateBox"),$("ffDate"));
+      $("ffClose").addEventListener("click",()=>closeModal("finFacilModal"));
+      w.addEventListener("mousedown",e=>{if(e.target===w)closeModal("finFacilModal")});
+      $("ffType").addEventListener("click",e=>{const b=e.target.closest("[data-fft]");if(!b)return;ffState.type=b.dataset.fft;ffPaint()});
+      $("ffAccounts").addEventListener("click",e=>{const b=e.target.closest("[data-ffa]");if(!b)return;ffState.account=b.dataset.ffa;ffPaint()});
+      $("ffGroups").addEventListener("click",e=>{const b=e.target.closest("[data-ffg]");if(!b)return;ffState.group=b.dataset.ffg;ffPaint()});
+      $("ffIncomeKinds").addEventListener("click",e=>{const b=e.target.closest("[data-ffi]");if(!b)return;ffState.incomeKind=b.dataset.ffi;ffPaint()});
+      $("ffFrequent").addEventListener("click",e=>{const b=e.target.closest("[data-ffc]");if(!b)return;$("ffConcept").value=b.dataset.ffc;$("ffFrequent").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));if(!finDigits($("ffAmount").value))$("ffAmount").focus()});
+      $("ffMore").addEventListener("click",async()=>{const amt=finDigits($("ffAmount").value),c=$("ffConcept").value.trim(),t=ffState.type,acc=ffState.account;closeModal("finFacilModal");await finOpen(t);setTimeout(()=>{if(amt)$("financeMovementAmount").value=amt;if(c)$("financeMovementConcept").value=c;const a=$("financeMovementAccount");if(a&&acc){a.value=acc;a.dispatchEvent(new Event("change",{bubbles:true}))}},120)});
+      $("finFacilForm").addEventListener("submit",ffSubmit);
+    }
+    function ffFrequent(){
+      const since=new Date();since.setDate(since.getDate()-90);const iso=since.toISOString().slice(0,10),by={};
+      (state.financeMovements||[]).forEach(m=>{if(m.is_voided||String(m.movement_date)<iso||m.source_type==="account_transfer")return;if(ffState.type==="expense"){if(m.movement_type!=="expense"||finGroupOf(m)!==ffState.group)return}else return;const k=String(m.concept||"").trim();if(!k||/sin detalle/i.test(k)||k.length>40||/·\s*(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre) de \d{4}/i.test(k))return;by[k]=(by[k]||0)+1});
+      return Object.entries(by).filter(([,n])=>n>=2).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k])=>k);
+    }
+    function ffPaint(){
+      const exp=ffState.type==="expense",g=finGroupInfo(ffState.group);
+      $("ffTitle").textContent=exp?"Salió plata":"Entró plata";
+      $("ffType").querySelectorAll("[data-fft]").forEach(b=>{const on=b.dataset.fft===ffState.type;b.className=on?("on "+(exp?"out":"in")):"";b.setAttribute("aria-pressed",on)});
+      $("ffAccLabel").textContent=exp?"¿De qué cuenta salió?":"¿A qué cuenta entró?";
+      $("ffAccounts").innerHTML=(state.financeAccounts||[]).map(a=>`<button type="button" class="fin-acc-btn ${a.id===ffState.account?"on":""}" data-ffa="${a.id}" aria-pressed="${a.id===ffState.account}">${escapeHTML(a.name)}</button>`).join("");
+      $("ffGroupsWrap").classList.toggle("hidden",!exp);$("ffIncomeWrap").classList.toggle("hidden",exp);
+      $("ffGroups").innerHTML=FIN_GROUPS.map(x=>`<button type="button" class="ff-group ${x.id===ffState.group?"on":""}" data-ffg="${x.id}" aria-pressed="${x.id===ffState.group}" style="--cc:${x.color}"><span>${x.emoji}</span><strong>${x.name}</strong><small>${x.hint}</small></button>`).join("");
+      $("ffIncomeKinds").querySelectorAll("[data-ffi]").forEach(b=>b.classList.toggle("on",b.dataset.ffi===ffState.incomeKind));
+      $("ffConceptLabel").innerHTML=exp?'¿Qué fue o a quién? <small>(opcional)</small>':'¿De quién o de qué trabajo? <small>(opcional)</small>';
+      $("ffConcept").placeholder=exp?(ffState.group?g.ph:"Primero toca en qué se fue"):"Ej. Lona Delulu, talonarios, abono cajas";
+      const fr=exp&&ffState.group?ffFrequent():[];
+      $("ffFrequent").innerHTML=fr.map(k=>`<button type="button" class="fin-chip-btn" data-ffc="${escapeHTML(k)}">${escapeHTML(k)}</button>`).join("");
+    }
+    function finFacil(type){
+      if(!canManageFinance())return showToast("No tienes permiso para registrar movimientos");
+      ffEnsure();ffState.type=type==="income"?"income":"expense";ffState.group="";ffState.incomeKind="venta";
+      let last="";try{last=localStorage.getItem("ffAcc:"+ffState.type)||""}catch(e){}
+      const accs=state.financeAccounts||[];ffState.account=(accs.find(a=>a.id===last)||accs.find(a=>/efectivo|caja/i.test(a.name))||accs[0]||{}).id||"";
+      $("finFacilForm").reset();$("ffAmountHint").innerHTML="";ffDates.reset();ffPaint();openModal("finFacilModal");setTimeout(()=>$("ffAmount").focus(),60);
+    }
+    window.finFacil=finFacil;
+    let ffBusy=false;
+    async function ffSubmit(e){
+      e.preventDefault();if(ffBusy)return;const again=e.submitter?.dataset?.again==="1";
+      const exp=ffState.type==="expense",amount=finDigits($("ffAmount").value),date=$("ffDate").value||finTodayISO();
+      if(!(amount>0)){showToast("Escribe cuánto fue");$("ffAmount").focus();return}
+      if(!ffState.account){showToast("Toca la cuenta");return}
+      if(exp&&!ffState.group){showToast("Toca en qué se fue la plata");return}
+      const g=finGroupInfo(ffState.group),cats=state.financeCategories||[];
+      const catName=exp?g.cat:(ffState.incomeKind==="venta"?"Ventas y trabajos":"Otros ingresos");
+      const cat=cats.find(c=>c.name===catName)||cats.find(c=>c.movement_type===(exp?"expense":"income"));
+      if(!cat){alert("No encontré la categoría para guardar. Avísale a Lu.");return}
+      const concept=$("ffConcept").value.trim()||(exp?g.name:(ffState.incomeKind==="venta"?"Venta":"Otro ingreso"));
+      ffBusy=true;$("ffSave").disabled=$("ffSaveMore").disabled=true;
+      try{
+        const {error}=await db.from("finance_movements").insert({movement_type:ffState.type,movement_date:date,concept,category_id:cat.id,account_id:ffState.account,amount,notes:null,source_type:"manual",expense_class:exp?g.cls:null,created_by:state.session.user.id});
+        if(error)throw error;
+        try{localStorage.setItem("ffAcc:"+ffState.type,ffState.account)}catch(_){}
+        showToast(`✓ Anotado: ${exp?"−":"+"} ${formatCOP(amount)} · ${concept}`);
+        if(again){$("ffAmount").value="";$("ffConcept").value="";$("ffAmountHint").innerHTML="";ffPaint();$("ffAmount").focus()}else closeModal("finFacilModal");
+        loadFinance();
+      }catch(err){alert("No se pudo guardar: "+(err.message||err))}
+      finally{ffBusy=false;$("ffSave").disabled=$("ffSaveMore").disabled=false}
+    }
+    // Resumen: la barra del mes por grupos, "a quién" y el nombre del grupo en los últimos movimientos
+    function finRenderGroupsHome(){
+      if(!$("finMonthBar")||!state.financeAccounts)return;
+      const ym=finTodayISO().slice(0,7),mm=(state.financeMovements||[]).filter(m=>!m.is_voided&&m.source_type!=="account_transfer"&&m.movement_type==="expense"&&String(m.movement_date).startsWith(ym));
+      const exp=mm.reduce((s,m)=>s+Number(m.amount||0),0),by={};mm.forEach(m=>{const k=finGroupOf(m);by[k]=(by[k]||0)+Number(m.amount||0)});
+      const parts=FIN_GROUPS.filter(g=>by[g.id]>0).sort((a,b)=>by[b.id]-by[a.id]);
+      $("finMonthBar").innerHTML=exp>0?parts.map(g=>`<span style="width:${(by[g.id]/exp*100).toFixed(2)}%;background:${g.color}" title="${escapeHTML(g.name)}"></span>`).join(""):'<span style="width:100%;background:#e4e7ee"></span>';
+      $("finMonthBar").setAttribute("aria-label",exp>0?"Salidas del mes: "+parts.map(g=>`${g.name} ${Math.round(by[g.id]/exp*100)}%`).join(", "):"Sin salidas este mes");
+      $("finMonthLegend").innerHTML=parts.length?parts.map(g=>`<span><b style="background:${g.color}"></b>${g.emoji} ${escapeHTML(g.name)} · ${formatCOP(by[g.id])}</span>`).join(""):'<span class="fin-muted">Todavía no hay salidas registradas este mes.</span>';
+      const ppl={};mm.forEach(m=>{const p=finPersonOf(m.concept);if(!p)return;const r=ppl[p]||(ppl[p]={name:p,total:0,n:0,g:{}});const v=Number(m.amount||0),k=finGroupOf(m);r.total+=v;r.n++;r.g[k]=(r.g[k]||0)+v});
+      const rows=Object.values(ppl).sort((a,b)=>b.total-a.total).slice(0,8);
+      if($("finPeople"))$("finPeople").innerHTML=rows.length?rows.map(r=>`<div class="fin-person"><div><strong>${escapeHTML(r.name)}</strong><span class="fin-muted">${r.n} entrega${r.n===1?"":"s"} · ${Object.entries(r.g).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${finGroupInfo(k).name} ${formatCOP(v)}`).join(" · ")}</span></div><strong>${formatCOP(r.total)}</strong></div>`).join(""):'<div class="empty">Cuando anotes salidas con el nombre de la persona, aquí se van sumando.</div>';
+      const recent=(state.financeMovements||[]).filter(m=>!m.is_voided).slice(0,6);
+      if(recent.length&&$("finRecent"))$("finRecent").innerHTML=recent.map(m=>{const inc=m.movement_type==="income",tr=m.source_type==="account_transfer",kind=tr?"Transferencia":inc?"Entró":finGroupInfo(finGroupOf(m)).name;return `<button type="button" class="fin-mov" onclick="window.viewFinanceMovement('${m.id}')"><span class="fin-mov-date">${finShort(m.movement_date)}</span><span class="fin-mov-main"><strong>${escapeHTML(m.concept||"Movimiento")}</strong><small>${escapeHTML(kind)} · ${escapeHTML(m.finance_accounts?.name||"—")}</small></span><strong class="fin-mov-amt ${tr?"":inc?"in":"out"}">${inc?"+":"−"} ${formatCOP(m.amount)}</strong></button>`}).join("");
+    }
+    {const __rfh=renderFinanceHome;renderFinanceHome=function(...a){const r=__rfh.apply(this,a);try{finRenderGroupsHome()}catch(e){console.error(e)}return r}}
+    // Pagos del mes: si el recibo cambia (luz, agua, gas), se escribe lo que llegó y listo
+    let pmState={oid:"",pid:"",account:""},pmDates=null;
+    function pmEnsure(){
+      if($("finPagoMesModal"))return;
+      const w=document.createElement("div");w.className="modal-backdrop hidden";w.id="finPagoMesModal";
+      w.innerHTML=`<form class="modal ff" id="finPagoMesForm" style="width:min(480px,100%)" autocomplete="off">
+        <div class="modal-head"><div><h3 id="pmTitle">Pago del mes</h3><small id="pmSub"></small></div><button type="button" class="modal-close" id="pmClose" aria-label="Cerrar">×</button></div>
+        <label class="ff-l" for="pmAmount">¿Cuánto se pagó este mes?</label>
+        <div class="ff-amount-wrap"><span>$</span><input id="pmAmount" class="ff-amount" inputmode="numeric" placeholder="0"/></div><div id="pmAmountHint" class="fin-chips"></div>
+        <p class="ff-note">Si el recibo llegó por otro valor, cámbialo aquí: queda guardado lo que de verdad se pagó.</p>
+        <label class="ff-l">¿De qué cuenta salió?</label><div class="fin-accounts" id="pmAccounts"></div>
+        <div class="ff-date" id="pmDateBox"><button type="button" class="fin-chip-btn" data-ffd="0">Hoy</button><button type="button" class="fin-chip-btn" data-ffd="1">Ayer</button><input type="date" id="pmDate" aria-label="Fecha del pago"/></div>
+        <div class="ff-actions"><button type="submit" class="btn primary" id="pmSave">✓ Marcar como pagado</button><button type="button" class="fin-link" id="pmMore">Abono parcial, comprobante o más datos →</button></div>
+      </form>`;
+      document.body.appendChild(w);finBindAmount($("pmAmount"),$("pmAmountHint"));pmDates=finDateChips($("pmDateBox"),$("pmDate"));
+      $("pmClose").addEventListener("click",()=>closeModal("finPagoMesModal"));w.addEventListener("mousedown",e=>{if(e.target===w)closeModal("finPagoMesModal")});
+      $("pmAccounts").addEventListener("click",e=>{const b=e.target.closest("[data-pma]");if(!b)return;pmState.account=b.dataset.pma;pmPaint()});
+      $("pmMore").addEventListener("click",()=>{closeModal("finPagoMesModal");payObligation(pmState.oid)});
+      $("finPagoMesForm").addEventListener("submit",async e=>{e.preventDefault();const amt=finDigits($("pmAmount").value);if(!(amt>0)){showToast("Escribe cuánto se pagó");$("pmAmount").focus();return}if(!pmState.account){showToast("Toca la cuenta");return}
+        const date=$("pmDate").value||finTodayISO();closeModal("finPagoMesModal");payObligation(pmState.oid);
+        if(pmState.pid){const per=state.financeObligationPeriods.find(x=>x.id===pmState.pid);if(per){$("financeObligationPayPeriodId").value=per.id;$("financeObligationPeriodLabel").value=per.period_label||"";$("financeObligationPeriodDueDate").value=per.due_date||""}}
+        const cur=state.financeObligationPeriods.find(x=>x.id===$("financeObligationPayPeriodId").value),already=Number(cur?.paid_amount||0);
+        $("financeObligationPeriodAmount").value=already+amt;$("financeObligationPaymentAmount").value=amt;$("financeObligationPaymentAccount").value=pmState.account;$("financeObligationPaymentDate").value=date;$("financeObligationPaymentNotes").value="";
+        closeModal("financeObligationPayModal");await saveObligationPay({preventDefault(){}})});
+    }
+    function pmPaint(){$("pmAccounts").innerHTML=(state.financeAccounts||[]).map(a=>`<button type="button" class="fin-acc-btn ${a.id===pmState.account?"on":""}" data-pma="${a.id}" aria-pressed="${a.id===pmState.account}">${escapeHTML(a.name)}</button>`).join("")}
+    function finPagoMes(o,pid){
+      pmEnsure();const per=(state.financeObligationPeriods||[]).find(x=>x.id===pid)||nextObligationPeriod(o);
+      pmState={oid:o.id,pid:per?.id||"",account:o.default_account_id||""};
+      $("finPagoMesForm").reset();$("pmAmountHint").innerHTML="";$("pmTitle").textContent=o.name;$("pmSub").textContent=per?.period_label||"";
+      const pend=per?finPending(per):Number(o.default_amount||0);$("pmAmount").value=finMiles(Math.round(pend||Number(o.default_amount||0)));
+      pmDates.reset();pmPaint();openModal("finPagoMesModal");setTimeout(()=>{$("pmAmount").focus();$("pmAmount").select()},60);
+    }
+    {const __qp=quickPayObligation;quickPayObligation=async function(oid,pid){const o=(state.financeObligations||[]).find(x=>x.id===oid);if(!o||o.obligation_type!=="recurring"||!canManageFinance())return __qp(oid,pid);finPagoMes(o,pid)};window.quickPayObligation=quickPayObligation}
+
     // V9.09: venta rápida, comprobantes y niveles de acceso
     function financePermsInstalled(){return state.permissions instanceof Map&&state.permissions.has("finance.view")}
     function supportsEnabled(){return financePermsInstalled()}

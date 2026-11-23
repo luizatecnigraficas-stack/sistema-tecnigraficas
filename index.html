@@ -810,7 +810,7 @@
     .pay-extra{background:#fff7e3;border:1px solid #f3dfa6}.pay-extra>div+div{margin-top:8px;padding-top:8px;border-top:1px dashed #e7d08e}
     .pay-extra ul{margin:6px 0 0 18px;padding:0}.pay-spread{display:flex;gap:7px;align-items:flex-start;margin-top:7px;font-weight:700;cursor:pointer}.pay-spread input{margin-top:2px;flex:none}
     .ca-general{margin-top:14px;background:#f6f8fb;border-radius:16px;padding:12px 14px}
-    .ca-gen-nums{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0}
+    .ca-gen-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}
     .ca-gen-nums>div{background:#fff;border-radius:12px;padding:9px 11px;display:flex;flex-direction:column}
     .ca-gen-nums span{font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}.ca-gen-nums strong{font-size:17px;font-weight:950}.ca-gen-nums small{font-size:10.5px;color:var(--muted)}
     .ca-gen-nums .due strong{color:var(--magenta)}.ca-gen-nums .fav strong{color:#12894a}
@@ -818,7 +818,7 @@
     .ca-gen-row{display:grid;grid-template-columns:auto auto 1fr auto;gap:10px;align-items:center;padding:7px 2px;border-top:1px solid #e6eaf0;font-size:12.5px}
     .ca-gen-row .n{font-weight:800}.ca-gen-row .d{color:var(--muted)}.ca-gen-row .t{text-align:right;font-weight:800}.ca-gen-row .s{font-size:11px;font-weight:800;border-radius:999px;padding:3px 9px;background:#eef1f5;color:#56606e;white-space:nowrap}
     .ca-gen-row .s.ok{background:#e9f8ef;color:#12894a}.ca-gen-row .s.due{background:#fdebf4;color:var(--magenta)}
-    @media(max-width:760px){.ca-gen-nums{grid-template-columns:1fr 1fr}.ca-gen-row{grid-template-columns:1fr auto;row-gap:3px}.ca-gen-row .d{display:none}.ca-gen-row .s{grid-column:1/-1;justify-self:start}}
+    @media(max-width:760px){.ca-gen-nums{grid-template-columns:1fr 1fr}.ca-gen-nums>div:last-child{grid-column:1/-1}.ca-gen-row{grid-template-columns:1fr auto;row-gap:3px}.ca-gen-row .d{display:none}.ca-gen-row .s{grid-column:1/-1;justify-self:start}}
     /* V9.19 Productos unificados */
     .pchips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
     .pchip{border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;font-weight:800;font-size:14px;cursor:pointer;min-height:44px}
@@ -4854,7 +4854,7 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
     async function caLoadGeneral(){
       ca.general=null;const cid=ca.current?.client_id;if(!cid)return;
       try{
-        const [q,o,b]=await Promise.all([db.from("quotes").select("id,quote_number,status,total,issue_date").eq("client_id",cid).order("issue_date",{ascending:false}),db.from("work_orders").select("id,order_number,quote_id,status,source_quote_total").eq("client_id",cid),db.from("client_account_balances").select("client_account_id,label,status,balance").eq("client_id",cid)]);
+        const [q,o,b]=await Promise.all([db.from("quotes").select("id,quote_number,status,total,issue_date").eq("client_id",cid).order("issue_date",{ascending:false}),db.from("work_orders").select("id,order_number,quote_id,status,source_quote_total").eq("client_id",cid),db.from("client_account_balances").select("client_account_id,label,status,paid,balance").eq("client_id",cid)]);
         const orders=o.data||[],ids=orders.map(x=>x.id);let pays=[];if(ids.length){const p=await db.from("work_order_payments").select("work_order_id,amount,status").in("work_order_id",ids);pays=p.data||[]}
         ca.general={quotes:q.data||[],orders,pays,accounts:b.data||[]};
       }catch(e){console.warn("cuenta general:",e.message)}
@@ -4864,15 +4864,15 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       if(!g||!a||(!g.quotes.length&&g.accounts.length<2)){box.classList.add("hidden");box.innerHTML="";return}
       const byQuote=new Map(g.orders.filter(o=>o.status!=="cancelled").map(o=>[o.quote_id,o])),paidOf=id=>g.pays.filter(p=>p.work_order_id===id&&p.status==="active").reduce((s,p)=>s+numberValue(p.amount),0);
       const live=g.quotes.filter(q=>q.status!=="cancelled"),sum=arr=>arr.reduce((s,q)=>s+numberValue(q.total),0),appr=live.filter(q=>q.status==="approved"),open=live.filter(q=>q.status!=="approved");
-      const others=g.accounts.filter(x=>x.client_account_id!==a.id),bal=others.reduce((s,x)=>s+numberValue(x.balance),0)+caTotals().balance,n=others.length+1;
+      const others=g.accounts.filter(x=>x.client_account_id!==a.id),ct=caTotals(),bal=others.reduce((s,x)=>s+numberValue(x.balance),0)+ct.balance,paid=others.reduce((s,x)=>s+numberValue(x.paid),0)+ct.paid,n=others.length+1;
       const rows=g.quotes.map(q=>{
         const o=byQuote.get(q.id);let cls="",txt="Sin aprobar";
-        if(q.status==="cancelled")txt="Cancelada";
+        if(q.status==="cancelled")txt="Cancelada";else if(q.status!=="approved")txt="Sin aprobar · no suma";
         else if(q.status==="approved"){if(o){const due=Math.max(numberValue(o.source_quote_total)-paidOf(o.id),0);cls=due>.99?"due":"ok";txt=`${escapeHTML(o.order_number)} · ${due>.99?"debe "+formatCOP(due):"pagada ✓"}`}else{cls="ok";txt="Aprobada"}}
         return `<div class="ca-gen-row"><span class="n">${escapeHTML(q.quote_number||"—")}</span><span class="d">${caDate(q.issue_date)}</span><span class="t">${formatCOP(q.total)}</span><span class="s ${cls}">${txt}</span></div>`
       }).join("");
       box.innerHTML=`<div class="ca-box-head"><h4>🧾 Cuenta general de ${escapeHTML(a.client_name)}</h4></div>
-        <div class="ca-gen-nums"><div><span>Cotizado en total</span><strong>${formatCOP(sum(live))}</strong><small>${live.length} cotizaci${live.length===1?"ón":"ones"}</small></div><div><span>Aprobado</span><strong>${formatCOP(sum(appr))}</strong><small>${appr.length} aprobada${appr.length===1?"":"s"}</small></div><div><span>Sin aprobar</span><strong>${formatCOP(sum(open))}</strong><small>${open.length} · todavía no es deuda</small></div><div class="${bal>.99?"due":bal<-.99?"fav":""}"><span>Saldo general</span><strong>${bal>.99?"Debe "+formatCOP(bal):bal<-.99?"A favor "+formatCOP(-bal):"Al día ✓"}</strong><small>${n>1?`sumando sus ${n} cuentas`:"todo lo aprobado menos lo pagado"}</small></div></div>
+        <div class="ca-gen-nums"><div><span>Aprobado</span><strong>${formatCOP(sum(appr))}</strong><small>${appr.length} cotizaci${appr.length===1?"ón aprobada":"ones aprobadas"}</small></div><div><span>Abonado</span><strong>${formatCOP(paid)}</strong><small>${n>1?`en sus ${n} cuentas`:"lo que ha pagado"}</small></div><div class="${bal>.99?"due":bal<-.99?"fav":""}"><span>Saldo general</span><strong>${bal>.99?"Debe "+formatCOP(bal):bal<-.99?"A favor "+formatCOP(-bal):"Al día ✓"}</strong><small>${open.length?`${open.length} sin aprobar no se suma${open.length===1?"":"n"}`:"solo cuenta lo aprobado"}</small></div></div>
         ${rows?`<details${g.quotes.length<=6?" open":""}><summary>Ver sus ${g.quotes.length} cotizaciones</summary>${rows}</details>`:""}`;
       box.classList.remove("hidden");
     }

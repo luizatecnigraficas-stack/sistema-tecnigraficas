@@ -787,6 +787,22 @@
     .pl-line .q{display:flex;align-items:center;gap:4px}.pl-line .q button{width:32px;height:32px;border-radius:10px;border:1px solid var(--line);background:#fff;font-weight:900;font-size:16px;cursor:pointer}.pl-line .q input{width:48px;text-align:center;border:1px solid var(--line);border-radius:10px;padding:6px 2px;font-weight:800}
     .pl-line .x{border:0;background:none;font-size:16px;cursor:pointer;color:var(--muted)}.pl-tot{display:flex;justify-content:space-between;font-weight:900;font-size:16px;margin:12px 0}.pl-sup{margin:10px 0 2px;font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase}
     .pl-foot{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-top:8px}
+    /* V9.97 Pegar del grupo y ¿Cuadra? */
+    #fpText{width:100%;font-size:15px;line-height:1.5;padding:12px;border-radius:12px;min-height:150px}
+    .fp-list{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow:auto;padding:2px}
+    .fp-row{border:1px solid #d9dde6;border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;background:#fff}.fp-row.off{opacity:.45}.fp-row.doubt{border-color:#e0a800;background:#fffaf0}
+    .fp-l1{display:grid;grid-template-columns:auto auto 110px 1fr;gap:6px;align-items:center}.fp-l2{display:grid;grid-template-columns:1fr 1fr auto;gap:6px}
+    .fp-row input,.fp-row select{min-height:38px;padding:6px 8px;font-size:13px;min-width:0;width:100%}.fp-row input[type=checkbox]{width:20px;min-height:20px;height:20px}
+    .fp-amt{font-weight:900;text-align:right}
+    .fp-sign{border:0;border-radius:999px;padding:8px 10px;font-weight:900;font-size:12px;cursor:pointer;white-space:nowrap}.fp-sign.in{background:#e8f7f1;color:#0f6046}.fp-sign.out{background:#ffeaea;color:#9b2525}
+    .fp-doubt{color:#8a5a00;font-size:11px}
+    .fp-skip{margin-top:10px;font-size:12px;color:var(--muted)}.fp-skip div{padding:3px 0;border-top:1px dashed var(--line)}
+    .fp-total{display:flex;gap:16px;justify-content:flex-end;margin-top:12px;font-size:13px}
+    .fin-cuadra{margin-top:8px;align-self:flex-start;border:1px solid #d9dde6;background:#fff;border-radius:999px;padding:6px 12px;font-weight:800;font-size:11.5px;cursor:pointer;color:var(--ink)}
+    .fc-result{margin-top:14px}.fc-ok{background:#e8f7f1;color:#0f6046;border-radius:12px;padding:14px;font-weight:800}
+    .fc-warn{background:#fff6e0;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px}.fc-warn span{font-size:12px;color:var(--muted)}.fc-warn .btn{margin-top:6px;min-height:46px}
+    @media(max-width:640px){.fp-l1{grid-template-columns:auto auto 1fr}.fp-con{grid-column:1/-1}.fp-l2{grid-template-columns:1fr 1fr}.fp-l2 input[type=date]{grid-column:1/-1}}
+
     /* V9.19 Productos unificados */
     .pchips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
     .pchip{border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;font-weight:800;font-size:14px;cursor:pointer;min-height:44px}
@@ -1383,6 +1399,7 @@
               <button type="button" class="fin-act in" id="finActIncome" onclick="window.finFacil('income')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Entró plata</button>
               <button type="button" class="fin-act out" id="finActExpense" onclick="window.finFacil('expense')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>Salió plata</button>
               <button type="button" class="fin-act out" id="finActDelivery" onclick="window.finDomicilio()"><span style="font-size:22px;line-height:1">🛵</span>Domicilio</button>
+              <button type="button" class="fin-act" id="finActPaste" onclick="window.finPegar()"><span style="font-size:22px;line-height:1">📋</span>Pegar del grupo</button>
               <button type="button" class="fin-act close" id="finActClose" onclick="window.finCloseCash()"><span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Cerrar caja</span><small id="finCloseBadge"></small></button>
             </div>
             <div class="fin-two">
@@ -4509,12 +4526,12 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       const fr=exp&&ffState.group?ffFrequent():[];
       $("ffFrequent").innerHTML=fr.map(k=>`<button type="button" class="fin-chip-btn" data-ffc="${escapeHTML(k)}">${escapeHTML(k)}</button>`).join("");
     }
-    function finFacil(type){
+    function finFacil(type,preset){
       if(!canManageFinance())return showToast("No tienes permiso para registrar movimientos");
       ffEnsure();ffState.type=type==="income"?"income":"expense";ffState.group="";ffState.incomeKind="venta";
       let last="";try{last=localStorage.getItem("ffAcc:"+ffState.type)||""}catch(e){}
       const accs=state.financeAccounts||[];ffState.account=(accs.find(a=>a.id===last)||accs.find(a=>/efectivo|caja/i.test(a.name))||accs[0]||{}).id||"";
-      $("finFacilForm").reset();$("ffAmountHint").innerHTML="";ffDates.reset();ffPaint();openModal("finFacilModal");setTimeout(()=>$("ffAmount").focus(),60);
+      $("finFacilForm").reset();$("ffAmountHint").innerHTML="";ffDates.reset();if(preset?.account)ffState.account=preset.account;if(preset?.amount)$("ffAmount").value=finMiles(Math.round(preset.amount));ffPaint();openModal("finFacilModal");setTimeout(()=>$("ffAmount").focus(),60);
     }
     window.finFacil=finFacil;
     let ffBusy=false;
@@ -4649,6 +4666,110 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
     $("plSups").addEventListener("click",e=>{const b=e.target.closest("[data-pl-sup]");if(!b)return;pl.sup=b.dataset.plSup;pl.cat="";pl.limit=60;plRender()});
     $("plCats").addEventListener("click",e=>{const b=e.target.closest("[data-pl-cat]");if(!b)return;pl.cat=b.dataset.plCat;pl.limit=60;plRender()});
     $("plList").addEventListener("click",e=>{if(e.target.closest("#plMore")){pl.limit+=120;return plRender()}const a=e.target.closest("[data-pl-add]");if(!a)return;pl.cart[a.dataset.plAdd]=(pl.cart[a.dataset.plAdd]||0)+1;plSave();a.classList.add("in");a.textContent="🛒 "+pl.cart[a.dataset.plAdd]});
+
+    // ===== V9.97: pegar la lista del grupo de WhatsApp y "¿Cuadra?" por cuenta =====
+    function fpAmount(tok,mil){let s=String(tok).replace(/[^\d.,]/g,"").replace(/[.,]+$/,"");if(!s)return 0;let v;
+      if(/^\d{1,3}([.,]\d{3})+([.,]\d{2})?$/.test(s)){s=s.replace(/[.,]\d{2}$/,m=>/^\d{1,3}([.,]\d{3})+$/.test(s)?m:"");v=Number(s.replace(/[.,]/g,""))}
+      else if(/^\d+[.,]\d{1,2}$/.test(s))v=Number(s.replace(",","."));
+      else v=Number(s.replace(/[.,]/g,""));
+      if(!isFinite(v)||v<=0)return 0;if(mil||v<1000)v=v*1000;return Math.round(v)}
+    const FP_GROUP_RULES=[["transporte",/\bdomi|domicilio|hermel|flete|envio|tpte|transporte|gasolina|taxi|pasaje/],["familia",/prestamo|adelanto/],["produccion",/trabajo|\bcali\b|\bdtf\b|shark|herrero|\bcortes?\b|tiraje|\buv\b|troquel|bordad|calvo|instalad|gran formato|\bgf\b|\bpaul\b|publilaser|\bsellos?\b|planchas/],["materiales",/proadhesivos|papel|vinilo|resma|tinta|toner|acrilic|lamina|polietileno|tubo|tornillo|broca|lija|madera|mdf|material|botilito|\btela\b|encaje|mosqueton|retablo|caucho|master|dormita|bolsas/],["local",/\baseo\b|\brub[iy]\b|almuerzo|\bpan\b|mecato|mazamorra|huevos|\bagua\b|energia|\bluz\b|\bgas\b|internet|tiquetera|jabon|pizza/],["nomina",/alejo|gis+ela|\bsofi|mav[yi]|marth?a\b|martis|nomina|salario|planilla/],["deudas",/cuota|credito|interes|4x1000/],["familia",/luiza|\bmara\b|\bpapi\b|\bpapa\b|don fer|\bmami\b|medicament|pastilla|droguer|mercado|celular/]];
+    function fpGuessGroup(concept){const t=finPlain(concept),k=t.trim();if(k){const hit=(state.financeMovements||[]).find(m=>!m.is_voided&&m.movement_type==="expense"&&finPlain(m.concept).trim()===k);if(hit)return finGroupOf(hit)}const r=FP_GROUP_RULES.find(([,re])=>re.test(t));return r?r[0]:"otros"}
+    function fpAccountOf(text){const t=finPlain(text),accs=state.financeAccounts||[],by=re=>accs.find(a=>re.test(finPlain(a.name)));return (/nequi/.test(t)&&by(/nequi/))||(/\btecni\b/.test(t)&&/cuenta|bancolombia|transfer/.test(t)&&by(/tecni/))||(/bancolom|transfer|\bllave\b|consign/.test(t)&&by(/luiza/))||by(/efectivo|caja/)||accs[0]}
+    function fpParse(text,defDate){
+      const rows=[],skipped=[],pad=n=>String(n).padStart(2,"0");
+      String(text||"").split(/\r?\n/).forEach(raw=>{
+        let line=raw.replace(/[‎‏‪-‮]/g,"").trim(),date=defDate;if(!line)return;
+        const wa=line.match(/^\[?(\d{1,2})\/(\d{1,2})\/(\d{2,4}),?\s+[^\]]*?(?:\]|\s-)\s*[^:]{1,60}:\s*(.*)$/);
+        if(wa){date=`${wa[3].length===2?"20"+wa[3]:wa[3]}-${pad(wa[2])}-${pad(wa[1])}`;line=wa[4].trim()}
+        line=line.replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();if(!line)return;
+        line.split(/\s+(?=[+\-−–]{1,2}\s?\$?\s?\d)/).forEach(part=>{
+          part=part.trim();if(!part)return;
+          const lead=part.match(/^([+\-−–]{1,2})\s*/);let rest=lead?part.slice(lead[0].length):part;
+          const num=rest.match(/\$?\s*(\d[\d.,]*)\s*(mil\b|k\b)?/i);
+          if(!num||/^\d{9,}$/.test(num[1].replace(/\D/g,""))||/^\s*\d+\s*x\s*\d/i.test(rest.slice(num.index))){skipped.push(part);return}
+          const amount=fpAmount(num[1],!!num[2]);if(!amount){skipped.push(part);return}
+          let concept=(rest.slice(0,num.index)+" "+rest.slice(num.index+num[0].length)).replace(/\s+/g," ").trim();
+          const plain=finPlain(part);let type=lead?(lead[1].includes("+")?"income":"expense"):(/\b(ingres|entro|abono|saldo|recibiste|a la llave|pago de|pago\b.*\b(lona|sticker|talonario|tarjeta))/.test(plain)?"income":"expense");
+          const acc=fpAccountOf(part);
+          concept=concept.replace(/\b(en |desde |a |por )?(efectivo|nequi)\b/gi," ").replace(/^(de|por|para|a)\s+/i,"").replace(/^[\s·,.:;=\-]+|[\s·,.:;=\-]+$/g,"").replace(/\s+/g," ").trim();
+          if(concept)concept=concept.charAt(0).toUpperCase()+concept.slice(1);
+          rows.push({on:true,type,amount,concept,account:acc?.id||"",group:type==="expense"?fpGuessGroup(concept):"",incomeKind:/devuelv|devoluc|regres|prestamo|credito/.test(plain)?"otro":"venta",date,sure:!!lead});
+        });
+      });
+      return {rows,skipped};
+    }
+    let fpRows=[],fpSkipped=[],fpDates=null,fpBusy=false;
+    function fpEnsure(){
+      if($("finPegarModal"))return;
+      const w=document.createElement("div");w.className="modal-backdrop hidden";w.id="finPegarModal";
+      w.innerHTML=`<form class="modal ff" id="finPegarForm" style="width:min(720px,100%)" autocomplete="off">
+        <div class="modal-head"><div><h3>Pegar del grupo</h3><small>Copia los mensajes del grupo «Registro Diario» y pégalos aquí. Yo los separo y tú revisas.</small></div><button type="button" class="modal-close" id="fpClose" aria-label="Cerrar">×</button></div>
+        <div id="fpStep1">
+          <textarea id="fpText" rows="7" placeholder="-56 Hermel&#10;+240 efectivo yogur&#10;-4 domi&#10;+85.000 lienzo&#10;-200.000 trabajos efectivo entregado a papá"></textarea>
+          <p class="ff-note">Un movimiento por línea. <b>−</b> es salida y <b>+</b> es entrada. Si el número es menor de 1.000 lo tomo en miles (56 = $56.000). Si no dice la cuenta, es Efectivo.</p>
+          <div class="ff-date" id="fpDateBox"><span class="fin-muted">¿De qué día son?</span><button type="button" class="fin-chip-btn" data-ffd="0">Hoy</button><button type="button" class="fin-chip-btn" data-ffd="1">Ayer</button><input type="date" id="fpDate" aria-label="Fecha"/></div>
+          <div class="ff-actions" style="grid-template-columns:1fr"><button type="button" class="btn primary" id="fpRead">Leer la lista →</button></div>
+        </div>
+        <div id="fpStep2" class="hidden">
+          <div id="fpList" class="fp-list"></div>
+          <div id="fpSkipped"></div>
+          <div class="fp-total" id="fpTotal"></div>
+          <div class="ff-actions"><button type="submit" class="btn primary" id="fpSave">Guardar</button><button type="button" class="btn secondary" id="fpBack">← Volver a la lista</button></div>
+        </div>
+      </form>`;
+      document.body.appendChild(w);fpDates=finDateChips($("fpDateBox"),$("fpDate"));
+      $("fpClose").addEventListener("click",()=>closeModal("finPegarModal"));
+      $("fpRead").addEventListener("click",()=>{const r=fpParse($("fpText").value,$("fpDate").value||finTodayISO());if(!r.rows.length){showToast("No encontré valores en lo que pegaste");return}fpRows=r.rows;fpSkipped=r.skipped;$("fpStep1").classList.add("hidden");$("fpStep2").classList.remove("hidden");fpPaint()});
+      $("fpBack").addEventListener("click",()=>{$("fpStep2").classList.add("hidden");$("fpStep1").classList.remove("hidden")});
+      $("fpList").addEventListener("click",e=>{const row=e.target.closest("[data-fpi]");if(!row)return;const r=fpRows[+row.dataset.fpi];if(e.target.closest("[data-fpsign]")){r.type=r.type==="income"?"expense":"income";r.sure=true;if(r.type==="expense"&&!r.group)r.group=fpGuessGroup(r.concept);fpPaint()}});
+      $("fpList").addEventListener("change",e=>{const row=e.target.closest("[data-fpi]");if(!row)return;const r=fpRows[+row.dataset.fpi],f=e.target.dataset.fpf;if(!f)return;if(f==="on")r.on=e.target.checked;else if(f==="amount"){r.amount=finDigits(e.target.value);e.target.value=finMiles(r.amount)}else r[f]=e.target.value;if(f==="on")row.classList.toggle("off",!r.on);fpTotals()});
+      $("finPegarForm").addEventListener("submit",fpSubmit);
+    }
+    function fpTotals(){const act=fpRows.filter(r=>r.on&&r.amount>0),inn=act.filter(r=>r.type==="income").reduce((s,r)=>s+r.amount,0),out=act.filter(r=>r.type==="expense").reduce((s,r)=>s+r.amount,0);$("fpTotal").innerHTML=`<span>Entró <b>${formatCOP(inn)}</b></span><span>Salió <b>${formatCOP(out)}</b></span>`;$("fpSave").textContent=act.length?`Guardar ${act.length} movimiento${act.length===1?"":"s"}`:"Nada para guardar";$("fpSave").disabled=!act.length}
+    function fpPaint(){
+      const accs=state.financeAccounts||[];
+      $("fpList").innerHTML=fpRows.map((r,i)=>{const inc=r.type==="income";return `<div class="fp-row ${r.on?"":"off"} ${r.sure?"":"doubt"}" data-fpi="${i}">
+        <div class="fp-l1"><input type="checkbox" data-fpf="on" ${r.on?"checked":""} aria-label="Incluir"/><button type="button" class="fp-sign ${inc?"in":"out"}" data-fpsign="1" title="Toca para cambiar entre entró y salió">${inc?"＋ Entró":"− Salió"}</button><input class="fp-amt" data-fpf="amount" inputmode="numeric" value="${finMiles(r.amount)}" aria-label="Valor"/><input class="fp-con" data-fpf="concept" value="${escapeHTML(r.concept)}" placeholder="${inc?"¿De quién o de qué?":"¿Qué fue o a quién?"}" aria-label="Concepto"/></div>
+        <div class="fp-l2"><select data-fpf="account" aria-label="Cuenta">${accs.map(a=>`<option value="${a.id}" ${a.id===r.account?"selected":""}>${escapeHTML(a.name)}</option>`).join("")}</select>${inc?`<select data-fpf="incomeKind" aria-label="Qué entró"><option value="venta" ${r.incomeKind==="venta"?"selected":""}>Venta o trabajo</option><option value="otro" ${r.incomeKind==="otro"?"selected":""}>Devolución / otro</option></select>`:`<select data-fpf="group" aria-label="En qué se fue">${FIN_GROUPS.map(g=>`<option value="${g.id}" ${g.id===r.group?"selected":""}>${g.emoji} ${escapeHTML(g.name)}</option>`).join("")}</select>`}<input type="date" data-fpf="date" value="${r.date}" aria-label="Fecha"/></div>${r.sure?"":'<small class="fp-doubt">No traía + ni −: revisa si entró o salió.</small>'}</div>`}).join("");
+      $("fpSkipped").innerHTML=fpSkipped.length?`<details class="fp-skip"><summary>${fpSkipped.length} línea${fpSkipped.length===1?"":"s"} sin valor (no se guarda${fpSkipped.length===1?"":"n"})</summary>${fpSkipped.map(s=>`<div>${escapeHTML(s)}</div>`).join("")}</details>`:"";
+      fpTotals();
+    }
+    async function fpSubmit(e){
+      e.preventDefault();if(fpBusy)return;const cats=state.financeCategories||[],act=fpRows.filter(r=>r.on&&r.amount>0);if(!act.length)return;
+      const payload=[];for(const r of act){const exp=r.type==="expense",g=finGroupInfo(r.group),name=exp?g.cat:(r.incomeKind==="venta"?"Ventas y trabajos":"Otros ingresos"),cat=cats.find(c=>c.name===name)||cats.find(c=>c.movement_type===(exp?"expense":"income"));if(!cat||!r.account){alert("Falta la cuenta o la categoría en una línea.");return}
+        payload.push({movement_type:r.type,movement_date:r.date||finTodayISO(),concept:(r.concept||"").trim()||(exp?g.name:"Venta"),category_id:cat.id,account_id:r.account,amount:r.amount,notes:"Pegado del grupo Registro Diario",source_type:"manual",expense_class:exp?g.cls:null,created_by:state.session.user.id})}
+      fpBusy=true;$("fpSave").disabled=true;
+      try{const {error}=await db.from("finance_movements").insert(payload);if(error)throw error;closeModal("finPegarModal");showToast(`✓ Anotados ${payload.length} movimiento${payload.length===1?"":"s"} del grupo`);loadFinance()}
+      catch(err){alert("No se pudo guardar: "+(err.message||err))}finally{fpBusy=false;$("fpSave").disabled=false}
+    }
+    function finPegar(){if(!canManageFinance())return showToast("No tienes permiso para registrar movimientos");fpEnsure();$("finPegarForm").reset();fpRows=[];fpSkipped=[];fpDates.reset();$("fpStep2").classList.add("hidden");$("fpStep1").classList.remove("hidden");openModal("finPegarModal");setTimeout(()=>$("fpText").focus(),60)}
+    window.finPegar=finPegar;window.__fpParse=fpParse;
+    // ¿Cuadra?: comparar una cuenta con lo que dice el banco, sin hacer cierre
+    let fcAcc=null;
+    function fcEnsure(){
+      if($("finCuadraModal"))return;
+      const w=document.createElement("div");w.className="modal-backdrop hidden";w.id="finCuadraModal";
+      w.innerHTML=`<div class="modal ff" style="width:min(460px,100%)">
+        <div class="modal-head"><div><h3 id="fcTitle">¿Cuadra?</h3><small id="fcSub"></small></div><button type="button" class="modal-close" id="fcClose" aria-label="Cerrar">×</button></div>
+        <label class="ff-l" for="fcAmount">¿Cuánto hay de verdad?</label>
+        <div class="ff-amount-wrap"><span>$</span><input id="fcAmount" class="ff-amount" inputmode="numeric" placeholder="0"/></div>
+        <p class="ff-note">Míralo en la app del banco (o cuenta los billetes) y escríbelo aquí. No guarda nada: solo te dice si falta algo por anotar.</p>
+        <div id="fcResult" class="fc-result"></div>
+      </div>`;
+      document.body.appendChild(w);
+      $("fcClose").addEventListener("click",()=>closeModal("finCuadraModal"));w.addEventListener("mousedown",e=>{if(e.target===w)closeModal("finCuadraModal")});
+      $("fcAmount").addEventListener("input",()=>{const el=$("fcAmount"),n=finDigits(el.value);el.value=finMiles(n);fcPaint()});
+      $("fcResult").addEventListener("click",e=>{const b=e.target.closest("[data-fcgo]");if(!b||!fcAcc)return;const type=b.dataset.fcgo,amount=Number(b.dataset.amt),acc=fcAcc.id;closeModal("finCuadraModal");finFacil(type,{account:acc,amount})});
+    }
+    function fcPaint(){
+      if(!fcAcc)return;const sys=Math.round(financeAccountRealtimeBalance(fcAcc).balance),raw=$("fcAmount").value;if(!raw){$("fcResult").innerHTML="";return}
+      const real=finDigits(raw),d=real-sys;
+      $("fcResult").innerHTML=Math.abs(d)<1?'<div class="fc-ok">✓ Cuadra perfecto. No falta nada por anotar.</div>':d>0?`<div class="fc-warn"><strong>Hay ${formatCOP(d)} que entraron y no están anotados.</strong><span>Seguro es un pago de un cliente que no se registró.</span><button type="button" class="btn primary" data-fcgo="income" data-amt="${d}">Anotar esa entrada</button></div>`:`<div class="fc-warn"><strong>Hay ${formatCOP(-d)} que salieron y no están anotados.</strong><span>Algún pago o compra que no se registró.</span><button type="button" class="btn primary" data-fcgo="expense" data-amt="${-d}">Anotar esa salida</button></div>`;
+    }
+    function finCuadra(id){const a=(state.financeAccounts||[]).find(x=>x.id===id);if(!a)return;fcEnsure();fcAcc=a;$("fcTitle").textContent="¿Cuadra "+a.name+"?";$("fcSub").textContent="El sistema dice "+formatCOP(financeAccountRealtimeBalance(a).balance);$("fcAmount").value="";$("fcResult").innerHTML="";openModal("finCuadraModal");setTimeout(()=>$("fcAmount").focus(),60)}
+    window.finCuadra=finCuadra;
+    {const __rfh2=renderFinanceHome;renderFinanceHome=function(...a){const r=__rfh2.apply(this,a);try{if(canManageFinance()){const cards=$("finAccounts")?.querySelectorAll(".fin-acc:not(.fin-acc-total)")||[];(state.financeAccounts||[]).forEach((acc,i)=>{const c=cards[i];if(!c||c.querySelector(".fin-cuadra"))return;const b=document.createElement("button");b.type="button";b.className="fin-cuadra";b.textContent="¿Cuadra?";b.addEventListener("click",()=>finCuadra(acc.id));c.appendChild(b)})}}catch(e){console.error(e)}return r}}
 
     // V9.09: venta rápida, comprobantes y niveles de acceso
     function financePermsInstalled(){return state.permissions instanceof Map&&state.permissions.has("finance.view")}

@@ -777,7 +777,8 @@
 
     /* V9.96: Proveedores → Precios y pedidos */
     .pl-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}.pl-chips:empty{display:none}.pl-chips button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 13px;font-weight:800;font-size:12px;cursor:pointer;color:var(--ink)}.pl-chips button.on{background:var(--ink);color:#fff;border-color:var(--ink)}.pl-chips .lbl{align-self:center;font-weight:800;font-size:12px;color:var(--muted)}
-    .pl-grp h3{margin:16px 0 8px;font-size:14px}.pl-grp h3 small{color:var(--muted);font-weight:700}
+    .pl-grp{background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:6px;overflow:hidden}.pl-grp>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 14px;font-weight:800;font-size:13px}.pl-grp>summary::-webkit-details-marker{display:none}.pl-grp>summary::before{content:"▸";color:var(--muted);margin-right:2px}.pl-grp[open]>summary::before{content:"▾"}.pl-grp>summary span{flex:1}.pl-grp>summary em{font-style:normal;font-weight:700;font-size:11px;color:var(--muted);margin-left:4px}.pl-grp>summary small{color:var(--muted);font-weight:800;font-size:12px;white-space:nowrap}.pl-grp[open]>summary{border-bottom:1px solid var(--line);background:#fafbfd}
+    .pl-grp .pl-row{border:0;border-bottom:1px solid #f0f2f6;border-radius:0;margin:0}.pl-grp .pl-row:last-child{border-bottom:0}.pl-hint{margin:2px 0 10px;color:var(--muted);font-size:12px;font-weight:700}.pl-chips button small{opacity:.6;font-weight:800}
     .pl-row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:13px;padding:9px 12px;margin-bottom:5px}
     .pl-row .n{font-weight:800;font-size:13px}.pl-row .n small{display:block;color:var(--muted);font-weight:600;font-size:11px}.pl-row .p{font-weight:800;font-size:13px;white-space:nowrap}
     .pl-row .add{border:1px solid #bfe6f2;background:#eaf7fb;border-radius:10px;padding:8px 11px;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;min-width:74px}.pl-row .add.in{background:#ffe9f4;border-color:#f7b8d6}
@@ -4611,27 +4612,31 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
     // V9.96: Proveedores → Precios y pedidos. Listas de precios de proveedores (cost_catalog.price_list) con buscador y pedido para WhatsApp.
     // Solo la ve quien tiene el permiso costs.suppliers (la base de datos también lo exige).
     function canSeePriceLists(){return hasPermission("costs.suppliers")}
-    const pl={items:null,sup:"",cat:"",tab:"",limit:60,cart:{}};
+    const pl={items:null,sup:"",cat:"",tab:"",cart:{},open:new Set()};
     try{pl.cart=JSON.parse(localStorage.getItem("tecniPedido")||"{}")||{}}catch(e){}
     function plNorm(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
     function plEnter(){const f=canViewFinance(),p=canSeePriceLists();$("spTabs").classList.toggle("hidden",!(f&&p));if(!pl.tab||(pl.tab==="debts"&&!f)||(pl.tab==="prices"&&!p))pl.tab=f?"debts":"prices";plTab(pl.tab)}
     function plTab(t){pl.tab=t;document.querySelectorAll("#spTabs [data-sp-tab]").forEach(b=>b.classList.toggle("on",b.dataset.spTab===t));$("spDebts").classList.toggle("hidden",t!=="debts");$("spPrices").classList.toggle("hidden",t!=="prices");if(t==="prices")plLoad();plBar()}
     async function plLoad(force){if(pl.items&&!force){plRender();return}
-      const {data,error}=await db.from("cost_catalog").select("id,category,name,detail,supplier,price,updated_on,pack_qty,unit_kind").eq("price_list",true).eq("active",true).order("sort_order").order("name").limit(5000);
+      const {data,error}=await db.from("cost_catalog").select("id,category,name,detail,supplier,price,updated_on,pack_qty,unit_kind,notes").eq("price_list",true).eq("active",true).order("sort_order").order("name").limit(5000);
       if(error){$("plList").innerHTML='<div class="pgrid-empty">No pude cargar las listas de precios: '+escapeHTML(error.message)+'</div>';return}
       pl.items=data||[];plRender()}
     function plById(id){return (pl.items||[]).find(i=>i.id===id)}
     function plAge(d){if(!d)return"";const [y,m,dd]=d.split("-").map(Number),days=Math.floor((Date.now()-new Date(y,m-1,dd))/864e5);return days<=45?"":" · lista de hace "+Math.max(2,Math.round(days/30))+" meses"}
+    // V9.98: por familias. category = "Familia · Subfamilia": la familia va en los chips y cada subfamilia es una sección que se abre al tocarla (cerradas al entrar, para que no salga la lista larga).
+    function plFam(c){return String(c||"").split(" · ")[0]}
+    function plSub(c){const p=String(c||"").split(" · ");return p.length>1&&p[1]!==p[0]?p.slice(1).join(" · "):""}
     function plRender(){const all=pl.items||[],sups=[...new Set(all.map(i=>i.supplier||"Sin proveedor"))];if(pl.sup&&!sups.includes(pl.sup))pl.sup="";
       $("plSups").innerHTML=sups.length>1?'<span class="lbl">Proveedor:</span>'+[""].concat(sups).map(s=>`<button type="button" data-pl-sup="${escapeHTML(s)}"${pl.sup===s?' class="on"':""}>${s?escapeHTML(s):"Todos"}</button>`).join(""):"";
-      const bySup=all.filter(i=>!pl.sup||(i.supplier||"Sin proveedor")===pl.sup),cats=[...new Set(bySup.map(i=>i.category))];if(pl.cat&&!cats.includes(pl.cat))pl.cat="";
-      $("plCats").innerHTML=cats.length>1?[""].concat(cats).map(c=>`<button type="button" data-pl-cat="${escapeHTML(c)}"${pl.cat===c?' class="on"':""}>${c?escapeHTML(c.split(" · ").pop()):"Todo ("+bySup.length+")"}</button>`).join(""):"";
+      const bySup=all.filter(i=>!pl.sup||(i.supplier||"Sin proveedor")===pl.sup),fams=[...new Set(bySup.map(i=>plFam(i.category)))];if(pl.cat&&!fams.includes(pl.cat))pl.cat="";
+      $("plCats").innerHTML=fams.length>1?[""].concat(fams).map(c=>`<button type="button" data-pl-cat="${escapeHTML(c)}"${pl.cat===c?' class="on"':""}>${c?escapeHTML(c):"Todo"} <small>${c?bySup.filter(i=>plFam(i.category)===c).length:bySup.length}</small></button>`).join(""):"";
       const words=plNorm($("plSearch").value).split(/\s+/).filter(Boolean);
-      const list=bySup.filter(i=>(!pl.cat||i.category===pl.cat)&&(!words.length||(h=>words.every(w=>h.includes(w)))(plNorm([i.supplier,i.category,i.name,i.detail].join(" ")))));
+      const list=bySup.filter(i=>(!pl.cat||plFam(i.category)===pl.cat)&&(!words.length||(h=>words.every(w=>h.includes(w)))(plNorm([i.supplier,i.category,i.name,i.detail].join(" ")))));
       if(!all.length){$("plList").innerHTML='<div class="pgrid-empty">Todavía no hay listas de precios cargadas.</div>';return}
       if(!list.length){$("plList").innerHTML='<div class="pgrid-empty">No encontré nada con eso.</div>';return}
-      const shown=list.slice(0,pl.limit),groups=[...new Set(shown.map(i=>i.category))];
-      $("plList").innerHTML=groups.map(g=>{const rows=shown.filter(i=>i.category===g);return `<div class="pl-grp"><h3>${escapeHTML(g)} <small>${list.filter(i=>i.category===g).length}</small></h3>${rows.map(i=>`<div class="pl-row"><div class="n">${escapeHTML(i.name)}${i.detail?" "+escapeHTML(i.detail):""}<small>${escapeHTML(i.supplier||"")}${plAge(i.updated_on)}</small></div><div class="p">${formatCOP(i.price)}</div><button type="button" class="add${pl.cart[i.id]?" in":""}" data-pl-add="${i.id}">${pl.cart[i.id]?"🛒 "+pl.cart[i.id]:"＋ Pedir"}</button></div>`).join("")}</div>`}).join("")+(list.length>shown.length?`<button type="button" class="pl-more" id="plMore">Ver más (${list.length-shown.length} más)</button>`:"");
+      const keys=[...new Set(list.map(i=>(i.supplier||"")+"|"+i.category))],openAll=words.length>0||keys.length===1,many=!pl.sup&&sups.length>1;
+      $("plList").innerHTML=(openAll?"":'<p class="pl-hint">Toca una familia para ver sus precios 👇</p>')+keys.map(k=>{const [su,cat]=[k.slice(0,k.indexOf("|")),k.slice(k.indexOf("|")+1)],rows=list.filter(i=>(i.supplier||"")===su&&i.category===cat),inCart=rows.reduce((a,i)=>a+(pl.cart[i.id]||0),0),sub=plSub(cat);
+        return `<details class="pl-grp" data-k="${escapeHTML(k)}"${openAll||pl.open.has(k)?" open":""}><summary><span>${pl.cat?"":escapeHTML(plFam(cat))+(sub?" · ":"")}${escapeHTML(sub||(pl.cat?plFam(cat):""))}${many?` <em>${escapeHTML(su)}</em>`:""}</span><small>${inCart?"🛒 "+inCart+" · ":""}${rows.length}</small></summary>${rows.map(i=>`<div class="pl-row"><div class="n">${escapeHTML(i.name)}${i.detail?" · "+escapeHTML(i.detail):""}<small>${escapeHTML([i.supplier,i.notes].filter(Boolean).join(" · "))}${plAge(i.updated_on)}</small></div><div class="p">${formatCOP(i.price)}</div><button type="button" class="add${pl.cart[i.id]?" in":""}" data-pl-add="${i.id}">${pl.cart[i.id]?"🛒 "+pl.cart[i.id]:"＋ Pedir"}</button></div>`).join("")}</details>`}).join("");
       plBar()}
     function plSave(){try{localStorage.setItem("tecniPedido",JSON.stringify(pl.cart))}catch(e){}plBar()}
     function plLines(){return Object.keys(pl.cart).map(id=>({it:plById(id),q:pl.cart[id]})).filter(l=>l.it&&l.q>0)}
@@ -4639,11 +4644,11 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       if(!b){b=document.createElement("button");b.id="plCartBar";b.type="button";b.onclick=plOpenCart;document.body.appendChild(b)}
       b.textContent=`🛒 Ver pedido · ${ls.reduce((a,l)=>a+l.q,0)} · ${formatCOP(ls.reduce((a,l)=>a+l.q*numberValue(l.it.price),0))}`}
     function plText(sup,note){const ls=plLines().filter(l=>(l.it.supplier||"")===sup),tot=ls.reduce((a,l)=>a+l.q*numberValue(l.it.price),0);
-      return ["Hola, buen día 👋 Les escribo de Tecnigráficas. Quiero hacer este pedido:",""].concat(ls.map(l=>`• ${l.q} × ${l.it.name}${l.it.detail?" "+l.it.detail:""} — ${formatCOP(l.it.price)} c/u`),["",`Total aprox.: ${formatCOP(tot)}`],note?["",note]:[],["","¿Me confirman disponibilidad y valor total? ¡Gracias!"]).join("\n")}
+      return ["Hola, buen día 👋 Les escribo de Tecnigráficas. Quiero hacer este pedido:",""].concat(ls.map(l=>`• ${l.q} × ${l.it.name}${l.it.detail?" · "+l.it.detail:""} — ${formatCOP(l.it.price)} c/u`),["",`Total aprox.: ${formatCOP(tot)}`+(ls.length&&ls.every(l=>/sin iva/i.test(l.it.notes||""))?" (sin IVA)":"")],note?["",note]:[],["","¿Me confirman disponibilidad y valor total? ¡Gracias!"]).join("\n")}
     function plOpenCart(){
       const b=document.createElement("div");b.className="modal-backdrop";b.id="plCartModal";let note="";const close=()=>{b.remove();plRender()};
       const paint=()=>{const ls=plLines(),sups=[...new Set(ls.map(l=>l.it.supplier||""))];if(!ls.length){close();return}
-        b.innerHTML=`<div class="modal" style="width:min(560px,100%)"><div class="modal-head"><div><h3>🛒 Pedido</h3></div><button type="button" class="btn secondary" data-pl-close>✕</button></div>${sups.map(su=>{const r=ls.filter(l=>(l.it.supplier||"")===su),t=r.reduce((a,l)=>a+l.q*numberValue(l.it.price),0);return `<div class="pl-sup">${escapeHTML(su)}</div>${r.map(l=>`<div class="pl-line" data-id="${l.it.id}"><div class="n">${escapeHTML(l.it.name)}<small>${formatCOP(l.it.price)} c/u · ${formatCOP(l.q*numberValue(l.it.price))}</small></div><div class="q"><button type="button" data-d="-1">−</button><input inputmode="numeric" value="${l.q}"><button type="button" data-d="1">＋</button></div><button type="button" class="x" title="Quitar">✕</button></div>`).join("")}
+        b.innerHTML=`<div class="modal" style="width:min(560px,100%)"><div class="modal-head"><div><h3>🛒 Pedido</h3></div><button type="button" class="btn secondary" data-pl-close>✕</button></div>${sups.map(su=>{const r=ls.filter(l=>(l.it.supplier||"")===su),t=r.reduce((a,l)=>a+l.q*numberValue(l.it.price),0);return `<div class="pl-sup">${escapeHTML(su)}</div>${r.map(l=>`<div class="pl-line" data-id="${l.it.id}"><div class="n">${escapeHTML(l.it.name)}${l.it.detail?" · "+escapeHTML(l.it.detail):""}<small>${formatCOP(l.it.price)} c/u · ${formatCOP(l.q*numberValue(l.it.price))}</small></div><div class="q"><button type="button" data-d="-1">−</button><input inputmode="numeric" value="${l.q}"><button type="button" data-d="1">＋</button></div><button type="button" class="x" title="Quitar">✕</button></div>`).join("")}
           <div class="pl-tot"><span>Total ${escapeHTML(su)}</span><span>${formatCOP(t)}</span></div>
           <div class="pl-foot"><button type="button" class="btn secondary" data-pl-copy="${escapeHTML(su)}">📋 Copiar texto</button><button type="button" class="btn primary" data-pl-wa="${escapeHTML(su)}">Enviar por WhatsApp</button></div>`}).join("")}
           <label style="display:block;margin-top:14px;font-weight:800;font-size:12px">Nota para el proveedor (opcional)<input class="search" id="plNote" style="width:100%;margin-top:4px" value="${escapeHTML(note)}" placeholder="Ej. Para recoger el martes"></label>
@@ -4662,10 +4667,11 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
     }
     function tcConfirmSafe(t){return Promise.resolve(window.confirm(t))}
     $("spTabs").addEventListener("click",e=>{const b=e.target.closest("[data-sp-tab]");if(b)plTab(b.dataset.spTab)});
-    $("plSearch").addEventListener("input",()=>{pl.limit=60;plRender()});
-    $("plSups").addEventListener("click",e=>{const b=e.target.closest("[data-pl-sup]");if(!b)return;pl.sup=b.dataset.plSup;pl.cat="";pl.limit=60;plRender()});
-    $("plCats").addEventListener("click",e=>{const b=e.target.closest("[data-pl-cat]");if(!b)return;pl.cat=b.dataset.plCat;pl.limit=60;plRender()});
-    $("plList").addEventListener("click",e=>{if(e.target.closest("#plMore")){pl.limit+=120;return plRender()}const a=e.target.closest("[data-pl-add]");if(!a)return;pl.cart[a.dataset.plAdd]=(pl.cart[a.dataset.plAdd]||0)+1;plSave();a.classList.add("in");a.textContent="🛒 "+pl.cart[a.dataset.plAdd]});
+    $("plSearch").addEventListener("input",()=>plRender());
+    $("plList").addEventListener("toggle",e=>{const d=e.target.closest?.("details[data-k]");if(!d||$("plSearch").value.trim())return;d.open?pl.open.add(d.dataset.k):pl.open.delete(d.dataset.k)},true);
+    $("plSups").addEventListener("click",e=>{const b=e.target.closest("[data-pl-sup]");if(!b)return;pl.sup=b.dataset.plSup;pl.cat="";plRender()});
+    $("plCats").addEventListener("click",e=>{const b=e.target.closest("[data-pl-cat]");if(!b)return;pl.cat=b.dataset.plCat;plRender()});
+    $("plList").addEventListener("click",e=>{const a=e.target.closest("[data-pl-add]");if(!a)return;pl.cart[a.dataset.plAdd]=(pl.cart[a.dataset.plAdd]||0)+1;plSave();a.classList.add("in");a.textContent="🛒 "+pl.cart[a.dataset.plAdd]});
 
     // ===== V9.97: pegar la lista del grupo de WhatsApp y "¿Cuadra?" por cuenta =====
     function fpAmount(tok,mil){let s=String(tok).replace(/[^\d.,]/g,"").replace(/[.,]+$/,"");if(!s)return 0;let v;

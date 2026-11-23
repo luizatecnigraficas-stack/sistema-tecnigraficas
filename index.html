@@ -804,6 +804,21 @@
     .fc-warn{background:#fff6e0;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px}.fc-warn span{font-size:12px;color:var(--muted)}.fc-warn .btn{margin-top:6px;min-height:46px}
     @media(max-width:640px){.fp-l1{grid-template-columns:auto auto 1fr}.fp-con{grid-column:1/-1}.fp-l2{grid-template-columns:1fr 1fr}.fp-l2 input[type=date]{grid-column:1/-1}}
 
+    /* V10.00 saldo a favor y cuenta general del cliente */
+    .pay-note{margin-top:10px;border-radius:14px;padding:10px 12px;font-size:12.5px;line-height:1.45}
+    .pay-credit{background:#e9f8ef;border:1px solid #bfe8cf;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .pay-extra{background:#fff7e3;border:1px solid #f3dfa6}.pay-extra>div+div{margin-top:8px;padding-top:8px;border-top:1px dashed #e7d08e}
+    .pay-extra ul{margin:6px 0 0 18px;padding:0}.pay-spread{display:flex;gap:7px;align-items:flex-start;margin-top:7px;font-weight:700;cursor:pointer}.pay-spread input{margin-top:2px;flex:none}
+    .ca-general{margin-top:14px;background:#f6f8fb;border-radius:16px;padding:12px 14px}
+    .ca-gen-nums{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0}
+    .ca-gen-nums>div{background:#fff;border-radius:12px;padding:9px 11px;display:flex;flex-direction:column}
+    .ca-gen-nums span{font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}.ca-gen-nums strong{font-size:17px;font-weight:950}.ca-gen-nums small{font-size:10.5px;color:var(--muted)}
+    .ca-gen-nums .due strong{color:var(--magenta)}.ca-gen-nums .fav strong{color:#12894a}
+    .ca-general summary{cursor:pointer;font-weight:800;font-size:12.5px;padding:4px 0}
+    .ca-gen-row{display:grid;grid-template-columns:auto auto 1fr auto;gap:10px;align-items:center;padding:7px 2px;border-top:1px solid #e6eaf0;font-size:12.5px}
+    .ca-gen-row .n{font-weight:800}.ca-gen-row .d{color:var(--muted)}.ca-gen-row .t{text-align:right;font-weight:800}.ca-gen-row .s{font-size:11px;font-weight:800;border-radius:999px;padding:3px 9px;background:#eef1f5;color:#56606e;white-space:nowrap}
+    .ca-gen-row .s.ok{background:#e9f8ef;color:#12894a}.ca-gen-row .s.due{background:#fdebf4;color:var(--magenta)}
+    @media(max-width:760px){.ca-gen-nums{grid-template-columns:1fr 1fr}.ca-gen-row{grid-template-columns:1fr auto;row-gap:3px}.ca-gen-row .d{display:none}.ca-gen-row .s{grid-column:1/-1;justify-self:start}}
     /* V9.19 Productos unificados */
     .pchips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
     .pchip{border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;font-weight:800;font-size:14px;cursor:pointer;min-height:44px}
@@ -1874,7 +1889,7 @@
         <div class="ca-box-head"><h4>💵 Abonos</h4></div>
         <form class="ca-pay-form ca-write" id="caPayForm" autocomplete="off">
           <label>Fecha<input type="date" id="caPayDate" /></label>
-          <label>Valor *<input type="number" id="caPayAmount" min="0" step="any" inputmode="numeric" placeholder="0" /></label>
+          <label>Valor *<input type="text" id="caPayAmount" inputmode="numeric" autocomplete="off" placeholder="0" /></label>
           <label class="full">Tipo<select id="caPayKind"><option value="payment">💵 Pago (entra plata)</option><option value="retention">📄 Retención en la fuente</option><option value="discount">🎁 Descuento</option></select></label>
           <div class="full" id="caPayAccWrap"><span class="ca-mini-label">¿A qué cuenta entró?</span><div class="qs-chips" id="caPayAccounts"></div></div>
           <label class="full">Referencia<input id="caPayRef" placeholder="Opcional: # transferencia, quién pagó…" /></label>
@@ -1884,6 +1899,7 @@
         <div class="ca-pays" id="caPays"></div>
       </section>
     </div>
+    <div id="caGeneral" class="ca-general hidden"></div>
     <div class="modal-actions ca-actions"><label class="ca-check ca-write"><input type="checkbox" id="caTax" /> Lleva IVA (19%)</label><button type="button" class="btn secondary hidden" id="caDeleteAccount">🗑 Eliminar cuenta</button><span style="flex:1"></span><button type="button" class="btn secondary ca-write" id="caContractButton">📄 Contrato</button><button type="button" class="btn secondary ca-write" id="caCloseAccount">✅ Cerrar cuenta</button><button type="button" class="btn primary" id="caStatementButton">📲 Estado de cuenta</button></div>
   </div></div>
 
@@ -1947,8 +1963,9 @@
         <div class="payment-metric"><span>Saldo</span><strong id="paymentBalance">$ 0</strong></div>
         <div class="payment-metric"><span>Estado</span><strong id="paymentCurrentStatus">Sin pago</strong></div>
       </div>
+      <div id="paymentCredit" class="pay-note pay-credit hidden"></div>
       <div class="form-grid" style="margin-top:14px">
-        <div class="field"><label>Valor recibido *</label><input id="paymentAmount" type="number" min="1" required placeholder="0"  step="any" inputmode="decimal" /></div>
+        <div class="field"><label>Valor recibido *</label><input id="paymentAmount" type="text" inputmode="numeric" autocomplete="off" required placeholder="0" /><div id="paymentAmountHint"></div><div id="paymentExtra" class="pay-note pay-extra hidden"></div></div>
         <div class="field"><label>Fecha del pago *</label><input id="paymentDate" type="date" required /></div>
         <div class="field"><label>Método de pago *</label><select id="paymentMethod"><option value="bancolombia">Bancolombia</option><option value="nequi">Nequi</option><option value="llave">Llave</option><option value="cash">Efectivo</option><option value="bank_transfer">Otra transferencia</option><option value="card">Tarjeta</option><option value="other">Otro</option></select></div>
         <div class="field"><label>Referencia o comprobante</label><input id="paymentReference" placeholder="Número, banco o dato del soporte" /></div>
@@ -3302,7 +3319,7 @@
       $("caGrid").innerHTML=rows.length?rows.map(r=>{
         const bal=numberValue(r.balance),closed=r.status==="closed"&&bal<=.01,zero=r.status!=="closed"&&bal<=.01,last=[r.last_item_date,r.last_payment_date].filter(Boolean).sort().pop();
         const flags=[numberValue(r.pending_delivery)?`<span class="ca-flag">📦 ${r.pending_delivery} sin entregar</span>`:""].join("");
-        return `<button type="button" class="ca-card${closed?" closed":zero?" zero":""}" data-ca="${r.client_account_id}"><div class="ca-top"><span class="ca-name">${escapeHTML(r.client_name)}</span><span class="ca-label">${escapeHTML(r.label)}${r.status==="closed"?(bal>.01?" · cerrada · por cobrar":" · pagada"):""}</span></div><span class="ca-due">${closed?"Pagada ✓ "+caDate(r.closed_on):zero?"Al día ✓":formatCOP(bal)}</span>${flags?`<div class="ca-flags">${flags}</div>`:""}</button>`
+        return `<button type="button" class="ca-card${closed?" closed":zero?" zero":""}" data-ca="${r.client_account_id}"><div class="ca-top"><span class="ca-name">${escapeHTML(r.client_name)}</span><span class="ca-label">${escapeHTML(r.label)}${r.status==="closed"?(bal>.01?" · cerrada · por cobrar":" · pagada"):""}</span></div><span class="ca-due">${closed?"Pagada ✓ "+caDate(r.closed_on):zero?(bal<-.01?"A favor "+formatCOP(-bal):"Al día ✓"):formatCOP(bal)}</span>${flags?`<div class="ca-flags">${flags}</div>`:""}</button>`
       }).join(""):`<div class="pgrid-empty">${f==="due"?"Nadie nos debe en cuentas 🎉 Toca <strong>+ Abrir cuenta</strong> para empezar una.":"No hay cuentas con ese filtro."}</div>`;
     }
     async function caLoadClients(){if(ca.clients.length)return;const [c,p]=await Promise.all([db.from("clients").select("id,name,phone").eq("active",true).order("name"),db.from("products").select("id,name,sale_price,active").eq("active",true).order("name")]);ca.clients=c.data||[];ca.products=p.data||[]}
@@ -3324,7 +3341,7 @@
         await caLoadClients();const [acc,items,pays]=await Promise.all([db.from("client_accounts").select("*").eq("id",id).single(),db.from("client_account_items").select("*").eq("account_id",id),db.from("client_account_payments").select("*,finance_accounts(name)").eq("account_id",id).order("payment_date").order("created_at")]);
         if(acc.error)throw acc.error;ca.current=acc.data;ca.items=(items.data||[]).sort((a,b)=>String(a.item_date||"9999").localeCompare(String(b.item_date||"9999"))||numberValue(a.sort_order)-numberValue(b.sort_order)||String(a.created_at).localeCompare(String(b.created_at)));ca.pays=pays.data||[];
         if(caCanWrite()&&!ca.accounts){const r=await db.rpc("finance_payment_accounts");ca.accounts=r.error?[]:(r.data||[])}
-        await caLoadHistory();
+        await caLoadHistory();await caLoadGeneral();
       }catch(err){loading(false);return alert(err.message)}
       loading(false);caResetItemForm();caResetPayForm();caRender();if($("caModal").classList.contains("hidden"))openModal("caModal");
     }
@@ -3338,6 +3355,7 @@
     }
     function caTotals(){const a=ca.current,sub=ca.items.reduce((s,i)=>s+numberValue(i.quantity)*numberValue(i.unit_price),0),tax=Math.round(sub*numberValue(a.tax_rate))/100,total=sub+tax,paid=ca.pays.reduce((s,p)=>s+numberValue(p.amount),0);return {sub,tax,total,paid,balance:total-paid}}
     function caRender(){
+      try{caRenderGeneral()}catch(e){console.error(e)}
       const a=ca.current,t=caTotals(),w=caCanWrite(),closed=a.status==="closed";
       $("caTitle").textContent=`${a.client_name} · ${a.label}`;$("caSubtitle").textContent=`${closed?(t.balance>.01?"Cerrada el "+caDate(a.closed_on)+" · todavía debe "+formatCOP(t.balance)+" · ":"Pagada y cerrada el "+caDate(a.closed_on)+" · "):"Abierta desde "+caDate(a.opened_on)+" · "}${ca.items.length} producto${ca.items.length===1?"":"s"}${a.notes?" · "+a.notes:""}`;
       $("caTotal").textContent=formatCOP(t.total);$("caTaxNote").textContent=numberValue(a.tax_rate)?`Incluye IVA ${numberValue(a.tax_rate)}%: ${formatCOP(t.tax)}`:"";$("caPaid").textContent=formatCOP(t.paid);$("caBalance").textContent=t.balance<=.01?(t.balance<-.01?`A favor ${formatCOP(-t.balance)}`:"Al día ✓"):formatCOP(t.balance);
@@ -3368,7 +3386,7 @@
     function caResetPayForm(){$("caPayForm").reset();$("caPayDate").value=todayISO();$("caPayKind").value="payment";const accs=ca.accounts||[];ca.payAcc=(accs.find(a=>/efectivo|caja/i.test(a.name))||accs[0]||{}).id||null;$("caPayAccounts").innerHTML=accs.map(a=>`<button type="button" class="qs-chip" data-ca-acc="${a.id}">${escapeHTML(a.name)}</button>`).join("")||'<span class="subtle">No hay cuentas activas en Finanzas.</span>';caPayKindSync()}
     function caPayKindSync(){const pay=$("caPayKind").value==="payment";$("caPayAccWrap").classList.toggle("hidden",!pay);$("caPayAccounts").querySelectorAll("[data-ca-acc]").forEach(b=>b.classList.toggle("on",b.dataset.caAcc===ca.payAcc))}
     async function caSavePay(e){
-      e.preventDefault();const amount=numberValue($("caPayAmount").value),kind=$("caPayKind").value,t=caTotals();
+      e.preventDefault();const amount=finDigits($("caPayAmount").value),kind=$("caPayKind").value,t=caTotals();
       if(!(amount>0))return alert("Escribe el valor del abono.");if(kind==="payment"&&!ca.payAcc)return alert("Elige a qué cuenta entró la plata.");
       if(amount>t.balance+.01&&!confirm(`El abono (${formatCOP(amount)}) es mayor que el saldo (${formatCOP(Math.max(t.balance,0))}). ¿Registrarlo igual?`))return;
       loading(true,"Registrando abono…");
@@ -4777,6 +4795,81 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
     window.finCuadra=finCuadra;
     {const __rfh2=renderFinanceHome;renderFinanceHome=function(...a){const r=__rfh2.apply(this,a);try{if(canManageFinance()){const cards=$("finAccounts")?.querySelectorAll(".fin-acc:not(.fin-acc-total)")||[];(state.financeAccounts||[]).forEach((acc,i)=>{const c=cards[i];if(!c||c.querySelector(".fin-cuadra"))return;const b=document.createElement("button");b.type="button";b.className="fin-cuadra";b.textContent="¿Cuadra?";b.addEventListener("click",()=>finCuadra(acc.id));c.appendChild(b)})}}catch(e){console.error(e)}return r}}
 
+    // V10.00: pagos de más (saldo a favor), cuenta general del cliente y fechas anteriores al cierre
+    const payPlus={info:null,spread:true};
+    function payAmount(){return finDigits($("paymentAmount").value)}
+    function payPlusPlan(amount,balance){
+      const total=Math.round(amount-balance);let left=total;const parts=[];if(total<1)return {left:0,parts,credit:0};
+      if(payPlus.info&&payPlus.spread!==false)for(const o of (payPlus.info.others||[])){if(left<1)break;const ob=Math.round(Number(o.balance)||0),take=Math.min(left,ob);if(take<1)continue;parts.push({order_number:o.order_number,amount:take,balance:ob});left-=take}
+      return {left:total,parts,credit:Math.max(left,0)}
+    }
+    function payPlusPaint(){
+      const order=state.paymentOrder,box=$("paymentExtra"),cbox=$("paymentCredit");if(!order||!box||!cbox)return;
+      const bal=orderFinancial(order).balance,amount=payAmount(),info=payPlus.info,name=escapeHTML(info?.client_name||order.client_name||"el cliente"),credit=Math.round(Number(info?.credit)||0);
+      if(credit>=1&&bal>.99){const use=Math.min(credit,Math.round(bal));cbox.innerHTML=`<span>💚 <strong>${name}</strong> tiene <strong>${formatCOP(credit)}</strong> de saldo a favor.</span><button type="button" class="btn success" id="paymentUseCredit">Usar ${formatCOP(use)} en esta orden</button>`;cbox.classList.remove("hidden")}else{cbox.classList.add("hidden");cbox.innerHTML=""}
+      const lines=[];
+      if(amount-bal>.99){
+        if(info&&!info.client_id)lines.push(`<strong>Este pago es mayor que el saldo</strong> y la orden no tiene un cliente guardado, así que no hay dónde dejarle el saldo a favor. Registra solo ${formatCOP(bal)}.`);
+        else{
+          const plan=payPlusPlan(amount,bal),others=info?.others||[];
+          let h=`<strong>Pagaron ${formatCOP(plan.left)} de más.</strong> Esta orden queda pagada y lo que sobra no se pierde:`;
+          if(others.length)h+=`<label class="pay-spread"><input type="checkbox" id="paymentSpread" ${payPlus.spread!==false?"checked":""}/> <span>Abonarlo a sus otras órdenes que deben (${others.map(o=>`${escapeHTML(o.order_number)}: ${formatCOP(o.balance)}`).join(", ")})</span></label>`;
+          h+="<ul>"+plan.parts.map(p=>`<li>${formatCOP(p.amount)} → abono a <strong>${escapeHTML(p.order_number)}</strong>${p.balance-p.amount>.99?` (queda debiendo ${formatCOP(p.balance-p.amount)})`:" (queda pagada)"}</li>`).join("")+(plan.credit>=1?`<li>${formatCOP(plan.credit)} → <strong>saldo a favor</strong> de ${name}, para usar en otra orden</li>`:"")+"</ul>";
+          lines.push(h)
+        }
+      }
+      const cd=info?.last_close||null,d=$("paymentDate").value;
+      if(cd&&d&&d<cd)lines.push(`📅 Esta fecha es anterior al último cierre de caja (${finShort(cd)}). El pago queda registrado con su fecha, pero <strong>no cambia los saldos de hoy</strong>: esa plata ya estaba contada en el cierre.`);
+      box.innerHTML=lines.map(l=>`<div>${l}</div>`).join("");box.classList.toggle("hidden",!lines.length);
+    }
+    async function payPlusLoad(order){
+      payPlus.info=null;payPlus.spread=true;payPlusPaint();
+      try{const r=await db.rpc("client_credit_for_order",{p_work_order_id:order.id});if(r.error)throw r.error;if(state.paymentOrder?.id===order.id){payPlus.info=r.data||null;payPlusPaint()}}catch(e){console.warn("saldo a favor:",e.message)}
+    }
+    async function payAfterSave(orderId){
+      await Promise.all([loadPayments(),loadProduction(),loadDashboard()]);
+      if(!$("workOrderModal").classList.contains("hidden")&&state.workOrderDraft?.order?.id===orderId){const order=state.workOrders.find(o=>o.id===orderId);$("workOrderPaymentSummary").innerHTML=paymentSummaryHTML(order);$("workOrderRegisterPayment").classList.toggle("hidden",orderFinancial(order).balance<=.01)}
+    }
+    async function payUseCredit(){
+      const order=state.paymentOrder,info=payPlus.info;if(!order||!info)return;const use=Math.min(Math.round(Number(info.credit)||0),Math.round(orderFinancial(order).balance));if(use<1)return;
+      if(!confirm(`¿Usar ${formatCOP(use)} del saldo a favor de ${info.client_name} en ${order.order_number}?\n\nNo entra plata nueva: es la que ya había pagado de más.`))return;
+      loading(true,"Aplicando saldo a favor…");
+      try{const r=await db.rpc("apply_client_credit_to_order",{p_work_order_id:order.id,p_amount:use});if(r.error)throw r.error;closeModal("paymentModal");showToast(`Listo: ${formatCOP(r.data?.applied||use)} del saldo a favor quedaron en ${order.order_number}`);await payAfterSave(order.id)}catch(e){alert(e.message)}finally{loading(false)}
+    }
+    try{
+      finBindAmount($("paymentAmount"),$("paymentAmountHint"));
+      $("paymentAmount").addEventListener("input",payPlusPaint);$("paymentDate").addEventListener("change",payPlusPaint);
+      $("paymentAmountHint").addEventListener("click",()=>setTimeout(payPlusPaint,0));
+      $("paymentExtra").addEventListener("change",e=>{if(e.target.id==="paymentSpread"){payPlus.spread=e.target.checked;payPlusPaint()}});
+      $("paymentCredit").addEventListener("click",e=>{if(e.target.closest("#paymentUseCredit"))payUseCredit()});
+      finBindAmount($("caPayAmount"));
+    }catch(e){console.error(e)}
+    async function caLoadGeneral(){
+      ca.general=null;const cid=ca.current?.client_id;if(!cid)return;
+      try{
+        const [q,o,b]=await Promise.all([db.from("quotes").select("id,quote_number,status,total,issue_date").eq("client_id",cid).order("issue_date",{ascending:false}),db.from("work_orders").select("id,order_number,quote_id,status,source_quote_total").eq("client_id",cid),db.from("client_account_balances").select("client_account_id,label,status,balance").eq("client_id",cid)]);
+        const orders=o.data||[],ids=orders.map(x=>x.id);let pays=[];if(ids.length){const p=await db.from("work_order_payments").select("work_order_id,amount,status").in("work_order_id",ids);pays=p.data||[]}
+        ca.general={quotes:q.data||[],orders,pays,accounts:b.data||[]};
+      }catch(e){console.warn("cuenta general:",e.message)}
+    }
+    function caRenderGeneral(){
+      const box=$("caGeneral");if(!box)return;const g=ca.general,a=ca.current;
+      if(!g||!a||(!g.quotes.length&&g.accounts.length<2)){box.classList.add("hidden");box.innerHTML="";return}
+      const byQuote=new Map(g.orders.filter(o=>o.status!=="cancelled").map(o=>[o.quote_id,o])),paidOf=id=>g.pays.filter(p=>p.work_order_id===id&&p.status==="active").reduce((s,p)=>s+numberValue(p.amount),0);
+      const live=g.quotes.filter(q=>q.status!=="cancelled"),sum=arr=>arr.reduce((s,q)=>s+numberValue(q.total),0),appr=live.filter(q=>q.status==="approved"),open=live.filter(q=>q.status!=="approved");
+      const others=g.accounts.filter(x=>x.client_account_id!==a.id),bal=others.reduce((s,x)=>s+numberValue(x.balance),0)+caTotals().balance,n=others.length+1;
+      const rows=g.quotes.map(q=>{
+        const o=byQuote.get(q.id);let cls="",txt="Sin aprobar";
+        if(q.status==="cancelled")txt="Cancelada";
+        else if(q.status==="approved"){if(o){const due=Math.max(numberValue(o.source_quote_total)-paidOf(o.id),0);cls=due>.99?"due":"ok";txt=`${escapeHTML(o.order_number)} · ${due>.99?"debe "+formatCOP(due):"pagada ✓"}`}else{cls="ok";txt="Aprobada"}}
+        return `<div class="ca-gen-row"><span class="n">${escapeHTML(q.quote_number||"—")}</span><span class="d">${caDate(q.issue_date)}</span><span class="t">${formatCOP(q.total)}</span><span class="s ${cls}">${txt}</span></div>`
+      }).join("");
+      box.innerHTML=`<div class="ca-box-head"><h4>🧾 Cuenta general de ${escapeHTML(a.client_name)}</h4></div>
+        <div class="ca-gen-nums"><div><span>Cotizado en total</span><strong>${formatCOP(sum(live))}</strong><small>${live.length} cotizaci${live.length===1?"ón":"ones"}</small></div><div><span>Aprobado</span><strong>${formatCOP(sum(appr))}</strong><small>${appr.length} aprobada${appr.length===1?"":"s"}</small></div><div><span>Sin aprobar</span><strong>${formatCOP(sum(open))}</strong><small>${open.length} · todavía no es deuda</small></div><div class="${bal>.99?"due":bal<-.99?"fav":""}"><span>Saldo general</span><strong>${bal>.99?"Debe "+formatCOP(bal):bal<-.99?"A favor "+formatCOP(-bal):"Al día ✓"}</strong><small>${n>1?`sumando sus ${n} cuentas`:"todo lo aprobado menos lo pagado"}</small></div></div>
+        ${rows?`<details${g.quotes.length<=6?" open":""}><summary>Ver sus ${g.quotes.length} cotizaciones</summary>${rows}</details>`:""}`;
+      box.classList.remove("hidden");
+    }
+
     // V9.09: venta rápida, comprobantes y niveles de acceso
     function financePermsInstalled(){return state.permissions instanceof Map&&state.permissions.has("finance.view")}
     function supportsEnabled(){return financePermsInstalled()}
@@ -4951,7 +5044,7 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       const cl=await db.from("finance_cash_closures").select("closed_at").order("closed_at",{ascending:false}).limit(1);
       const closedAt=(cl.data||[])[0]?.closed_at||null,start=finWindowStart();
       const detail=finFetchAll(()=>{let q=db.from("finance_movements").select(FIN_MOV_SELECT);q=closedAt?q.or(`movement_date.gte.${start},created_at.gt.${closedAt}`):q.gte("movement_date",start);return q.order("movement_date",{ascending:false}).order("created_at",{ascending:false})});
-      const light=finFetchAll(()=>{let q=db.from("finance_movements").select("id,account_id,movement_type,amount,is_voided,created_at");if(closedAt)q=q.gt("created_at",closedAt);return q.order("id")});
+      const light=finFetchAll(()=>{let q=db.from("finance_movements").select("id,account_id,movement_type,amount,is_voided,created_at,movement_date");if(closedAt)q=q.gt("created_at",closedAt);return q.order("id")});
       const [d,l]=await Promise.all([detail,light]);
       state.financeLoadedFrom=start;state.financeAllLoaded=false;state.financeLoadedMonths=new Set();
       return {data:d.data,error:d.error||null,balanceRows:l.data||null,balErr:l.error||null,closure:closedAt};
@@ -5556,20 +5649,33 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
     }
     async function openPaymentModal(orderId){
       if(!hasPermission("payments.create"))return showToast("No tienes permiso para registrar pagos");
-      loading(true,"Preparando pago…");try{const order=await ensurePaymentOrder(orderId),f=orderFinancial(order);if(f.balance<=.01){showToast("Esta orden ya está pagada");return}state.paymentOrder=order;$("paymentWorkOrderId").value=order.id;$("paymentSource").innerHTML=`<strong>${escapeHTML(order.order_number)} · ${escapeHTML(workOrderRecipient(order))}</strong><span>Cotización ${escapeHTML(order.quote_number)}</span>`;$("paymentApproved").textContent=formatCOP(f.total);$("paymentPaid").textContent=formatCOP(f.paid);$("paymentBalance").textContent=formatCOP(f.balance);$("paymentCurrentStatus").textContent=paymentStatusText[f.status];$("paymentAmount").value="";$("paymentAmount").max=String(f.balance);$("paymentAmount").placeholder=String(Math.round(f.balance));$("paymentDate").value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);$("paymentMethod").value="bancolombia";$("paymentReference").value="";$("paymentPhysicalReceiptNumber").value="";$("paymentNotes").value="";if($("paymentSupportFile"))$("paymentSupportFile").value="";$("paymentFinanceSync").checked=true;await loadPaymentFinanceAccounts();suggestPaymentFinanceAccount();refreshPaymentFinanceSync();openModal("paymentModal")}catch(error){alert(error.message)}finally{loading(false)}
+      loading(true,"Preparando pago…");try{const order=await ensurePaymentOrder(orderId),f=orderFinancial(order);if(f.balance<=.01){showToast("Esta orden ya está pagada. Si pagaron de más, anótalo como abono en la cuenta del cliente (Cartera)");return}state.paymentOrder=order;$("paymentWorkOrderId").value=order.id;$("paymentSource").innerHTML=`<strong>${escapeHTML(order.order_number)} · ${escapeHTML(workOrderRecipient(order))}</strong><span>Cotización ${escapeHTML(order.quote_number)}</span>`;$("paymentApproved").textContent=formatCOP(f.total);$("paymentPaid").textContent=formatCOP(f.paid);$("paymentBalance").textContent=formatCOP(f.balance);$("paymentCurrentStatus").textContent=paymentStatusText[f.status];$("paymentAmount").value="";$("paymentAmount").placeholder=finMiles(Math.round(f.balance));$("paymentAmountHint").innerHTML="";$("paymentDate").value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);$("paymentMethod").value="bancolombia";$("paymentReference").value="";$("paymentPhysicalReceiptNumber").value="";$("paymentNotes").value="";if($("paymentSupportFile"))$("paymentSupportFile").value="";$("paymentFinanceSync").checked=true;await loadPaymentFinanceAccounts();suggestPaymentFinanceAccount();refreshPaymentFinanceSync();openModal("paymentModal");payPlusLoad(order)}catch(error){alert(error.message)}finally{loading(false)}
     }
     async function savePayment(event){
-      event.preventDefault();const orderId=$("paymentWorkOrderId").value,generateReceipt=event.submitter?.value!=="save";loading(true,"Guardando pago…");try{const {data:newPaymentId,error}=await db.rpc("register_work_order_payment",{p_work_order_id:orderId,p_amount:Number($("paymentAmount").value),p_payment_date:$("paymentDate").value,p_method:$("paymentMethod").value,p_reference:$("paymentReference").value.trim()||null,p_notes:$("paymentNotes").value.trim()||null,p_physical_receipt_number:$("paymentPhysicalReceiptNumber").value.trim()||null});if(error)throw error;
-      let financeLinked=false,financeWarning="";
-      if($("paymentFinanceSync").checked&&newPaymentId){
-        const accountId=$("paymentFinanceAccount").value;
-        if(accountId){
-          const {error:financeError}=await db.rpc("create_finance_income_from_payment",{p_payment_id:newPaymentId,p_account_id:accountId});
-          if(financeError)financeWarning=financeError.message;else financeLinked=true
-        }
+      event.preventDefault();const orderId=$("paymentWorkOrderId").value,generateReceipt=event.submitter?.value!=="save";
+      let amount=payAmount();const bal=orderFinancial(state.paymentOrder).balance;if(amount<1)return alert("Escribe el valor recibido.");if(Math.abs(amount-bal)<1)amount=bal;
+      const over=amount-bal>.99,accountId=$("paymentFinanceSync").checked?($("paymentFinanceAccount").value||null):null;
+      if(over){
+        if(payPlus.info&&!payPlus.info.client_id)return alert("Este pago es mayor que el saldo y la orden no tiene un cliente guardado para dejarle el saldo a favor. Registra solo "+formatCOP(bal)+".");
+        const plan=payPlusPlan(amount,bal);
+        if(!confirm(`Vas a registrar ${formatCOP(amount)} y esta orden debe ${formatCOP(bal)}.\n\nSobran ${formatCOP(plan.left)}:\n`+plan.parts.map(p=>`• ${formatCOP(p.amount)} a ${p.order_number}`).concat(plan.credit>=1?[`• ${formatCOP(plan.credit)} quedan como saldo a favor del cliente`]:[]).join("\n")+"\n\n¿Guardar así?"))return;
       }
-      try{await attachPaymentSupportFile(newPaymentId,$("paymentSupportFile").files[0])}catch(e){financeWarning=financeWarning||e.message}
-      closeModal("paymentModal");showToast(financeWarning?"Pago guardado; revisa Finanzas":financeLinked?"Pago registrado y enviado a Finanzas":(generateReceipt?"Pago registrado. Preparando recibo…":"Pago registrado correctamente"));await Promise.all([loadPayments(),loadProduction(),loadDashboard()]);if(!$("workOrderModal").classList.contains("hidden")&&state.workOrderDraft?.order?.id===orderId){const order=state.workOrders.find(o=>o.id===orderId);$("workOrderPaymentSummary").innerHTML=paymentSummaryHTML(order);$("workOrderRegisterPayment").classList.toggle("hidden",orderFinancial(order).balance<=.01)}if(generateReceipt&&newPaymentId)await openPaymentReceipt(newPaymentId)}catch(error){alert(error.message)}finally{loading(false)}
+      loading(true,"Guardando pago…");
+      try{
+        let newPaymentId=null,financeLinked=false,financeWarning="",plus=null;
+        const base={p_work_order_id:orderId,p_amount:amount,p_payment_date:$("paymentDate").value,p_method:$("paymentMethod").value,p_reference:$("paymentReference").value.trim()||null,p_notes:$("paymentNotes").value.trim()||null,p_physical_receipt_number:$("paymentPhysicalReceiptNumber").value.trim()||null};
+        if(over){
+          const r=await db.rpc("register_order_payment_plus",{...base,p_finance_account_id:accountId,p_spread:!!payPlus.info&&payPlus.spread!==false});if(r.error)throw r.error;plus=r.data;newPaymentId=plus?.payment_id||null;financeLinked=!!accountId;
+        }else{
+          const {data,error}=await db.rpc("register_work_order_payment",base);if(error)throw error;newPaymentId=data;
+          if(accountId&&newPaymentId){const {error:financeError}=await db.rpc("create_finance_income_from_payment",{p_payment_id:newPaymentId,p_account_id:accountId});if(financeError)financeWarning=financeError.message;else financeLinked=true}
+        }
+        try{await attachPaymentSupportFile(newPaymentId,$("paymentSupportFile").files[0])}catch(e){financeWarning=financeWarning||e.message}
+        closeModal("paymentModal");
+        const plusText=plus?[...(plus.extra||[]).map(x=>`${formatCOP(x.amount)} a ${x.order_number}`),...(Number(plus.credit)>=1?[`${formatCOP(plus.credit)} de saldo a favor`]:[])].join(" · "):"";
+        showToast(financeWarning?"Pago guardado; revisa Finanzas":plus?`Pago registrado. Lo que sobró: ${plusText}`:financeLinked?"Pago registrado y enviado a Finanzas":(generateReceipt?"Pago registrado. Preparando recibo…":"Pago registrado correctamente"));
+        await payAfterSave(orderId);if(generateReceipt&&newPaymentId)await openPaymentReceipt(newPaymentId)
+      }catch(error){alert(error.message)}finally{loading(false)}
     }
     async function openPaymentHistory(orderId){
       if(!hasPermission("payments.view"))return showToast("No tienes permiso para ver pagos");loading(true,"Cargando pagos…");try{const order=await ensurePaymentOrder(orderId);state.paymentOrder=order;const f=orderFinancial(order);$("paymentHistoryTitle").textContent=`${order.order_number} · ${workOrderRecipient(order)}`;$("paymentHistorySummary").innerHTML=`<strong>${paymentStatusBadge(f.status)} · Saldo ${formatCOP(f.balance)}</strong><span>Aprobado: ${formatCOP(f.total)} · Pagado: ${formatCOP(f.paid)}</span>`;renderPaymentHistory(order);$("paymentHistoryAddButton").classList.toggle("hidden",!hasPermission("payments.create")||f.balance<=.01||order.status==="cancelled");openModal("paymentHistoryModal")}catch(error){alert(error.message)}finally{loading(false)}
@@ -6108,8 +6214,8 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
     function financeAccountRealtimeBalance(account){
       const close=state.financeLatestClosure,row=financeAccountClosureRow(account.id),src=state.financeBalanceRows||state.financeMovements;
       if(close&&row){
-        const closedAt=new Date(close.closed_at).getTime();
-        const after=src.filter(m=>!m.is_voided&&m.account_id===account.id&&new Date(m.created_at).getTime()>closedAt).reduce((s,m)=>s+financeSignedAmount(m),0);
+        const closedAt=new Date(close.closed_at).getTime(),closeDay=new Date(closedAt-5*3600000).toISOString().slice(0,10);
+        const after=src.filter(m=>!m.is_voided&&m.account_id===account.id&&new Date(m.created_at).getTime()>closedAt&&(!m.movement_date||String(m.movement_date).slice(0,10)>=closeDay)).reduce((s,m)=>s+financeSignedAmount(m),0);
         return {balance:Number(row.actual_balance||0)+after,confirmed:true,closedAt:close.closed_at}
       }
       const balance=Number(account.opening_balance||0)+src.filter(m=>!m.is_voided&&m.account_id===account.id).reduce((s,m)=>s+financeSignedAmount(m),0);

@@ -10,148 +10,136 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Rubik:wght@500;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--r:#A3162B;--rd:#8A0F22;--g:#FFD45C;--go:#F2A81D;--cr:#FFF8EA;--ink:#3A1A12;--pend:#FFE27A;--pago:#3FB56B}
+:root{--r:#A3162B;--rd:#8A0F22;--g:#FFD45C;--cr:#FFF8EA;--ink:#3A1A12;--pend:#FFE27A;--abono:#FFB36B;--pago:#2E9E5B}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:Rubik,system-ui,sans-serif;color:var(--ink);background:var(--cr);min-height:100vh}
-button,input,textarea{font:inherit}
-.top{background:linear-gradient(135deg,#C62238,#8A0F22);color:#fff;padding:14px 16px 16px;position:sticky;top:0;z-index:5;box-shadow:0 4px 0 var(--g)}
-.top h1{margin:0;font-family:Lobster,cursive;font-weight:400;font-size:28px;line-height:1.1}
-.top p{margin:2px 0 0;font-size:13px;color:#FFE7A3}
-.wrap{max-width:560px;margin:0 auto;padding:16px}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
-.st{background:#fff;border:2px solid #F0D28A;border-radius:14px;padding:8px 6px;text-align:center}
-.st b{display:block;font-size:20px;font-weight:900;color:var(--rd)}
-.st span{font-size:11px;font-weight:700;color:#6b4a3a;text-transform:uppercase;letter-spacing:.5px}
-.st.wide{grid-column:span 3;display:flex;justify-content:space-around}
-.st.wide div b{font-size:18px}
-.tabs{display:flex;gap:8px;margin-bottom:14px}
-.tab{flex:1;border:0;border-radius:999px;padding:12px;font-weight:800;font-size:15px;background:#F3E3C2;color:var(--rd);min-height:48px}
+body{margin:0;font-family:Rubik,system-ui,sans-serif;font-size:18px;color:var(--ink);background:var(--cr);min-height:100vh}
+button,input{font:inherit}
+.top{background:linear-gradient(135deg,#C62238,#8A0F22);color:#fff;padding:14px 16px;box-shadow:0 4px 0 var(--g)}
+.top h1{margin:0;font-family:Lobster,cursive;font-weight:400;font-size:30px;line-height:1.1}
+.top p{margin:4px 0 0;font-size:15px;color:#FFE7A3}
+.wrap{max-width:560px;margin:0 auto;padding:16px 14px 40px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.st{background:#fff;border:2px solid #F0D28A;border-radius:16px;padding:10px;text-align:center}
+.st b{display:block;font-size:26px;font-weight:900;color:var(--rd)}
+.st span{font-size:15px;font-weight:700;color:#6b4a3a}
+.st.full{grid-column:span 2}
+.tabs{display:flex;gap:10px;margin-bottom:16px}
+.tab{flex:1;border:0;border-radius:16px;padding:14px 8px;font-weight:800;font-size:18px;background:#F3E3C2;color:var(--rd);min-height:60px}
 .tab.on{background:var(--r);color:#fff;box-shadow:0 4px 0 #5E0A17}
-.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;font-weight:600;margin-bottom:10px}
-.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:4px;border:2px solid #E2C27A}
-.grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px}
-.num{aspect-ratio:1;border:2px solid #F0C766;border-radius:10px;background:#fff;font-weight:900;font-size:clamp(13px,4vw,20px);color:var(--rd);padding:0;display:flex;align-items:center;justify-content:center}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;font-size:16px;font-weight:600;margin-bottom:14px}
+.legend i{display:inline-block;width:22px;height:22px;border-radius:6px;vertical-align:-5px;margin-right:6px;border:2px solid #E2C27A}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.num{height:64px;border:3px solid #F0C766;border-radius:14px;background:#fff;font-weight:900;font-size:28px;color:var(--rd);padding:0}
 .num.pendiente{background:var(--pend);border-color:#E0A800}
-.num.abono{background:#FFB36B;border-color:#E07B1A}
-.num.pago{background:var(--pago);border-color:#23864A;color:#fff}
-.box{background:#fff;border:2px solid #F0D28A;border-radius:16px;padding:14px;margin-top:16px}
-.box h2{margin:0 0 8px;font-size:16px;color:var(--rd)}
-.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #F3E3C2}
+.num.abono{background:var(--abono);border-color:#E07B1A}
+.num.pago{background:var(--pago);border-color:#1F7343;color:#fff}
+.hint{font-size:16px;color:#6b4a3a;margin:10px 0 0}
+.box{background:#fff;border:2px solid #F0D28A;border-radius:16px;padding:14px;margin-top:18px}
+.box h2{margin:0 0 6px;font-size:20px;color:var(--rd)}
+.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid #F3E3C2;width:100%;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;color:inherit}
 .row:first-of-type{border-top:0}
-.row .n{flex:none;width:42px;height:42px;border-radius:10px;background:var(--pend);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--rd)}
-.row .who{flex:1;min-width:0;font-size:14px}
-.row .who b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row .who span{color:#7a6152;font-size:12px}
-.btn{border:0;border-radius:14px;padding:13px 16px;font-weight:800;font-size:15px;min-height:48px;cursor:pointer}
-.btn.red{background:var(--r);color:#fff;box-shadow:0 4px 0 #5E0A17}
-.btn.gold{background:linear-gradient(135deg,#FFE27A,#F2A81D);color:var(--rd);box-shadow:0 4px 0 #B5740A}
-.btn.wa{background:#25D366;color:#fff;box-shadow:0 4px 0 #128C4A}
+.row .n{flex:none;width:50px;height:50px;border-radius:12px;background:var(--pend);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;color:var(--rd)}
+.row .who{flex:1;min-width:0}
+.row .who b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:18px}
+.row .who span{color:#6b4a3a;font-size:15px}
+.btn{border:0;border-radius:16px;padding:14px 16px;font-weight:800;font-size:18px;min-height:60px;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn.red{background:var(--r);color:#fff;box-shadow:0 5px 0 #5E0A17}
+.btn.green{background:var(--pago);color:#fff;box-shadow:0 5px 0 #1F7343;font-size:22px;min-height:68px}
+.btn.gold{background:linear-gradient(135deg,#FFE27A,#F2A81D);color:var(--rd);box-shadow:0 5px 0 #B5740A}
+.btn.wa{background:#25D366;color:#fff;box-shadow:0 5px 0 #128C4A}
 .btn.ghost{background:#F3E3C2;color:var(--rd)}
-.btn.sm{padding:8px 12px;min-height:40px;font-size:13px;border-radius:10px}
-.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-.btns .btn{flex:1 1 140px}
+.stack{display:flex;flex-direction:column;gap:14px;margin-top:16px}
 canvas{width:100%;height:auto;border-radius:16px;box-shadow:0 6px 18px rgba(58,26,18,.25);display:block}
-label{display:block;font-size:13px;font-weight:700;margin:12px 0 4px;color:#6b4a3a}
-input,textarea{width:100%;border:2px solid #E8D3A6;border-radius:12px;padding:12px;font-size:16px;background:#fff;color:var(--ink)}
-input:focus,textarea:focus{outline:none;border-color:var(--r)}
-.seg{display:flex;gap:8px}
-.seg button{flex:1;border:2px solid #E8D3A6;background:#fff;border-radius:12px;padding:12px;font-weight:800;min-height:48px;color:var(--ink)}
-.seg button.on.p{background:var(--pend);border-color:#E0A800}
-.seg button.on.g{background:var(--pago);border-color:#23864A;color:#fff}
-.sheet{position:fixed;inset:0;background:rgba(30,10,5,.5);display:none;align-items:flex-end;justify-content:center;z-index:20}
-.sheet.open{display:flex}
-.card{background:var(--cr);width:100%;max-width:560px;border-radius:24px 24px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
-.card .head{display:flex;align-items:center;gap:12px}
-.card .big{width:64px;height:64px;border-radius:16px;background:var(--r);color:#fff;font-weight:900;font-size:30px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 #5E0A17}
-.card .x{margin-left:auto;background:#F3E3C2;border:0;border-radius:50%;width:44px;height:44px;font-size:22px;color:var(--rd)}
-.login{max-width:380px;margin:12vh auto 0;padding:24px;text-align:center}
-.login h1{font-family:Lobster,cursive;font-weight:400;color:var(--r);font-size:40px;margin:0}
-.login input{text-align:center;font-size:28px;letter-spacing:8px;margin-top:18px}
-.msg{min-height:20px;color:var(--r);font-weight:700;margin-top:10px;font-size:14px}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:30}
+.q{font-size:20px;font-weight:800;margin:22px 0 8px;color:var(--ink)}
+input{width:100%;border:3px solid #E8D3A6;border-radius:14px;padding:14px;font-size:22px;background:#fff;color:var(--ink)}
+input:focus{outline:none;border-color:var(--r)}
+.opt{display:flex;align-items:center;gap:14px;width:100%;border:3px solid #E8D3A6;background:#fff;border-radius:16px;padding:14px 16px;font-weight:800;font-size:20px;min-height:66px;color:var(--ink);text-align:left;margin-bottom:10px}
+.opt .dot{flex:none;width:30px;height:30px;border-radius:50%;border:3px solid #C9B48A;background:#fff}
+.opt.on .dot{border-color:var(--ink);background:radial-gradient(circle,var(--ink) 42%,#fff 46%)}
+.opt.on.o-no{background:var(--pend);border-color:#E0A800}
+.opt.on.o-parte{background:var(--abono);border-color:#E07B1A}
+.opt.on.o-todo{background:#CFF0DA;border-color:var(--pago)}
+.parte{background:#FFF1E2;border:3px solid var(--abono);border-radius:16px;padding:14px;margin-bottom:10px}
+.parte .falta{font-size:18px;font-weight:700;margin-top:10px}
+.parte .falta b{color:var(--rd);font-size:22px}
+.sheet{position:fixed;inset:0;background:var(--cr);display:none;z-index:20;overflow:auto}
+.sheet.open{display:block}
+.card{max-width:560px;margin:0 auto;padding:18px 16px calc(28px + env(safe-area-inset-bottom))}
+.card .head{display:flex;align-items:center;gap:14px}
+.card .big{width:84px;height:84px;border-radius:20px;background:var(--r);color:#fff;font-weight:900;font-size:42px;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 0 #5E0A17;flex:none}
+.card .head b{font-size:24px}
+.card .head div div{font-size:17px;color:#6b4a3a;margin-top:2px}
+.link{background:none;border:0;color:var(--rd);font-weight:700;font-size:17px;text-decoration:underline;padding:14px;width:100%;margin-top:8px}
+.login{max-width:380px;margin:10vh auto 0;padding:24px;text-align:center}
+.login h1{font-family:Lobster,cursive;font-weight:400;color:var(--r);font-size:44px;margin:0}
+.login p{font-size:19px}
+.login input{text-align:center;font-size:32px;letter-spacing:8px;margin-top:10px}
+.msg{min-height:24px;color:var(--r);font-weight:700;margin-top:12px;font-size:18px}
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:var(--pago);color:#fff;padding:16px 22px;border-radius:18px;font-weight:800;font-size:19px;opacity:0;transition:.25s;pointer-events:none;z-index:40;text-align:center;width:max-content;max-width:90vw}
+.toast.err{background:var(--r)}
 .toast.show{opacity:1}
 .hide{display:none!important}
 .ver{position:fixed;inset:0;background:rgba(20,6,3,.97);z-index:25;display:none;flex-direction:column;align-items:center;padding:14px 14px calc(14px + env(safe-area-inset-bottom));gap:12px}
 .ver.open{display:flex}
-.ver p{margin:0;color:#fff;font-weight:800;font-size:17px;text-align:center;line-height:1.3}
+.ver p{margin:0;color:#fff;font-weight:800;font-size:19px;text-align:center;line-height:1.3}
 .ver p span{color:var(--g)}
 .ver img{flex:1;min-height:0;max-width:100%;object-fit:contain;border-radius:12px;-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto}
-.hint{font-size:12px;color:#7a6152;margin-top:6px}
-.pay{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.pay div{background:#fff;border:2px solid #E8D3A6;border-radius:12px;padding:8px;text-align:center}
-.pay span{display:block;font-size:11px;font-weight:700;color:#6b4a3a;text-transform:uppercase}
-.pay b{font-size:22px;font-weight:900;color:var(--rd)}
-.pay .ok b{color:#23864A}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.chips button{flex:1 1 70px;border:2px solid #E8D3A6;background:#fff;border-radius:10px;padding:10px 4px;font-weight:800;color:var(--rd);min-height:44px}
 </style>
 </head>
 <body>
 
 <div id="vLogin" class="login">
   <h1>Abuelita Tarcila</h1>
-  <p>Control de números del bono solidario</p>
-  <input id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="••••••" aria-label="PIN">
-  <button id="btnEntrar" class="btn red" style="width:100%;margin-top:14px">Entrar</button>
+  <p>Escribe la clave para entrar</p>
+  <input id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="••••••" aria-label="Clave">
+  <button id="btnEntrar" class="btn red" style="margin-top:16px">Entrar</button>
   <div id="loginMsg" class="msg"></div>
 </div>
 
 <div id="vApp" class="hide">
   <div class="top">
     <h1>Bono Abuelita Tarcila</h1>
-    <p>Lotería del Cauca · sábado 19 de diciembre de 2026</p>
+    <p>Lotería del Cauca · sábado 19 de diciembre</p>
   </div>
   <div class="wrap">
     <div class="stats">
       <div class="st"><b id="sVend">0</b><span>Vendidos</span></div>
-      <div class="st"><b id="sPag">0</b><span>Pagados</span></div>
       <div class="st"><b id="sLib">100</b><span>Libres</span></div>
-      <div class="st wide">
-        <div><b id="sRec">$0</b><span>Recogido</span></div>
-        <div><b id="sCob">$0</b><span>Por cobrar</span></div>
-      </div>
+      <div class="st"><b id="sRec">$0</b><span>Ya recogido</span></div>
+      <div class="st"><b id="sCob">$0</b><span>Falta por cobrar</span></div>
     </div>
 
     <div class="tabs">
       <button class="tab on" data-t="numeros">Números</button>
-      <button class="tab" data-t="imagen">Imagen para el estado</button>
+      <button class="tab" data-t="imagen">Imagen</button>
     </div>
 
     <section id="tNumeros">
       <div class="legend">
         <span><i style="background:#fff"></i>Libre</span>
-        <span><i style="background:var(--pend)"></i>Apartado, sin pagar</span>
-        <span><i style="background:#FFB36B"></i>Abonó una parte</span>
-        <span><i style="background:var(--pago)"></i>Pagó</span>
+        <span><i style="background:var(--pend)"></i>No ha pagado</span>
+        <span><i style="background:var(--abono)"></i>Pagó una parte</span>
+        <span><i style="background:var(--pago)"></i>Pagó todo</span>
       </div>
       <div id="grid" class="grid"></div>
-      <p class="hint">Toca un número para anotar quién lo compró.</p>
+      <p class="hint">👆 Toca un número para anotar quién lo compró.</p>
 
       <div class="box">
-        <h2>Pendientes por cobrar</h2>
+        <h2>Le deben</h2>
         <div id="pend"></div>
       </div>
       <div class="box">
-        <h2>Ya pagaron</h2>
+        <h2>Ya pagaron todo</h2>
         <div id="pagos"></div>
       </div>
     </section>
 
     <section id="tImagen" class="hide">
       <canvas id="cv" width="1080" height="1920" aria-label="Bono con los números vendidos tapados"></canvas>
-      <div class="btns">
-        <button id="btnShare" class="btn wa">Compartir imagen</button>
+      <div class="stack">
+        <button id="btnShare" class="btn wa">Mandar por WhatsApp</button>
         <button id="btnDown" class="btn gold">Guardar en la galería</button>
-      </div>
-      <div class="btns">
-        <button id="btnLista" class="btn ghost">Copiar lista de números libres</button>
-      </div>
-      <div class="box">
-        <h2>¿A quién le escriben para apartar un número?</h2>
-        <div class="hint" style="margin-top:0">Escribe tu nombre y tu celular. Salen en la parte de abajo de la imagen, así la gente sabe a quién escribirle.</div>
-        <label for="contacto">Tu nombre y celular</label>
-        <input id="contacto" placeholder="Ej: Carlos · 300 123 4567">
-        <div class="btns"><button id="btnContacto" class="btn red sm">Guardar</button></div>
+        <button id="btnLista" class="btn ghost">Copiar los números libres</button>
       </div>
     </section>
   </div>
@@ -161,44 +149,41 @@ input:focus,textarea:focus{outline:none;border-color:var(--r)}
   <div class="card">
     <div class="head">
       <div class="big" id="shNum">00</div>
-      <div><b id="shTitle" style="font-size:18px">Número</b><div class="hint" id="shSub">Libre</div></div>
-      <button class="x" id="shClose" aria-label="Cerrar">×</button>
+      <div><b id="shTitle">Número 00</b><div id="shSub">Libre</div></div>
     </div>
-    <label for="fNombre">Nombre</label>
-    <input id="fNombre" autocomplete="off" placeholder="¿Quién lo compró?">
-    <label for="fCel">Celular</label>
+
+    <div class="q"><label for="fNombre">1. ¿Quién lo compró?</label></div>
+    <input id="fNombre" autocomplete="off" autocapitalize="words" placeholder="Nombre">
+
+    <div class="q"><label for="fCel">2. Celular <span style="font-weight:500;color:#6b4a3a">(si lo tiene)</span></label></div>
     <input id="fCel" type="tel" inputmode="tel" autocomplete="off" placeholder="300 123 4567">
-    <label for="fAbono">¿Cuánto ha pagado en total?</label>
-    <div class="pay">
-      <div id="boxAbo"><span>Ha pagado</span><b id="pAbo">$0</b></div>
-      <div><span>Le falta</span><b id="pDebe">$50.000</b></div>
+
+    <div class="q">3. ¿Ya pagó?</div>
+    <button type="button" class="opt o-no" data-p="no"><span class="dot"></span>Todavía no ha pagado</button>
+    <button type="button" class="opt o-parte" data-p="parte"><span class="dot"></span>Pagó una parte</button>
+    <div id="boxParte" class="parte hide">
+      <label for="fAbono" style="font-weight:800;font-size:18px">¿Cuánto ha pagado en total?</label>
+      <input id="fAbono" inputmode="numeric" autocomplete="off" placeholder="Ej: 20.000" style="margin-top:8px">
+      <div class="falta">Le faltan: <b id="pDebe">$50.000</b></div>
     </div>
-    <input id="fAbono" inputmode="numeric" autocomplete="off" placeholder="0" style="margin-top:8px">
-    <div class="chips">
-      <button type="button" data-add="10000">+10.000</button>
-      <button type="button" data-add="20000">+20.000</button>
-      <button type="button" data-add="25000">+25.000</button>
-      <button type="button" data-add="todo">Pagó todo</button>
-      <button type="button" data-add="cero">$0</button>
+    <button type="button" class="opt o-todo" data-p="todo"><span class="dot"></span><span>Pagó todo <span id="valorTxt">($50.000)</span></span></button>
+
+    <div class="stack">
+      <button id="btnGuardar" class="btn green">✔ Guardar</button>
+      <button id="btnCancelar" class="btn ghost">Cancelar</button>
+      <a id="btnWa" class="btn wa hide" target="_blank" rel="noopener">Escribirle por WhatsApp</a>
     </div>
-    <div class="hint">Toca los botones para sumar un abono, o escribe el total. Si te equivocas, corrige el número y guarda.</div>
-    <label for="fNotas">Notas</label>
-    <textarea id="fNotas" rows="2" placeholder="Ej: paga el viernes por Nequi"></textarea>
-    <div class="btns">
-      <button id="btnGuardar" class="btn red">Guardar</button>
-      <a id="btnWa" class="btn wa" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center" target="_blank" rel="noopener">WhatsApp</a>
-    </div>
-    <div class="btns"><button id="btnLiberar" class="btn ghost sm">Eliminar comprador y dejar el número libre</button></div>
+    <button id="btnLiberar" class="link hide">Borrar a esta persona (el número queda libre)</button>
   </div>
 </div>
 
 <div id="ver" class="ver" role="dialog" aria-modal="true" aria-label="Guardar imagen">
   <p>Deja el dedo presionado sobre la imagen<br>y toca <span>"Guardar en Fotos"</span> o <span>"Descargar imagen"</span></p>
   <img id="verImg" alt="Bono con los números vendidos tapados">
-  <button id="verClose" class="btn gold" style="width:100%;max-width:420px">Listo</button>
+  <button id="verClose" class="btn gold" style="max-width:420px">Listo</button>
 </div>
 
-<div id="toast" class="toast"></div>
+<div id="toast" class="toast" role="status"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script>
 <script>
@@ -206,25 +191,24 @@ const sb = supabase.createClient("https://kqrfcdfygskzhsdzzcze.supabase.co","sb_
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2,'0');
 const peso = v => '$' + Math.round(v).toLocaleString('es-CO');
-let PIN = '', D = { valor: 50000, contacto: '', numeros: [] }, sel = null;
+let PIN = '', D = { valor: 50000, contacto: '', numeros: [] }, sel = null, pago = 'no';
 
 const store = {
   get(k){ try { return localStorage.getItem(k) || ''; } catch(e){ return ''; } },
   set(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
   del(k){ try { localStorage.removeItem(k); } catch(e){} }
 };
-function toast(t){ const e=$('toast'); e.textContent=t; e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),2200); }
+function toast(t, err){ const e=$('toast'); e.textContent=t; e.classList.toggle('err', !!err); e.classList.add('show'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('show'),2600); }
 
 async function cargar(silencioso){
   const { data, error } = await sb.rpc('bono_listar', { p_pin: PIN });
   if (error) {
-    if (!silencioso) { $('loginMsg').textContent = /PIN/.test(error.message) ? 'PIN incorrecto' : 'No se pudo conectar. Revisa el internet.'; }
+    if (!silencioso) { $('loginMsg').textContent = /PIN/.test(error.message) ? 'Esa clave no es. Inténtalo otra vez.' : 'No hay conexión. Revisa el internet.'; }
     if (/PIN/.test(error.message)) { store.del('bonoPin'); mostrarLogin(); }
     return false;
   }
   D = data; pintar(); return true;
 }
-
 function mostrarLogin(){ $('vLogin').classList.remove('hide'); $('vApp').classList.add('hide'); }
 async function entrar(){
   PIN = $('pin').value.trim(); $('loginMsg').textContent = '';
@@ -233,91 +217,98 @@ async function entrar(){
 $('btnEntrar').onclick = entrar;
 $('pin').addEventListener('keyup', e => { if (e.key === 'Enter') entrar(); });
 
+const claseNum = x => x.estado === 'pendiente' && x.abonado > 0 ? 'abono' : x.estado;
 function pintar(){
   const ns = D.numeros;
-  const vend = ns.filter(x => x.estado !== 'libre'), pag = ns.filter(x => x.estado === 'pago');
+  const vend = ns.filter(x => x.estado !== 'libre');
   const rec = vend.reduce((a, x) => a + (x.abonado || 0), 0);
-  $('sVend').textContent = vend.length; $('sPag').textContent = pag.length; $('sLib').textContent = 100 - vend.length;
+  $('sVend').textContent = vend.length; $('sLib').textContent = 100 - vend.length;
   $('sRec').textContent = peso(rec); $('sCob').textContent = peso(vend.length * D.valor - rec);
+  $('valorTxt').textContent = '(' + peso(D.valor) + ')';
   const g = $('grid'); g.innerHTML = '';
   ns.forEach(x => {
     const b = document.createElement('button');
-    b.className = 'num ' + (x.estado === 'pendiente' && x.abonado > 0 ? 'abono' : x.estado); b.textContent = pad(x.n);
+    b.className = 'num ' + claseNum(x); b.textContent = pad(x.n);
     b.setAttribute('aria-label', 'Número ' + pad(x.n) + (x.estado === 'libre' ? ', libre' : ', ' + x.nombre));
     b.onclick = () => abrir(x.n);
     g.appendChild(b);
   });
   lista('pend', ns.filter(x => x.estado === 'pendiente'), 'Nadie debe por ahora.');
-  lista('pagos', pag, 'Todavía no hay pagos.');
-  if (document.activeElement !== $('contacto')) $('contacto').value = D.contacto || '';
+  lista('pagos', ns.filter(x => x.estado === 'pago'), 'Todavía nadie ha pagado todo.');
   dibujar();
 }
 function lista(id, arr, vacio){
   const el = $(id); el.innerHTML = '';
-  if (!arr.length) { el.innerHTML = '<div class="hint">' + vacio + '</div>'; return; }
+  if (!arr.length) { el.innerHTML = '<p class="hint" style="margin:0">' + vacio + '</p>'; return; }
   arr.forEach(x => {
-    const r = document.createElement('div'); r.className = 'row';
+    const r = document.createElement('button'); r.className = 'row'; r.onclick = () => abrir(x.n);
     const n = document.createElement('div'); n.className = 'n'; n.textContent = pad(x.n);
-    if (x.estado === 'pago') { n.style.background = 'var(--pago)'; n.style.color = '#fff'; } else if (x.abonado > 0) n.style.background = '#FFB36B';
+    if (x.estado === 'pago') { n.style.background = 'var(--pago)'; n.style.color = '#fff'; } else if (x.abonado > 0) n.style.background = 'var(--abono)';
     const w = document.createElement('div'); w.className = 'who';
     const b = document.createElement('b'); b.textContent = x.nombre || '(sin nombre)';
-    const s = document.createElement('span'); s.textContent = [x.estado === 'pendiente' ? (x.abonado > 0 ? 'Abonó ' + peso(x.abonado) + ' · debe ' + peso(D.valor - x.abonado) : 'Debe ' + peso(D.valor)) : '', x.celular, x.notas].filter(Boolean).join(' · ');
-    w.append(b, s);
-    const ed = document.createElement('button'); ed.className = 'btn ghost sm'; ed.textContent = 'Ver'; ed.onclick = () => abrir(x.n);
-    r.append(n, w, ed); el.appendChild(r);
+    const s = document.createElement('span');
+    s.textContent = x.estado === 'pago' ? (x.celular || 'Pagó todo') : x.abonado > 0 ? 'Pagó ' + peso(x.abonado) + ', le faltan ' + peso(D.valor - x.abonado) : 'Debe ' + peso(D.valor);
+    w.append(b, s); r.append(n, w); el.appendChild(r);
   });
 }
 
-const leerAbono = () => Math.min(parseInt(($('fAbono').value || '').replace(/\D/g, ''), 10) || 0, D.valor);
-function verPago(){
-  const a = leerAbono(); $('pAbo').textContent = peso(a); $('pDebe').textContent = peso(D.valor - a);
-  $('boxAbo').classList.toggle('ok', a >= D.valor); waLink();
+/* ---- Registrar un número ---- */
+const leerAbono = () => parseInt(($('fAbono').value || '').replace(/\D/g, ''), 10) || 0;
+function setPago(p){
+  pago = p;
+  document.querySelectorAll('.opt').forEach(o => o.classList.toggle('on', o.dataset.p === p));
+  $('boxParte').classList.toggle('hide', p !== 'parte');
+  if (p === 'parte') { verFalta(); setTimeout(() => $('fAbono').focus(), 100); }
+  waLink();
 }
-$('fAbono').addEventListener('input', verPago);
-document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => {
-  const k = b.dataset.add; let a = leerAbono();
-  a = k === 'todo' ? D.valor : k === 'cero' ? 0 : Math.min(a + parseInt(k, 10), D.valor);
-  $('fAbono').value = a ? a.toLocaleString('es-CO') : ''; verPago();
+document.querySelectorAll('.opt').forEach(o => o.onclick = () => setPago(o.dataset.p));
+function verFalta(){ $('pDebe').textContent = peso(Math.max(D.valor - leerAbono(), 0)); waLink(); }
+$('fAbono').addEventListener('input', () => {
+  const v = leerAbono(); $('fAbono').value = v ? v.toLocaleString('es-CO') : ''; verFalta();
 });
+function abonoFinal(){ return pago === 'todo' ? D.valor : pago === 'parte' ? Math.min(leerAbono(), D.valor) : 0; }
 function waLink(){
   let c = $('fCel').value.replace(/\D/g, ''); if (c.length === 10) c = '57' + c;
-  const debe = D.valor - leerAbono();
-  const msg = 'Hola ' + ($('fNombre').value.trim() || '') + ', te escribo por el bono solidario de la abuelita Tarcila. Tu número es el ' + pad(sel) + ' 🍀' + (debe > 0 ? ' Te quedan ' + peso(debe) + ' por pagar.' : ' ¡Ya está pago, gracias!');
-  $('btnWa').href = c ? 'https://wa.me/' + c + '?text=' + encodeURIComponent(msg) : '#';
-  $('btnWa').style.opacity = c ? 1 : .5;
+  const x = D.numeros[sel];
+  $('btnWa').classList.toggle('hide', !c || !x || x.estado === 'libre');
+  const debe = D.valor - abonoFinal();
+  const msg = 'Hola ' + ($('fNombre').value.trim() || '') + ', te escribo por el bono solidario de la abuelita Tarcila. Tu número es el ' + pad(sel) + '.' + (debe > 0 ? ' Te faltan ' + peso(debe) + ' por pagar.' : ' ¡Ya está pago, muchas gracias!');
+  $('btnWa').href = 'https://wa.me/' + c + '?text=' + encodeURIComponent(msg);
 }
-$('fCel').addEventListener('input', waLink); $('fNombre').addEventListener('input', waLink);
+$('fCel').addEventListener('input', waLink);
 
 function abrir(n){
   sel = n; const x = D.numeros[n];
   $('shNum').textContent = pad(n); $('shTitle').textContent = 'Número ' + pad(n);
-  $('shSub').textContent = x.estado === 'libre' ? 'Libre' : x.estado === 'pago' ? 'Vendido y pagado' : x.abonado > 0 ? 'Abonó una parte' : 'Apartado, falta pagar';
-  $('fNombre').value = x.nombre; $('fCel').value = x.celular; $('fNotas').value = x.notas;
-  $('fAbono').value = x.abonado ? x.abonado.toLocaleString('es-CO') : ''; verPago();
+  $('shSub').textContent = x.estado === 'libre' ? 'Está libre' : x.estado === 'pago' ? 'Vendido y pagado' : x.abonado > 0 ? 'Pagó una parte' : 'Vendido, no ha pagado';
+  $('fNombre').value = x.nombre; $('fCel').value = x.celular;
+  $('fAbono').value = x.estado === 'pendiente' && x.abonado ? x.abonado.toLocaleString('es-CO') : '';
+  setPago(x.estado === 'pago' ? 'todo' : x.abonado > 0 ? 'parte' : 'no');
   $('btnLiberar').classList.toggle('hide', x.estado === 'libre');
-  waLink(); $('sheet').classList.add('open');
+  $('sheet').classList.add('open'); $('sheet').scrollTop = 0;
   if (x.estado === 'libre') setTimeout(() => $('fNombre').focus(), 150);
 }
 function cerrar(){ $('sheet').classList.remove('open'); }
-$('shClose').onclick = cerrar;
-$('sheet').addEventListener('click', e => { if (e.target === $('sheet')) cerrar(); });
+$('btnCancelar').onclick = cerrar;
 
-async function guardar(nombre, cel, abonado, notas, liberar){
+async function guardar(nombre, cel, abonado, liberar){
+  const notas = liberar ? '' : (D.numeros[sel].notas || '');
   const { error } = await sb.rpc('bono_guardar', { p_pin: PIN, p_numero: sel, p_nombre: nombre, p_celular: cel, p_abonado: abonado, p_notas: notas, p_liberar: !!liberar });
-  if (error) { toast('No se guardó. Revisa el internet e intenta otra vez.'); return false; }
+  if (error) { toast('No se guardó. Revisa el internet y vuelve a tocar Guardar.', true); return false; }
   await cargar(true); return true;
 }
 $('btnGuardar').onclick = async () => {
   const nombre = $('fNombre').value.trim();
-  if (!nombre) { toast('Escribe el nombre del comprador'); $('fNombre').focus(); return; }
+  if (!nombre) { toast('Falta escribir quién lo compró', true); $('fNombre').focus(); return; }
+  if (pago === 'parte' && !leerAbono()) { toast('Escribe cuánto ha pagado', true); $('fAbono').focus(); return; }
   const b = $('btnGuardar'); b.disabled = true; b.textContent = 'Guardando…';
-  const ok = await guardar(nombre, $('fCel').value.trim(), leerAbono(), $('fNotas').value.trim(), false);
-  b.disabled = false; b.textContent = 'Guardar';
-  if (ok) { cerrar(); toast('Número ' + pad(sel) + ' guardado ✓'); }
+  const ok = await guardar(nombre, $('fCel').value.trim(), abonoFinal(), false);
+  b.disabled = false; b.textContent = '✔ Guardar';
+  if (ok) { cerrar(); toast('✔ Número ' + pad(sel) + ' guardado'); }
 };
 $('btnLiberar').onclick = async () => {
-  if (!confirm('¿Eliminar a ' + (D.numeros[sel].nombre || 'este comprador') + ' y dejar libre el número ' + pad(sel) + '? Se borran el nombre, el celular y lo que haya abonado.')) return;
-  if (await guardar('', '', 0, '', true)) { cerrar(); toast('Número ' + pad(sel) + ' quedó libre'); }
+  if (!confirm('¿Borrar a ' + (D.numeros[sel].nombre || 'esta persona') + '? El número ' + pad(sel) + ' queda libre otra vez.')) return;
+  if (await guardar('', '', 0, true)) { cerrar(); toast('El número ' + pad(sel) + ' quedó libre'); }
 };
 
 document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
@@ -326,12 +317,6 @@ document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
   $('tImagen').classList.toggle('hide', t.dataset.t !== 'imagen');
   if (t.dataset.t === 'imagen') dibujar();
 });
-
-$('btnContacto').onclick = async () => {
-  const { error } = await sb.rpc('bono_contacto', { p_pin: PIN, p_contacto: $('contacto').value.trim() });
-  if (error) { toast('No se guardó el contacto'); return; }
-  await cargar(true); toast('Contacto guardado ✓');
-};
 
 /* ---- Imagen del bono con los números tapados ---- */
 const fondo = new Image(); fondo.src = 'bono-tarcila-fondo.webp'; fondo.onload = () => dibujar();
@@ -360,9 +345,7 @@ async function dibujar(){
     }
   });
   c.fillStyle = '#6E0B1B'; c.font = '900 30px Rubik, sans-serif';
-  const txt = D.contacto ? 'Separa tu número: ' + D.contacto : '¡Separa tu número ya!';
-  let size = 30; while (size > 18) { c.font = '900 ' + size + 'px Rubik, sans-serif'; if (c.measureText(txt).width <= 880) break; size -= 1; }
-  c.fillText(txt, 540, 1786);
+  c.fillText('¡Separa tu número ya!', 540, 1786);
 }
 function nombreArchivo(){ return 'bono-abuelita-tarcila-' + new Date().toISOString().slice(0,10) + '.png'; }
 function blob(){ return new Promise(r => $('cv').toBlob(r, 'image/png')); }
@@ -380,8 +363,8 @@ $('btnShare').onclick = async () => {
 };
 $('btnLista').onclick = async () => {
   const libres = D.numeros.filter(x => x.estado === 'libre').map(x => pad(x.n));
-  const t = '🍀 Bono solidario Abuelita Tarcila\n🎁 Premio $1.000.000 · Bono ' + peso(D.valor) + '\n📅 Lotería del Cauca, sábado 19 de diciembre\n\nNúmeros disponibles (' + libres.length + '):\n' + libres.join(' · ') + (D.contacto ? '\n\nSepara el tuyo: ' + D.contacto : '');
-  try { await navigator.clipboard.writeText(t); toast('Lista copiada ✓ Pégala en WhatsApp'); }
+  const t = '🍀 Bono solidario Abuelita Tarcila\n🎁 Premio $1.000.000 · Bono ' + peso(D.valor) + '\n📅 Lotería del Cauca, sábado 19 de diciembre\n\nNúmeros disponibles (' + libres.length + '):\n' + libres.join(' · ');
+  try { await navigator.clipboard.writeText(t); toast('✔ Copiado. Ahora pégalo en WhatsApp'); }
   catch(e){ prompt('Copia este texto:', t); }
 };
 

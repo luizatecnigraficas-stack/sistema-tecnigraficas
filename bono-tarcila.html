@@ -71,6 +71,11 @@ input:focus,textarea:focus{outline:none;border-color:var(--r)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:30}
 .toast.show{opacity:1}
 .hide{display:none!important}
+.ver{position:fixed;inset:0;background:rgba(20,6,3,.97);z-index:25;display:none;flex-direction:column;align-items:center;padding:14px 14px calc(14px + env(safe-area-inset-bottom));gap:12px}
+.ver.open{display:flex}
+.ver p{margin:0;color:#fff;font-weight:800;font-size:17px;text-align:center;line-height:1.3}
+.ver p span{color:var(--g)}
+.ver img{flex:1;min-height:0;max-width:100%;object-fit:contain;border-radius:12px;-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto}
 .hint{font-size:12px;color:#7a6152;margin-top:6px}
 .pay{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .pay div{background:#fff;border:2px solid #E8D3A6;border-radius:12px;padding:8px;text-align:center}
@@ -136,7 +141,7 @@ input:focus,textarea:focus{outline:none;border-color:var(--r)}
       <canvas id="cv" width="1080" height="1920" aria-label="Bono con los números vendidos tapados"></canvas>
       <div class="btns">
         <button id="btnShare" class="btn wa">Compartir imagen</button>
-        <button id="btnDown" class="btn gold">Descargar imagen</button>
+        <button id="btnDown" class="btn gold">Guardar en la galería</button>
       </div>
       <div class="btns">
         <button id="btnLista" class="btn ghost">Copiar lista de números libres</button>
@@ -184,6 +189,12 @@ input:focus,textarea:focus{outline:none;border-color:var(--r)}
     </div>
     <div class="btns"><button id="btnLiberar" class="btn ghost sm">Eliminar comprador y dejar el número libre</button></div>
   </div>
+</div>
+
+<div id="ver" class="ver" role="dialog" aria-modal="true" aria-label="Guardar imagen">
+  <p>Deja el dedo presionado sobre la imagen<br>y toca <span>"Guardar en Fotos"</span> o <span>"Descargar imagen"</span></p>
+  <img id="verImg" alt="Bono con los números vendidos tapados">
+  <button id="verClose" class="btn gold" style="width:100%;max-width:420px">Listo</button>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -355,14 +366,16 @@ async function dibujar(){
 function nombreArchivo(){ return 'bono-abuelita-tarcila-' + new Date().toISOString().slice(0,10) + '.png'; }
 function blob(){ return new Promise(r => $('cv').toBlob(r, 'image/png')); }
 $('btnDown').onclick = async () => {
-  await dibujar(); const b = await blob(); const a = document.createElement('a');
-  a.href = URL.createObjectURL(b); a.download = nombreArchivo(); a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  await dibujar();
+  $('verImg').src = $('cv').toDataURL('image/jpeg', 0.92);
+  $('ver').classList.add('open');
 };
+$('verClose').onclick = () => { $('ver').classList.remove('open'); $('verImg').removeAttribute('src'); };
 $('btnShare').onclick = async () => {
   await dibujar(); const b = await blob(); const f = new File([b], nombreArchivo(), { type: 'image/png' });
   if (navigator.canShare && navigator.canShare({ files: [f] })) {
     try { await navigator.share({ files: [f], title: 'Bono Abuelita Tarcila' }); } catch(e){}
-  } else { $('btnDown').click(); toast('Se descargó la imagen. Súbela desde tu galería.'); }
+  } else { $('btnDown').click(); }
 };
 $('btnLista').onclick = async () => {
   const libres = D.numeros.filter(x => x.estado === 'libre').map(x => pad(x.n));

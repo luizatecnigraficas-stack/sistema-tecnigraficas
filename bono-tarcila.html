@@ -32,6 +32,7 @@ button,input,textarea{font:inherit}
 .grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px}
 .num{aspect-ratio:1;border:2px solid #F0C766;border-radius:10px;background:#fff;font-weight:900;font-size:clamp(13px,4vw,20px);color:var(--rd);padding:0;display:flex;align-items:center;justify-content:center}
 .num.pendiente{background:var(--pend);border-color:#E0A800}
+.num.abono{background:#FFB36B;border-color:#E07B1A}
 .num.pago{background:var(--pago);border-color:#23864A;color:#fff}
 .box{background:#fff;border:2px solid #F0D28A;border-radius:16px;padding:14px;margin-top:16px}
 .box h2{margin:0 0 8px;font-size:16px;color:var(--rd)}
@@ -71,6 +72,13 @@ input:focus,textarea:focus{outline:none;border-color:var(--r)}
 .toast.show{opacity:1}
 .hide{display:none!important}
 .hint{font-size:12px;color:#7a6152;margin-top:6px}
+.pay{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pay div{background:#fff;border:2px solid #E8D3A6;border-radius:12px;padding:8px;text-align:center}
+.pay span{display:block;font-size:11px;font-weight:700;color:#6b4a3a;text-transform:uppercase}
+.pay b{font-size:22px;font-weight:900;color:var(--rd)}
+.pay .ok b{color:#23864A}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chips button{flex:1 1 70px;border:2px solid #E8D3A6;background:#fff;border-radius:10px;padding:10px 4px;font-weight:800;color:var(--rd);min-height:44px}
 </style>
 </head>
 <body>
@@ -108,6 +116,7 @@ input:focus,textarea:focus{outline:none;border-color:var(--r)}
       <div class="legend">
         <span><i style="background:#fff"></i>Libre</span>
         <span><i style="background:var(--pend)"></i>Apartado, sin pagar</span>
+        <span><i style="background:#FFB36B"></i>Abonó una parte</span>
         <span><i style="background:var(--pago)"></i>Pagó</span>
       </div>
       <div id="grid" class="grid"></div>
@@ -153,18 +162,27 @@ input:focus,textarea:focus{outline:none;border-color:var(--r)}
     <input id="fNombre" autocomplete="off" placeholder="¿Quién lo compró?">
     <label for="fCel">Celular</label>
     <input id="fCel" type="tel" inputmode="tel" autocomplete="off" placeholder="300 123 4567">
-    <label>¿Ya pagó?</label>
-    <div class="seg">
-      <button id="eP" class="p" type="button">Pendiente</button>
-      <button id="eG" class="g" type="button">Pagó</button>
+    <label for="fAbono">¿Cuánto ha pagado en total?</label>
+    <div class="pay">
+      <div id="boxAbo"><span>Ha pagado</span><b id="pAbo">$0</b></div>
+      <div><span>Le falta</span><b id="pDebe">$50.000</b></div>
     </div>
+    <input id="fAbono" inputmode="numeric" autocomplete="off" placeholder="0" style="margin-top:8px">
+    <div class="chips">
+      <button type="button" data-add="10000">+10.000</button>
+      <button type="button" data-add="20000">+20.000</button>
+      <button type="button" data-add="25000">+25.000</button>
+      <button type="button" data-add="todo">Pagó todo</button>
+      <button type="button" data-add="cero">$0</button>
+    </div>
+    <div class="hint">Toca los botones para sumar un abono, o escribe el total. Si te equivocas, corrige el número y guarda.</div>
     <label for="fNotas">Notas</label>
     <textarea id="fNotas" rows="2" placeholder="Ej: paga el viernes por Nequi"></textarea>
     <div class="btns">
       <button id="btnGuardar" class="btn red">Guardar</button>
       <a id="btnWa" class="btn wa" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center" target="_blank" rel="noopener">WhatsApp</a>
     </div>
-    <div class="btns"><button id="btnLiberar" class="btn ghost sm">Liberar número</button></div>
+    <div class="btns"><button id="btnLiberar" class="btn ghost sm">Eliminar comprador y dejar el número libre</button></div>
   </div>
 </div>
 
@@ -176,7 +194,7 @@ const sb = supabase.createClient("https://kqrfcdfygskzhsdzzcze.supabase.co","sb_
 const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2,'0');
 const peso = v => '$' + Math.round(v).toLocaleString('es-CO');
-let PIN = '', D = { valor: 50000, contacto: '', numeros: [] }, sel = null, estadoSel = 'pendiente';
+let PIN = '', D = { valor: 50000, contacto: '', numeros: [] }, sel = null;
 
 const store = {
   get(k){ try { return localStorage.getItem(k) || ''; } catch(e){ return ''; } },
@@ -206,12 +224,13 @@ $('pin').addEventListener('keyup', e => { if (e.key === 'Enter') entrar(); });
 function pintar(){
   const ns = D.numeros;
   const vend = ns.filter(x => x.estado !== 'libre'), pag = ns.filter(x => x.estado === 'pago');
+  const rec = vend.reduce((a, x) => a + (x.abonado || 0), 0);
   $('sVend').textContent = vend.length; $('sPag').textContent = pag.length; $('sLib').textContent = 100 - vend.length;
-  $('sRec').textContent = peso(pag.length * D.valor); $('sCob').textContent = peso((vend.length - pag.length) * D.valor);
+  $('sRec').textContent = peso(rec); $('sCob').textContent = peso(vend.length * D.valor - rec);
   const g = $('grid'); g.innerHTML = '';
   ns.forEach(x => {
     const b = document.createElement('button');
-    b.className = 'num ' + x.estado; b.textContent = pad(x.n);
+    b.className = 'num ' + (x.estado === 'pendiente' && x.abonado > 0 ? 'abono' : x.estado); b.textContent = pad(x.n);
     b.setAttribute('aria-label', 'Número ' + pad(x.n) + (x.estado === 'libre' ? ', libre' : ', ' + x.nombre));
     b.onclick = () => abrir(x.n);
     g.appendChild(b);
@@ -227,21 +246,31 @@ function lista(id, arr, vacio){
   arr.forEach(x => {
     const r = document.createElement('div'); r.className = 'row';
     const n = document.createElement('div'); n.className = 'n'; n.textContent = pad(x.n);
-    if (x.estado === 'pago') { n.style.background = 'var(--pago)'; n.style.color = '#fff'; }
+    if (x.estado === 'pago') { n.style.background = 'var(--pago)'; n.style.color = '#fff'; } else if (x.abonado > 0) n.style.background = '#FFB36B';
     const w = document.createElement('div'); w.className = 'who';
     const b = document.createElement('b'); b.textContent = x.nombre || '(sin nombre)';
-    const s = document.createElement('span'); s.textContent = [x.celular, x.notas].filter(Boolean).join(' · ');
+    const s = document.createElement('span'); s.textContent = [x.estado === 'pendiente' ? (x.abonado > 0 ? 'Abonó ' + peso(x.abonado) + ' · debe ' + peso(D.valor - x.abonado) : 'Debe ' + peso(D.valor)) : '', x.celular, x.notas].filter(Boolean).join(' · ');
     w.append(b, s);
     const ed = document.createElement('button'); ed.className = 'btn ghost sm'; ed.textContent = 'Ver'; ed.onclick = () => abrir(x.n);
     r.append(n, w, ed); el.appendChild(r);
   });
 }
 
-function setEstado(e){ estadoSel = e; $('eP').classList.toggle('on', e === 'pendiente'); $('eG').classList.toggle('on', e === 'pago'); }
-$('eP').onclick = () => setEstado('pendiente'); $('eG').onclick = () => setEstado('pago');
+const leerAbono = () => Math.min(parseInt(($('fAbono').value || '').replace(/\D/g, ''), 10) || 0, D.valor);
+function verPago(){
+  const a = leerAbono(); $('pAbo').textContent = peso(a); $('pDebe').textContent = peso(D.valor - a);
+  $('boxAbo').classList.toggle('ok', a >= D.valor); waLink();
+}
+$('fAbono').addEventListener('input', verPago);
+document.querySelectorAll('[data-add]').forEach(b => b.onclick = () => {
+  const k = b.dataset.add; let a = leerAbono();
+  a = k === 'todo' ? D.valor : k === 'cero' ? 0 : Math.min(a + parseInt(k, 10), D.valor);
+  $('fAbono').value = a ? a.toLocaleString('es-CO') : ''; verPago();
+});
 function waLink(){
   let c = $('fCel').value.replace(/\D/g, ''); if (c.length === 10) c = '57' + c;
-  const msg = 'Hola ' + ($('fNombre').value.trim() || '') + ', te escribo por el bono solidario de la abuelita Tarcila. Tu número es el ' + pad(sel) + ' 🍀';
+  const debe = D.valor - leerAbono();
+  const msg = 'Hola ' + ($('fNombre').value.trim() || '') + ', te escribo por el bono solidario de la abuelita Tarcila. Tu número es el ' + pad(sel) + ' 🍀' + (debe > 0 ? ' Te quedan ' + peso(debe) + ' por pagar.' : ' ¡Ya está pago, gracias!');
   $('btnWa').href = c ? 'https://wa.me/' + c + '?text=' + encodeURIComponent(msg) : '#';
   $('btnWa').style.opacity = c ? 1 : .5;
 }
@@ -250,9 +279,9 @@ $('fCel').addEventListener('input', waLink); $('fNombre').addEventListener('inpu
 function abrir(n){
   sel = n; const x = D.numeros[n];
   $('shNum').textContent = pad(n); $('shTitle').textContent = 'Número ' + pad(n);
-  $('shSub').textContent = x.estado === 'libre' ? 'Libre' : x.estado === 'pago' ? 'Vendido y pagado' : 'Apartado, falta pagar';
+  $('shSub').textContent = x.estado === 'libre' ? 'Libre' : x.estado === 'pago' ? 'Vendido y pagado' : x.abonado > 0 ? 'Abonó una parte' : 'Apartado, falta pagar';
   $('fNombre').value = x.nombre; $('fCel').value = x.celular; $('fNotas').value = x.notas;
-  setEstado(x.estado === 'pago' ? 'pago' : 'pendiente');
+  $('fAbono').value = x.abonado ? x.abonado.toLocaleString('es-CO') : ''; verPago();
   $('btnLiberar').classList.toggle('hide', x.estado === 'libre');
   waLink(); $('sheet').classList.add('open');
   if (x.estado === 'libre') setTimeout(() => $('fNombre').focus(), 150);
@@ -261,8 +290,8 @@ function cerrar(){ $('sheet').classList.remove('open'); }
 $('shClose').onclick = cerrar;
 $('sheet').addEventListener('click', e => { if (e.target === $('sheet')) cerrar(); });
 
-async function guardar(estado, nombre, cel, notas){
-  const { error } = await sb.rpc('bono_guardar', { p_pin: PIN, p_numero: sel, p_nombre: nombre, p_celular: cel, p_estado: estado, p_notas: notas });
+async function guardar(nombre, cel, abonado, notas, liberar){
+  const { error } = await sb.rpc('bono_guardar', { p_pin: PIN, p_numero: sel, p_nombre: nombre, p_celular: cel, p_abonado: abonado, p_notas: notas, p_liberar: !!liberar });
   if (error) { toast('No se guardó. Revisa el internet e intenta otra vez.'); return false; }
   await cargar(true); return true;
 }
@@ -270,13 +299,13 @@ $('btnGuardar').onclick = async () => {
   const nombre = $('fNombre').value.trim();
   if (!nombre) { toast('Escribe el nombre del comprador'); $('fNombre').focus(); return; }
   const b = $('btnGuardar'); b.disabled = true; b.textContent = 'Guardando…';
-  const ok = await guardar(estadoSel, nombre, $('fCel').value.trim(), $('fNotas').value.trim());
+  const ok = await guardar(nombre, $('fCel').value.trim(), leerAbono(), $('fNotas').value.trim(), false);
   b.disabled = false; b.textContent = 'Guardar';
   if (ok) { cerrar(); toast('Número ' + pad(sel) + ' guardado ✓'); }
 };
 $('btnLiberar').onclick = async () => {
-  if (!confirm('¿Liberar el número ' + pad(sel) + '? Se borran el nombre y el celular.')) return;
-  if (await guardar('libre', '', '', '')) { cerrar(); toast('Número ' + pad(sel) + ' quedó libre'); }
+  if (!confirm('¿Eliminar a ' + (D.numeros[sel].nombre || 'este comprador') + ' y dejar libre el número ' + pad(sel) + '? Se borran el nombre, el celular y lo que haya abonado.')) return;
+  if (await guardar('', '', 0, '', true)) { cerrar(); toast('Número ' + pad(sel) + ' quedó libre'); }
 };
 
 document.querySelectorAll('.tab').forEach(t => t.onclick = () => {

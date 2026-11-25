@@ -319,7 +319,7 @@ document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
 });
 
 /* ---- Imagen del bono con los números tapados ---- */
-const fondo = new Image(); fondo.src = 'bono-tarcila-fondo.webp'; fondo.onload = () => dibujar();
+const fondo = new Image(); fondo.src = 'bono-tarcila-fondo-foto.webp'; fondo.onload = () => dibujar();
 const CX = 74, CY = 878, SX = 93.89, SY = 85, CW = 86.89, CH = 78;
 function rr(c, x, y, w, h, r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
 async function dibujar(){

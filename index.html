@@ -1908,6 +1908,8 @@
     <div class="form-grid">
       <div class="field full"><label>Número o nombre del contrato</label><input id="caCtrNumber" placeholder="Ej. Contrato de suministro No. 6.1-17.7/009 de 2026" /></div>
       <div class="field full"><label>Valor total del contrato (IVA incluido)</label><input id="caCtrValue" type="number" min="0" step="any" inputmode="numeric" placeholder="0" /></div>
+      <div class="field full"><label class="ca-check"><input type="checkbox" id="caCtrFund" onchange="document.getElementById('caCtrTaxWrap').classList.toggle('hidden',!this.checked)" /> 💼 Es un rubro: el cliente paga por adelantado y se le va descontando lo que se hace</label></div>
+      <div class="field full hidden" id="caCtrTaxWrap"><label>IVA del rubro (se resta de lo recibido)</label><input id="caCtrTax" type="number" min="0" step="any" inputmode="numeric" placeholder="Si lo dejas vacío lo calculo: 19 % incluido en el valor del contrato" /><small class="subtle">Los trabajos se anotan con su valor antes de IVA. Disponible = lo recibido − IVA − trabajos.</small></div>
       <div class="field full"><label>Texto aclaratorio para el estado de cuenta</label><textarea id="caCtrNote" rows="5" placeholder="Opcional: aparece al final del estado de cuenta"></textarea></div>
     </div>
     <div class="modal-actions"><button type="button" class="btn secondary" data-close="caContractModal">Cancelar</button><button class="btn primary" type="submit">Guardar</button></div>
@@ -3313,7 +3315,7 @@
       const [bal,pays]=await Promise.all([db.from("client_account_balances").select("*"),db.from("client_account_payments").select("amount,kind,payment_date").gte("payment_date",monthStart)]);
       if(bal.error){ca.missing=true;$("caGrid").innerHTML='<div class="pgrid-empty">Falta un pasito: corre el archivo <strong>cartera-clientes.sql</strong> en Supabase para activar las cuentas de clientes.</div>';return}
       ca.missing=false;ca.rows=bal.data||[];
-      const open=ca.rows.filter(r=>r.status==="open"),due=ca.rows.filter(r=>numberValue(r.balance)>.01);
+      const open=ca.rows.filter(r=>r.status==="open"),due=ca.rows.filter(r=>!r.is_fund&&numberValue(r.balance)>.01);
       $("caStatDue").textContent=formatCOP(due.reduce((a,r)=>a+numberValue(r.balance),0));$("caStatDueNote").textContent=due.length?`${due.length} cuenta${due.length===1?"":"s"} con saldo`:"Nadie nos debe 🎉";
       $("caStatOpen").textContent=open.length;$("caStatMonth").textContent=formatCOP((pays.data||[]).filter(p=>p.kind==="payment").reduce((a,p)=>a+numberValue(p.amount),0));
       $("caStatPending").textContent=open.reduce((a,r)=>a+numberValue(r.pending_delivery),0);
@@ -3321,12 +3323,12 @@
     }
     function renderCartera(){
       if(ca.missing)return;const term=caKey($("caSearch").value),f=$("caFilter").value;
-      const rows=ca.rows.filter(r=>(!term||caKey(r.client_name+" "+r.label).includes(term))&&(f==="all"||(f==="due"?numberValue(r.balance)>.01:f==="closed"?r.status==="closed":r.status==="open")))
+      const rows=ca.rows.filter(r=>(!term||caKey(r.client_name+" "+r.label).includes(term))&&(f==="all"||(f==="due"?!r.is_fund&&numberValue(r.balance)>.01:f==="closed"?r.status==="closed":r.status==="open")))
         .sort((a,b)=>(a.status===b.status?0:a.status==="open"?-1:1)||numberValue(b.balance)-numberValue(a.balance)||String(a.client_name).localeCompare(String(b.client_name),"es"));
       $("caGrid").innerHTML=rows.length?rows.map(r=>{
-        const bal=numberValue(r.balance),closed=r.status==="closed"&&bal<=.01,zero=r.status!=="closed"&&bal<=.01,last=[r.last_item_date,r.last_payment_date].filter(Boolean).sort().pop();
+        const bal=numberValue(r.balance),fund=!!r.is_fund,closed=r.status==="closed"&&bal<=.01,zero=r.status!=="closed"&&bal<=.01,last=[r.last_item_date,r.last_payment_date].filter(Boolean).sort().pop();
         const flags=[numberValue(r.pending_delivery)?`<span class="ca-flag">📦 ${r.pending_delivery} sin entregar</span>`:""].join("");
-        return `<button type="button" class="ca-card${closed?" closed":zero?" zero":""}" data-ca="${r.client_account_id}"><div class="ca-top"><span class="ca-name">${escapeHTML(r.client_name)}</span><span class="ca-label">${escapeHTML(r.label)}${r.status==="closed"?(bal>.01?" · cerrada · por cobrar":" · pagada"):""}</span></div><span class="ca-due">${closed?"Pagada ✓ "+caDate(r.closed_on):zero?(bal<-.01?"A favor "+formatCOP(-bal):"Al día ✓"):formatCOP(bal)}</span>${flags?`<div class="ca-flags">${flags}</div>`:""}</button>`
+        return `<button type="button" class="ca-card${closed?" closed":zero?" zero":""}" data-ca="${r.client_account_id}"><div class="ca-top"><span class="ca-name">${escapeHTML(r.client_name)}</span><span class="ca-label">${fund?"💼 ":""}${escapeHTML(r.label)}${r.status==="closed"?(bal>.01?" · cerrada · por cobrar":" · pagada"):""}</span></div><span class="ca-due">${fund?(numberValue(r.paid)<=0?"Falta registrar el pago":bal<=.01?"Disponible "+formatCOP(-bal):"Se pasó "+formatCOP(bal)):closed?"Pagada ✓ "+caDate(r.closed_on):zero?(bal<-.01?"A favor "+formatCOP(-bal):"Al día ✓"):formatCOP(bal)}</span>${flags?`<div class="ca-flags">${flags}</div>`:""}</button>`
       }).join(""):`<div class="pgrid-empty">${f==="due"?"Nadie nos debe en cuentas 🎉 Toca <strong>+ Abrir cuenta</strong> para empezar una.":"No hay cuentas con ese filtro."}</div>`;
     }
     async function caLoadClients(){if(ca.clients.length)return;const [c,p]=await Promise.all([db.from("clients").select("id,name,phone").eq("active",true).order("name"),db.from("products").select("id,name,sale_price,active").eq("active",true).order("name")]);ca.clients=c.data||[];ca.products=p.data||[]}
@@ -3360,18 +3362,44 @@
       const opts=new Map();[...ca.history.values()].forEach(h=>opts.set(caKey(h.description),`<option value="${escapeHTML(h.description)}">Último: ${formatCOP(h.price)}</option>`));ca.products.forEach(p=>{if(!opts.has(caKey(p.name)))opts.set(caKey(p.name),`<option value="${escapeHTML(p.name)}">${numberValue(p.sale_price)>0?"Lista: "+formatCOP(p.sale_price):""}</option>`)});
       $("caDescList").innerHTML=[...opts.values()].join("");
     }
-    function caTotals(){const a=ca.current,sub=ca.items.reduce((s,i)=>s+numberValue(i.quantity)*numberValue(i.unit_price),0),tax=Math.round(sub*numberValue(a.tax_rate))/100,total=sub+tax,paid=ca.pays.reduce((s,p)=>s+numberValue(p.amount),0);return {sub,tax,total,paid,balance:total-paid}}
+    function caTotals(){const a=ca.current,sub=ca.items.reduce((s,i)=>s+numberValue(i.quantity)*numberValue(i.unit_price),0);if(a.is_fund){const paid=ca.pays.reduce((s,p)=>s+numberValue(p.amount),0),tax=numberValue(a.fund_tax),cv=numberValue(a.contract_value),total=sub+tax;return {sub,tax,total,paid,balance:total-paid,fund:true,cv,disc:cv>0&&paid>0?Math.max(cv-paid,0):0,start:paid-tax,avail:paid-total}}const tax=Math.round(sub*numberValue(a.tax_rate))/100,total=sub+tax,paid=ca.pays.reduce((s,p)=>s+numberValue(p.amount),0);return {sub,tax,total,paid,balance:total-paid}}
     function caRender(){
       try{caRenderGeneral()}catch(e){console.error(e)}
       const a=ca.current,t=caTotals(),w=caCanWrite(),closed=a.status==="closed";
       $("caTitle").textContent=`${a.client_name} · ${a.label}`;$("caSubtitle").textContent=`${closed?(t.balance>.01?"Cerrada el "+caDate(a.closed_on)+" · todavía debe "+formatCOP(t.balance)+" · ":"Pagada y cerrada el "+caDate(a.closed_on)+" · "):"Abierta desde "+caDate(a.opened_on)+" · "}${ca.items.length} producto${ca.items.length===1?"":"s"}${a.notes?" · "+a.notes:""}`;
       $("caTotal").textContent=formatCOP(t.total);$("caTaxNote").textContent=numberValue(a.tax_rate)?`Incluye IVA ${numberValue(a.tax_rate)}%: ${formatCOP(t.tax)}`:"";$("caPaid").textContent=formatCOP(t.paid);$("caBalance").textContent=t.balance<=.01?(t.balance<-.01?`A favor ${formatCOP(-t.balance)}`:"Al día ✓"):formatCOP(t.balance);
-      $("caTax").checked=numberValue(a.tax_rate)>0;$("caCloseAccount").textContent=closed?"↩ Reabrir cuenta":t.balance>.01?"📂 Pasar a cuenta nueva":"✅ Cerrar (pagada)";$("caCloseAccount").title=closed?"Volver a abrir esta cuenta para seguir anotando":t.balance>.01?"Cierra esta cuenta para facturarla aparte (lo que debe sigue en Cartera) y abre otra para lo nuevo":"La cuenta está al día: se cierra como pagada";
+      caRenderFundSummary(t);$("caTax").checked=numberValue(a.tax_rate)>0;$("caCloseAccount").textContent=closed?"↩ Reabrir cuenta":t.balance>.01?"📂 Pasar a cuenta nueva":"✅ Cerrar (pagada)";$("caCloseAccount").title=closed?"Volver a abrir esta cuenta para seguir anotando":t.balance>.01?"Cierra esta cuenta para facturarla aparte (lo que debe sigue en Cartera) y abre otra para lo nuevo":"La cuenta está al día: se cierra como pagada";
       $("caDeleteAccount").classList.toggle("hidden",!w||ca.items.length>0||ca.pays.length>0);
       $("caItemForm").classList.toggle("hidden",!w||closed);$("caPayForm").classList.toggle("hidden",!w||(closed&&t.balance<=.01));
       $("caItems").innerHTML=ca.items.length?`<div class="ca-row head"><span>Fecha</span><span class="num">Cant.</span><span>Detalle</span><span class="num">V. unit.</span><span class="num">Total</span></div>`+ca.items.map(i=>`<div class="ca-row"><span class="c-date">${i.item_date?caDate(i.item_date):"—"}</span><span class="c-qty num">${formatInventoryQuantity(i.quantity)}</span><span class="c-desc"><strong>${escapeHTML(i.description)}</strong>${i.delivery_place?`<span class="place">📍 ${escapeHTML(i.delivery_place)}</span>`:""}<span class="place mob-only">${formatInventoryQuantity(i.quantity)} × ${formatCOP(i.unit_price)}</span><span class="acts"><button type="button" class="ca-tog ${i.delivered?"on":"off"}" data-ca-tog="delivered" data-id="${i.id}" ${w?"":"disabled"}>${i.delivered?"✓ Entregado":"Sin entregar"}</button><button type="button" class="ca-tog inv ${i.invoiced?"on":"off"}" data-ca-tog="invoiced" data-id="${i.id}" ${w?"":"disabled"}>${i.invoiced?"✓ Facturado":"Sin facturar"}</button>${w&&!closed?`<button type="button" class="ca-ic" data-ca-edit="${i.id}" title="Editar">✎</button><button type="button" class="ca-ic" data-ca-del="${i.id}" title="Borrar">🗑</button>`:""}</span></span><span class="c-unit num">${formatCOP(i.unit_price)}</span><span class="c-tot num tot">${formatCOP(numberValue(i.quantity)*numberValue(i.unit_price))}</span></div>`).join(""):'<div class="empty">Todavía no hay nada anotado. Agrega lo primero que le entregaste arriba ☝️</div>';
       $("caPays").innerHTML=ca.pays.length?ca.pays.map(p=>`<div class="ca-pay"><div><strong>${formatCOP(p.amount)}</strong> · ${escapeHTML(caKindText[p.kind]||p.kind)}<small>${caDate(p.payment_date)}${p.finance_accounts?.name?" · "+escapeHTML(p.finance_accounts.name):""}${p.reference?" · "+escapeHTML(p.reference):""}</small></div><span style="display:flex;gap:4px">${p.support_path?`<button type="button" class="ca-ic" data-ca-support="${escapeHTML(p.support_path)}" title="Ver comprobante">📎</button>`:""}${w?`<button type="button" class="ca-ic" data-ca-paydel="${p.id}" title="Borrar abono">🗑</button>`:""}</span></div>`).join(""):'<div class="empty">Sin abonos todavía.</div>';
       caPayKindSync();
+    }
+    // V10.03: rubros por contrato (el cliente pagó por adelantado y se le va descontando)
+    function caRenderFundSummary(t){
+      const f=!!t.fund,lab=(id,txt)=>{const el=$(id)?.previousElementSibling;if(el)el.textContent=txt};
+      lab("caTotal",f?"Usado del rubro":"Total entregado");lab("caPaid",f?"Recibido":"Abonado");lab("caBalance",f?"Disponible":"Saldo");
+      if(f){$("caTotal").textContent=formatCOP(t.sub);$("caTaxNote").textContent=`IVA del rubro: ${formatCOP(t.tax)} (no se gasta)`;$("caBalance").textContent=t.paid<=0?"Falta registrar el pago":t.avail>=-.01?formatCOP(Math.max(t.avail,0)):"Se pasó "+formatCOP(-t.avail)}
+      $("caTax").closest("label").classList.toggle("hidden",f||!caCanWrite());
+      const kind=$("caPayKind").closest("label");if(kind)kind.classList.toggle("hidden",f);if(f&&$("caPayKind").value!=="payment"){$("caPayKind").value="payment";caPayKindSync()}
+    }
+    function caFundStatementHTML(payInfo){
+      const a=ca.current,t=caTotals(),b=state.business||{},neg=v=>"− "+formatCOP(Math.abs(v));let run=t.start;
+      const rows=ca.items.map(i=>{const v=numberValue(i.quantity)*numberValue(i.unit_price);run-=v;return `<tr><td>${i.item_date?caDate(i.item_date):"—"}</td><td class="r">${formatInventoryQuantity(i.quantity)}</td><td>${escapeHTML(i.description)}${i.delivered?"":"<small>Pendiente</small>"}</td><td class="r">${formatCOP(i.unit_price)}</td><td class="r"><b>${formatCOP(v)}</b></td><td class="r">${run<-.5?neg(run):formatCOP(run)}</td></tr>`}).join("");
+      const recv=ca.pays.map(p=>caDate(p.payment_date)).join(", "),row=(l,v,c="")=>`<tr class="${c}"><td>${l}</td><td class="r">${v}</td></tr>`;
+      return `<div class="bar"><i></i><i></i><i></i></div><div class="top"><img src="logo.png" alt="Tecnigráficas" /><div class="t"><h1>ESTADO DE CUENTA DEL RUBRO</h1><div class="lbl">${escapeHTML(a.contract_number||a.label)}</div><div class="dt">Corte: ${caDate(todayISO())}</div></div></div>
+      <div class="who"><div><small>CLIENTE</small><strong>${escapeHTML(a.client_name)}</strong></div><div class="bal"><small>SALDO DISPONIBLE</small><strong>${t.paid<=0?"—":t.avail>=-.01?formatCOP(Math.max(t.avail,0)):"Se pasó "+formatCOP(-t.avail)}</strong></div></div>
+      <div class="ctr"><div class="ch">RESUMEN DEL RUBRO<span>${escapeHTML(a.contract_number||a.label)}</span></div><table>
+        ${t.cv>0?row("Valor de la cotización (IVA incluido)",formatCOP(t.cv)):""}
+        ${t.disc>.5?row("Descuentos aplicados en el pago",neg(t.disc)):""}
+        ${row(`Valor recibido${recv?" ("+escapeHTML(recv)+")":""}`,formatCOP(t.paid))}
+        ${t.tax?row("IVA",neg(t.tax)):""}
+        ${row("Saldo inicial disponible para trabajos",formatCOP(t.start),"tot")}
+      </table></div>
+      <table><thead><tr><th>Fecha</th><th class="r">Cant.</th><th>Trabajo</th><th class="r">V. unitario</th><th class="r">Total</th><th class="r">Saldo</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Todavía no hay trabajos descontados.</td></tr>'}</tbody></table>
+      <div class="sums"><table><tr><td>Saldo inicial</td><td class="r">${formatCOP(t.start)}</td></tr><tr><td>Trabajos descontados</td><td class="r">${neg(t.sub)}</td></tr><tr class="big"><td>${t.avail<-.01?"Se pasó":"Disponible"}</td><td class="r">${formatCOP(Math.abs(t.avail))}</td></tr></table></div>
+      <div class="cnote">Todos los valores van antes de IVA.${a.statement_note?"\n\n"+escapeHTML(a.statement_note):""}</div>
+      <div class="foot"><strong>${escapeHTML(b.company_name||"Tecnigráficas")}</strong> · www.sastecnigraficas.com<br>${escapeHTML(b.address||"")}<br>WhatsApp ${escapeHTML(b.whatsapp||"")} · ${escapeHTML(b.email||"")} · ${escapeHTML(b.instagram||"")}<br>¡Gracias por confiar en nosotros! 💙</div>`;
     }
     function caResetItemForm(){$("caItemForm").reset();$("caItemId").value="";$("caItemDate").value=todayISO();$("caItemQty").value=1;$("caItemDelivered").checked=true;$("caItemSave").textContent="+ Agregar";$("caItemCancel").classList.add("hidden");$("caPriceHint").classList.add("hidden")}
     function caPriceHint(){
@@ -3435,6 +3463,7 @@
     async function caEditPayInfo(){loading(true,"Cargando…");try{$("caPayInfoText").value=await caLoadPayInfo()}finally{loading(false)}openModal("caPayInfoModal")}
     async function caSavePayInfo(e){e.preventDefault();const v=$("caPayInfoText").value.trim();const {error}=await db.from("app_settings").upsert({key:"payment_info",value:v,updated_at:new Date().toISOString()});if(error)return alert(error.message);ca.payInfo=v;closeModal("caPayInfoModal");showToast("✓ Datos para pagar guardados")}
     function caStatementHTML(payInfo){
+      if(ca.current.is_fund)return caFundStatementHTML(payInfo);
       const a=ca.current,t=caTotals(),b=state.business||{},rows=ca.items.map(i=>`<tr><td>${i.item_date?caDate(i.item_date):"—"}</td><td class="r">${formatInventoryQuantity(i.quantity)}</td><td>${escapeHTML(i.description)}${i.delivery_place?`<small>Entregado en: ${escapeHTML(i.delivery_place)}</small>`:""}${i.delivered?"":"<small>Pendiente por entregar</small>"}</td><td class="r">${formatCOP(i.unit_price)}</td><td class="r"><b>${formatCOP(numberValue(i.quantity)*numberValue(i.unit_price))}</b></td></tr>`).join("");
       const pays=ca.pays.map(p=>`<tr><td>${caDate(p.payment_date)}</td><td>${escapeHTML(caKindText[p.kind]||p.kind)}${p.reference?` · ${escapeHTML(p.reference)}`:""}</td><td class="r"><b>${formatCOP(p.amount)}</b></td></tr>`).join("");
       const bal=t.balance;
@@ -3460,8 +3489,8 @@
         ${row("Saldo disponible por ejecutar",Math.max(disp,0))}
       </table><div class="bar2"><i style="width:${Math.min(100,fact/cv*100)}%;background:#00a6d6"></i><i style="width:${Math.min(100,pendFac/cv*100)}%;background:#e6007e"></i></div></div>`;
     }
-    async function caEditContract(){const a=ca.current;$("caCtrNumber").value=a.contract_number||"";$("caCtrValue").value=a.contract_value?numberValue(a.contract_value):"";$("caCtrNote").value=a.statement_note||"";openModal("caContractModal")}
-    async function caSaveContract(e){e.preventDefault();const v=numberValue($("caCtrValue").value);const payload={contract_number:$("caCtrNumber").value.trim()||null,contract_value:v>0?v:null,statement_note:$("caCtrNote").value.trim()||null};const {error}=await db.from("client_accounts").update(payload).eq("id",ca.current.id);if(error)return alert(error.message);Object.assign(ca.current,payload);closeModal("caContractModal");showToast("✓ Datos del contrato guardados")}
+    async function caEditContract(){const a=ca.current;$("caCtrNumber").value=a.contract_number||"";$("caCtrValue").value=a.contract_value?numberValue(a.contract_value):"";$("caCtrNote").value=a.statement_note||"";$("caCtrFund").checked=!!a.is_fund;$("caCtrTax").value=a.fund_tax!=null?numberValue(a.fund_tax):"";$("caCtrTaxWrap").classList.toggle("hidden",!a.is_fund);openModal("caContractModal")}
+    async function caSaveContract(e){e.preventDefault();const v=numberValue($("caCtrValue").value);const fund=$("caCtrFund").checked,tx=$("caCtrTax").value.trim();if(fund&&!(v>0))return alert("Para un rubro escribe el valor total del contrato (con IVA).");const payload={contract_number:$("caCtrNumber").value.trim()||null,contract_value:v>0?v:null,statement_note:$("caCtrNote").value.trim()||null,is_fund:fund,fund_tax:fund?(tx?numberValue(tx):Math.round(v*19/119)):null};if(fund)payload.tax_rate=0;const {error}=await db.from("client_accounts").update(payload).eq("id",ca.current.id);if(error)return alert(error.message);Object.assign(ca.current,payload);closeModal("caContractModal");showToast("✓ Datos del contrato guardados");caRender();loadCartera()}
     function caFitStatement(){const wrap=$("caStScale").parentElement,sc=Math.min(1,(wrap.clientWidth-28)/816);$("caStScale").style.transform=`scale(${sc})`;$("caStScale").style.height=($("caDoc").offsetHeight*sc)+"px"}
     const CA_ISSUERS={tecni:{name:"Tecnigráficas SAS",doc:"NIT 901911453",opts:[{k:"t_bco",l:"🏦 Bancolombia · Cuenta de ahorros",v:"26100011015"}]},
       personal:{name:"Luiza Fernanda Narváez Timaná",doc:"C.C. 1061795361",opts:[{k:"breb",l:"🔑 Llave Bre-B",v:"@tecnigraficas"},{k:"bco",l:"🏦 Bancolombia · Cuenta de ahorros",v:"91258813192"},{k:"nequi",l:"📲 Nequi",v:"3193451013"}]}};

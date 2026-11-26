@@ -3380,7 +3380,7 @@
       const f=!!t.fund,lab=(id,txt)=>{const el=$(id)?.previousElementSibling;if(el)el.textContent=txt};
       lab("caTotal",f?"Usado del rubro":"Total entregado");lab("caPaid",f?"Recibido":"Abonado");lab("caBalance",f?"Disponible":"Saldo");
       if(f){$("caTotal").textContent=formatCOP(t.sub);$("caTaxNote").textContent=`IVA del rubro: ${formatCOP(t.tax)} (no se gasta)`;$("caBalance").textContent=t.paid<=0?"Falta registrar el pago":t.avail>=-.01?formatCOP(Math.max(t.avail,0)):"Se pasó "+formatCOP(-t.avail)}
-      $("caTax").closest("label").style.display=f?"none":"";
+      {const l=$("caTax").closest("label");if(f)l.style.setProperty("display","none","important");else l.style.removeProperty("display")}
       const kind=$("caPayKind").closest("label");if(kind)kind.classList.toggle("hidden",f);if(f&&$("caPayKind").value!=="payment"){$("caPayKind").value="payment";caPayKindSync()}
     }
     function caFundStatementHTML(payInfo){

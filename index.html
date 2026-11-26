@@ -3323,7 +3323,7 @@
     }
     function renderCartera(){
       if(ca.missing)return;const term=caKey($("caSearch").value),f=$("caFilter").value;
-      const rows=ca.rows.filter(r=>(!term||caKey(r.client_name+" "+r.label).includes(term))&&(f==="all"||(f==="due"?!r.is_fund&&numberValue(r.balance)>.01:f==="closed"?r.status==="closed":r.status==="open")))
+      const rows=ca.rows.filter(r=>(!term||caKey(r.client_name+" "+r.label).includes(term))&&(f==="all"||(f==="due"?(r.is_fund?r.status==="open":numberValue(r.balance)>.01):f==="closed"?r.status==="closed":r.status==="open")))
         .sort((a,b)=>(a.status===b.status?0:a.status==="open"?-1:1)||numberValue(b.balance)-numberValue(a.balance)||String(a.client_name).localeCompare(String(b.client_name),"es"));
       $("caGrid").innerHTML=rows.length?rows.map(r=>{
         const bal=numberValue(r.balance),fund=!!r.is_fund,closed=r.status==="closed"&&bal<=.01,zero=r.status!=="closed"&&bal<=.01,last=[r.last_item_date,r.last_payment_date].filter(Boolean).sort().pop();
@@ -3380,12 +3380,12 @@
       const f=!!t.fund,lab=(id,txt)=>{const el=$(id)?.previousElementSibling;if(el)el.textContent=txt};
       lab("caTotal",f?"Usado del rubro":"Total entregado");lab("caPaid",f?"Recibido":"Abonado");lab("caBalance",f?"Disponible":"Saldo");
       if(f){$("caTotal").textContent=formatCOP(t.sub);$("caTaxNote").textContent=`IVA del rubro: ${formatCOP(t.tax)} (no se gasta)`;$("caBalance").textContent=t.paid<=0?"Falta registrar el pago":t.avail>=-.01?formatCOP(Math.max(t.avail,0)):"Se pasó "+formatCOP(-t.avail)}
-      $("caTax").closest("label").classList.toggle("hidden",f||!caCanWrite());
+      $("caTax").closest("label").style.display=f?"none":"";
       const kind=$("caPayKind").closest("label");if(kind)kind.classList.toggle("hidden",f);if(f&&$("caPayKind").value!=="payment"){$("caPayKind").value="payment";caPayKindSync()}
     }
     function caFundStatementHTML(payInfo){
-      const a=ca.current,t=caTotals(),b=state.business||{},neg=v=>"− "+formatCOP(Math.abs(v));let run=t.start;
-      const rows=ca.items.map(i=>{const v=numberValue(i.quantity)*numberValue(i.unit_price);run-=v;return `<tr><td>${i.item_date?caDate(i.item_date):"—"}</td><td class="r">${formatInventoryQuantity(i.quantity)}</td><td>${escapeHTML(i.description)}${i.delivered?"":"<small>Pendiente</small>"}</td><td class="r">${formatCOP(i.unit_price)}</td><td class="r"><b>${formatCOP(v)}</b></td><td class="r">${run<-.5?neg(run):formatCOP(run)}</td></tr>`}).join("");
+      const a=ca.current,t=caTotals(),b=state.business||{},neg=v=>`<span style="white-space:nowrap">− ${formatCOP(Math.abs(v))}</span>`,cop=v=>`<span style="white-space:nowrap">${v<-.5?"− ":""}${formatCOP(Math.abs(v))}</span>`;let run=t.start;
+      const rows=ca.items.map(i=>{const v=numberValue(i.quantity)*numberValue(i.unit_price);run-=v;return `<tr><td>${i.item_date?caDate(i.item_date):"—"}</td><td class="r">${formatInventoryQuantity(i.quantity)}</td><td>${escapeHTML(i.description)}${i.delivered?"":"<small>Pendiente</small>"}</td><td class="r">${formatCOP(i.unit_price)}</td><td class="r"><b>${formatCOP(v)}</b></td><td class="r">${cop(run)}</td></tr>`}).join("");
       const recv=ca.pays.map(p=>caDate(p.payment_date)).join(", "),row=(l,v,c="")=>`<tr class="${c}"><td>${l}</td><td class="r">${v}</td></tr>`;
       return `<div class="bar"><i></i><i></i><i></i></div><div class="top"><img src="logo.png" alt="Tecnigráficas" /><div class="t"><h1>ESTADO DE CUENTA DEL RUBRO</h1><div class="lbl">${escapeHTML(a.contract_number||a.label)}</div><div class="dt">Corte: ${caDate(todayISO())}</div></div></div>
       <div class="who"><div><small>CLIENTE</small><strong>${escapeHTML(a.client_name)}</strong></div><div class="bal"><small>SALDO DISPONIBLE</small><strong>${t.paid<=0?"—":t.avail>=-.01?formatCOP(Math.max(t.avail,0)):"Se pasó "+formatCOP(-t.avail)}</strong></div></div>
@@ -3394,10 +3394,10 @@
         ${t.disc>.5?row("Descuentos aplicados en el pago",neg(t.disc)):""}
         ${row(`Valor recibido${recv?" ("+escapeHTML(recv)+")":""}`,formatCOP(t.paid))}
         ${t.tax?row("IVA",neg(t.tax)):""}
-        ${row("Saldo inicial disponible para trabajos",formatCOP(t.start),"tot")}
+        ${row("Saldo inicial disponible para trabajos",cop(t.start),"tot")}
       </table></div>
       <table><thead><tr><th>Fecha</th><th class="r">Cant.</th><th>Trabajo</th><th class="r">V. unitario</th><th class="r">Total</th><th class="r">Saldo</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Todavía no hay trabajos descontados.</td></tr>'}</tbody></table>
-      <div class="sums"><table><tr><td>Saldo inicial</td><td class="r">${formatCOP(t.start)}</td></tr><tr><td>Trabajos descontados</td><td class="r">${neg(t.sub)}</td></tr><tr class="big"><td>${t.avail<-.01?"Se pasó":"Disponible"}</td><td class="r">${formatCOP(Math.abs(t.avail))}</td></tr></table></div>
+      <div class="sums"><table><tr><td>Saldo inicial</td><td class="r">${cop(t.start)}</td></tr><tr><td>Trabajos descontados</td><td class="r">${neg(t.sub)}</td></tr><tr class="big"><td>${t.avail<-.01?"Se pasó":"Disponible"}</td><td class="r">${formatCOP(Math.abs(t.avail))}</td></tr></table></div>
       <div class="cnote">Todos los valores van antes de IVA.${a.statement_note?"\n\n"+escapeHTML(a.statement_note):""}</div>
       <div class="foot"><strong>${escapeHTML(b.company_name||"Tecnigráficas")}</strong> · www.sastecnigraficas.com<br>${escapeHTML(b.address||"")}<br>WhatsApp ${escapeHTML(b.whatsapp||"")} · ${escapeHTML(b.email||"")} · ${escapeHTML(b.instagram||"")}<br>¡Gracias por confiar en nosotros! 💙</div>`;
     }

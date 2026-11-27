@@ -819,6 +819,11 @@
     .ca-gen-row .n{font-weight:800}.ca-gen-row .d{color:var(--muted)}.ca-gen-row .t{text-align:right;font-weight:800}.ca-gen-row .s{font-size:11px;font-weight:800;border-radius:999px;padding:3px 9px;background:#eef1f5;color:#56606e;white-space:nowrap}
     .ca-gen-row .s.ok{background:#e9f8ef;color:#12894a}.ca-gen-row .s.due{background:#fdebf4;color:var(--magenta)}
     @media(max-width:760px){.ca-gen-nums{grid-template-columns:1fr 1fr}.ca-gen-nums>div:last-child{grid-column:1/-1}.ca-gen-row{grid-template-columns:1fr auto;row-gap:3px}.ca-gen-row .d{display:none}.ca-gen-row .s{grid-column:1/-1;justify-self:start}}
+    /* V10.04 responsables por tablero */
+    .wo-rdots{display:inline-flex;margin-left:6px;vertical-align:middle}.wo-rdots i,.wo-rbar i,.wo-ropt i{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;font:800 9px/1 system-ui;font-style:normal;color:#1a1a1a;background:#e8e8ee;box-shadow:0 0 0 2px #fff}.wo-rdots i+i{margin-left:-6px}
+    .wo-rbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:-4px 2px 10px;font-size:13px}.wo-rbar[hidden]{display:none}.wo-rlbl{font-weight:700;opacity:.8}.wo-rpill{display:inline-flex;gap:5px;align-items:center;background:rgba(255,255,255,.85);border-radius:999px;padding:3px 10px 3px 3px;font-weight:600}.wo-rpill i{box-shadow:none}.wo-rnone{opacity:.65}
+    .wo-redit{border:0;background:rgba(255,255,255,.7);border-radius:999px;padding:4px 10px;font:600 12px system-ui;cursor:pointer}
+    .wo-rlist{display:grid;gap:6px;margin:4px 0 6px}.wo-ropt{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer;font-weight:600}.wo-ropt input{width:20px;height:20px}.wo-ropt i{width:28px;height:28px;font-size:11px;box-shadow:none}.wo-ropt:has(input:checked){background:#fdeef5;border-color:#f3a6c8}
     /* V9.19 Productos unificados */
     .pchips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
     .pchip{border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;font-weight:800;font-size:14px;cursor:pointer;min-height:44px}
@@ -4906,6 +4911,25 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       box.classList.remove("hidden");
     }
 
+    // V10.04: responsables por tablero (carpeta)
+    function woPerson(id){return (state.woTeam||[]).find(p=>p.id===id)}
+    function woFirst(p){const n=String(p.full_name||p.email||"").trim();return n.split(/\s+/)[0]||n}
+    function woIni(p){const w=String(p.full_name||p.email||"?").trim().split(/\s+/);return ((w[0]||"?")[0]+(w[2]||w[1]||"")[0]||"").toUpperCase()}
+    const WO_RC=["#f7a8c8","#8fd3f4","#ffe27a","#b8e3b0","#c9b6f2","#ffc39e","#a7e0d8"];
+    function woRC(id){let h=0;for(const c of String(id))h=(h*31+c.charCodeAt(0))>>>0;return WO_RC[h%WO_RC.length]}
+    function woRespOf(b){return (b&&b.responsables||[]).map(woPerson).filter(Boolean)}
+    function woRespDots(b){const ps=woRespOf(b);if(!ps.length)return"";return `<span class="wo-rdots" title="Responsables: ${escapeHTML(ps.map(woFirst).join(", "))}">${ps.slice(0,3).map(p=>`<i style="background:${woRC(p.id)}">${escapeHTML(woIni(p))}</i>`).join("")}${ps.length>3?`<i>+${ps.length-3}</i>`:""}</span>`}
+    function woRespBar(){let el=$("woRespBar");const host=$("woBoards");if(!host)return;if(!el){el=document.createElement("div");el.id="woRespBar";el.className="wo-rbar";host.insertAdjacentElement("afterend",el)}
+      const b=woBoard&&woBoardById(woBoard);if(!b||$("productionStatusFilter").value){el.innerHTML="";el.hidden=true;return}el.hidden=false;
+      const ps=woRespOf(b),can=hasPermission("work_orders.update");
+      el.innerHTML=`<span class="wo-rlbl">👤 Responsable${ps.length===1?"":"s"}:</span>${ps.length?ps.map(p=>`<span class="wo-rpill"><i style="background:${woRC(p.id)}">${escapeHTML(woIni(p))}</i>${escapeHTML(woFirst(p))}</span>`).join(""):`<span class="wo-rnone">Nadie todavía</span>`}${can?`<button type="button" class="wo-redit" onclick="window.woRespPick('${b.id}')">${ps.length?"✏️ Cambiar":"＋ Asignar"}</button>`:""}`}
+    function woRespPick(id){const b=woBoardById(id);if(!b)return;if(!hasPermission("work_orders.update"))return showToast("No tienes permiso para cambiar esto");
+      let m=$("woRespModal");if(!m){m=document.createElement("div");m.id="woRespModal";m.className="modal-backdrop hidden";m.addEventListener("click",e=>{if(e.target===m)closeModal("woRespModal")});document.body.appendChild(m)}
+      const sel=new Set(b.responsables||[]),team=state.woTeam||[];
+      m.innerHTML=`<div class="modal" style="width:min(420px,100%)"><div class="modal-head"><div><h3>👤 Responsables</h3><small>📁 ${escapeHTML(b.name)} · toca a una o varias personas</small></div><button type="button" class="modal-close" onclick="closeModal('woRespModal')">×</button></div><div class="wo-rlist">${team.map(p=>`<label class="wo-ropt"><input type="checkbox" value="${p.id}"${sel.has(p.id)?" checked":""}><i style="background:${woRC(p.id)}">${escapeHTML(woIni(p))}</i><span>${escapeHTML(p.full_name||p.email)}</span></label>`).join("")||`<div class="empty">No hay personas en Usuarios.</div>`}</div><div class="modal-actions"><button type="button" class="btn secondary" onclick="closeModal('woRespModal')">Cancelar</button><button type="button" class="btn primary" id="woRespSave">Guardar</button></div></div>`;
+      $("woRespSave").onclick=async()=>{const ids=[...m.querySelectorAll("input:checked")].map(x=>x.value);const btn=$("woRespSave");btn.disabled=true;const {error}=await db.from("production_boards").update({responsables:ids}).eq("id",id);btn.disabled=false;if(error)return alert(error.message);b.responsables=ids;closeModal("woRespModal");renderProduction();showToast(ids.length?"Responsables guardados":"Tablero sin responsables")};
+      openModal("woRespModal")}
+    Object.assign(window,{woRespPick});
     // V9.09: venta rápida, comprobantes y niveles de acceso
     function financePermsInstalled(){return state.permissions instanceof Map&&state.permissions.has("finance.view")}
     function supportsEnabled(){return financePermsInstalled()}
@@ -5431,7 +5455,7 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       if(ordersRes.error){showToast("No fue posible cargar producción");return}
       state.workOrders=ordersRes.data||[];state.payments=paymentsRes.error?[]:(paymentsRes.data||[]);
       const ids=state.workOrders.filter(o=>o.status!=="cancelled").map(o=>o.id);state.productionItems=[];for(let i=0;i<ids.length;i+=150){const r=await db.from("work_order_items").select("work_order_id,quantity,unit,description,sort_order").in("work_order_id",ids.slice(i,i+150)).order("sort_order");if(!r.error)state.productionItems.push(...(r.data||[]))}
-      const [bRes,tRes]=await Promise.all([db.from("production_boards").select("*").order("created_at"),db.from("production_tasks").select("*").order("created_at")]);
+      const [bRes,tRes,pRes]=await Promise.all([db.from("production_boards").select("*").order("created_at"),db.from("production_tasks").select("*").order("created_at"),db.from("profiles").select("id,full_name,email,active").order("full_name")]);state.woTeam=pRes.error?[]:(pRes.data||[]).filter(p=>p.active!==false);
       state.prodMissing=!!(bRes.error||tRes.error);state.prodBoards=bRes.error?[]:(bRes.data||[]);state.prodTasks=tRes.error?[]:(tRes.data||[]).map(t=>(t.__task=true,t));
       renderProduction();woLoadActivity();woRTStart()
     }
@@ -5504,7 +5528,7 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       const can=hasPermission("work_orders.update"),bs=(state.prodBoards||[]).filter(b=>!b.archived_at);
       const cnt=id=>state.workOrders.filter(o=>!woLinkedIds().has(o.id)&&!o.archived_at&&o.board_id===id&&!["delivered","cancelled"].includes(o.status)).length+(state.prodTasks||[]).filter(t=>!t.archived_at&&t.board_id===id&&t.col!=="done").length;
       const nav=`<span class="wo-scroll"><button type="button" title="Ver columnas a la izquierda" onclick="window.woScroll(-1)">◀</button><button type="button" title="Ver columnas a la derecha" onclick="window.woScroll(1)">▶</button></span>`;
-      el.innerHTML=`<span class="wo-bwrap"><button type="button" class="wo-bchip${!woBoard?" on":""}" onclick="window.woOpenBoard('')">🏠 General</button>${!woBoard?`<button class="wo-bmenu" type="button" aria-label="Color del tablero" title="Color del tablero" onclick="window.woColorPicker('')">🎨</button>`:""}</span>`+bs.map(b=>`<span class="wo-bwrap"><button type="button" class="wo-bchip${woBoard===b.id?" on":""}" onclick="window.woOpenBoard('${b.id}')">📁 ${escapeHTML(b.name)} <b>${cnt(b.id)}</b></button>${woBoard===b.id&&can?`<span class="table-actions"><button class="row-menu-btn wo-bmenu" type="button" aria-label="Opciones del tablero" onclick="window.toggleRowMenu(this)">⋯</button><span class="row-menu-source" hidden>${woColorMenu(b.id)}<hr><button type="button" onclick="window.woRenameBoard('${b.id}')">✏️ Cambiar nombre</button><button type="button" onclick="window.woArchiveBoard('${b.id}',true)">📦 Archivar tablero (proyecto terminado)</button>${hasPermission("work_orders.delete")?`<button type="button" class="danger" onclick="window.woDeleteBoard('${b.id}')">🗑 Eliminar tablero</button>`:""}</span></span>`:""}</span>`).join("")+(can?`<button type="button" class="wo-bchip add" onclick="window.woNewBoard()">＋ Tablero</button>`:"")+nav;
+      el.innerHTML=`<span class="wo-bwrap"><button type="button" class="wo-bchip${!woBoard?" on":""}" onclick="window.woOpenBoard('')">🏠 General</button>${!woBoard?`<button class="wo-bmenu" type="button" aria-label="Color del tablero" title="Color del tablero" onclick="window.woColorPicker('')">🎨</button>`:""}</span>`+bs.map(b=>`<span class="wo-bwrap"><button type="button" class="wo-bchip${woBoard===b.id?" on":""}" onclick="window.woOpenBoard('${b.id}')">📁 ${escapeHTML(b.name)} <b>${cnt(b.id)}</b>${woRespDots(b)}</button>${woBoard===b.id&&can?`<span class="table-actions"><button class="row-menu-btn wo-bmenu" type="button" aria-label="Opciones del tablero" onclick="window.toggleRowMenu(this)">⋯</button><span class="row-menu-source" hidden>${woColorMenu(b.id)}<hr><button type="button" onclick="window.woRespPick('${b.id}')">👤 Responsables</button><button type="button" onclick="window.woRenameBoard('${b.id}')">✏️ Cambiar nombre</button><button type="button" onclick="window.woArchiveBoard('${b.id}',true)">📦 Archivar tablero (proyecto terminado)</button>${hasPermission("work_orders.delete")?`<button type="button" class="danger" onclick="window.woDeleteBoard('${b.id}')">🗑 Eliminar tablero</button>`:""}</span></span>`:""}</span>`).join("")+(can?`<button type="button" class="wo-bchip add" onclick="window.woNewBoard()">＋ Tablero</button>`:"")+nav;
     }
     function renderProduction(){
       const term=$("productionSearch").value.trim().toLowerCase(),view=$("productionStatusFilter").value,weekAgo=new Date(Date.now()-7*864e5).toISOString(),seePay=hasPermission("payments.view"),canUp=hasPermission("work_orders.update");
@@ -5513,7 +5537,7 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       const byDate=(a,b)=>(b.priority==="urgent")-(a.priority==="urgent")||String(due(a)||"9999").localeCompare(String(due(b)||"9999"));
       const any=r=>r.__task?woTaskCard(r):woCard(r);
       if(woBoard&&!(woBoardById(woBoard)&&!woBoardById(woBoard).archived_at))woBoard="";
-      woRenderBoards();woApplyBg();
+      woRenderBoards();woRespBar();woApplyBg();
       $("woDetailsBtn")&&($("woDetailsBtn").textContent=woOpenAll?"▴ Resumir tarjetas":"▾ Ver detalles");
       const single=(title,help,rows,empty,extra="")=>{$("woTabs").innerHTML="";woLastCols=[];$("productionBody").className="wo-board single";$("productionBody").innerHTML=`<section class="wo-col"><header><strong>${title}</strong><small>${help}</small></header><div class="wo-list">${extra}${rows.map(any).join("")||`<div class="empty">${empty}</div>`}</div></section>`};
       if(view==="cancelled")return single("❌ Cancelados","Pedidos que el cliente no siguió",state.workOrders.filter(o=>o.status==="cancelled"&&match(o)),"No hay pedidos cancelados.");

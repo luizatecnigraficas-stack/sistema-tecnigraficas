@@ -820,7 +820,7 @@
     .ca-gen-row .s.ok{background:#e9f8ef;color:#12894a}.ca-gen-row .s.due{background:#fdebf4;color:var(--magenta)}
     @media(max-width:760px){.ca-gen-nums{grid-template-columns:1fr 1fr}.ca-gen-nums>div:last-child{grid-column:1/-1}.ca-gen-row{grid-template-columns:1fr auto;row-gap:3px}.ca-gen-row .d{display:none}.ca-gen-row .s{grid-column:1/-1;justify-self:start}}
     /* V10.04 responsables por tablero */
-    .wo-rdots{display:inline-flex;margin-left:6px;vertical-align:middle}.wo-rdots i,.wo-rbar i,.wo-ropt i{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;font:800 9px/1 system-ui;font-style:normal;color:#1a1a1a;background:#e8e8ee;box-shadow:0 0 0 2px #fff}.wo-rdots i+i{margin-left:-6px}
+    .wo-rdots{display:inline-flex;margin-left:6px;vertical-align:middle}.tc-badges .wo-rdots{margin-left:auto}.wo-rdots i,.wo-rbar i,.wo-ropt i{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;font:800 9px/1 system-ui;font-style:normal;color:#1a1a1a;background:#e8e8ee;box-shadow:0 0 0 2px #fff}.wo-rdots i+i{margin-left:-6px}
     .wo-rbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:-4px 2px 10px;font-size:13px}.wo-rbar[hidden]{display:none}.wo-rlbl{font-weight:700;opacity:.8}.wo-rpill{display:inline-flex;gap:5px;align-items:center;background:rgba(255,255,255,.85);border-radius:999px;padding:3px 10px 3px 3px;font-weight:600}.wo-rpill i{box-shadow:none}.wo-rnone{opacity:.65}
     .wo-redit{border:0;background:rgba(255,255,255,.7);border-radius:999px;padding:4px 10px;font:600 12px system-ui;cursor:pointer}
     .wo-rlist{display:grid;gap:6px;margin:4px 0 6px}.wo-ropt{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer;font-weight:600}.wo-ropt input{width:20px;height:20px}.wo-ropt i{width:28px;height:28px;font-size:11px;box-shadow:none}.wo-ropt:has(input:checked){background:#fdeef5;border-color:#f3a6c8}
@@ -4337,6 +4337,7 @@
       const quick=[];
       if(!isT&&can&&!r.archived_at&&WO_NEXT[r.status])quick.push(`<button type="button" class="primary" onclick="window.woCBNext()">${WO_NEXT_TXT[r.status]}</button>`);
       if(isT&&can)quick.push(`<button type="button" class="${r.completed_at?"done":""}" onclick="window.woComplete('${r.id}')">${r.completed_at?"✓ Lista":"○ Marcar como lista"}</button>`);
+      {const ps=woRespOf(r);quick.push(`<button type="button" ${can?`onclick="window.woRespPick('${r.id}','${isT?"t":"o"}')"`:"disabled"}>👤 ${ps.length?escapeHTML(ps.map(woFirst).join(", ")):"Responsables"}</button>`)}
       if(can)quick.push(`<button type="button" onclick="window.woCBDatePick()">🕒 Fecha</button>`);
       if(can)quick.push(`<button type="button" onclick="window.woCBFocus('cbAddItem')">☑ Checklist</button>`);
       if(!isT)quick.push(`<button type="button" onclick="window.woCloseCard();window.openWorkOrder('${r.id}')">📄 Pedido completo</button>`);
@@ -4911,7 +4912,7 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       box.classList.remove("hidden");
     }
 
-    // V10.04: responsables por tablero (carpeta)
+    // V10.04–V10.05: responsables por tablero (carpeta) y por tarjeta
     function woPerson(id){return (state.woTeam||[]).find(p=>p.id===id)}
     function woFirst(p){const n=String(p.full_name||p.email||"").trim();return n.split(/\s+/)[0]||n}
     function woIni(p){const w=String(p.full_name||p.email||"?").trim().split(/\s+/);return ((w[0]||"?")[0]+(w[2]||w[1]||"")[0]||"").toUpperCase()}
@@ -4923,11 +4924,11 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       const b=woBoard&&woBoardById(woBoard);if(!b||$("productionStatusFilter").value){el.innerHTML="";el.hidden=true;return}el.hidden=false;
       const ps=woRespOf(b),can=hasPermission("work_orders.update");
       el.innerHTML=`<span class="wo-rlbl">👤 Responsable${ps.length===1?"":"s"}:</span>${ps.length?ps.map(p=>`<span class="wo-rpill"><i style="background:${woRC(p.id)}">${escapeHTML(woIni(p))}</i>${escapeHTML(woFirst(p))}</span>`).join(""):`<span class="wo-rnone">Nadie todavía</span>`}${can?`<button type="button" class="wo-redit" onclick="window.woRespPick('${b.id}')">${ps.length?"✏️ Cambiar":"＋ Asignar"}</button>`:""}`}
-    function woRespPick(id){const b=woBoardById(id);if(!b)return;if(!hasPermission("work_orders.update"))return showToast("No tienes permiso para cambiar esto");
+    function woRespPick(id,kind){kind=kind||"b";const tbl={b:"production_boards",t:"production_tasks",o:"work_orders"}[kind];const b=kind==="b"?woBoardById(id):kind==="t"?(state.prodTasks||[]).find(x=>x.id===id):state.workOrders.find(x=>x.id===id);if(!b)return;const label=kind==="b"?"📁 "+b.name:kind==="t"?b.title:workOrderRecipient(b);if(!hasPermission("work_orders.update"))return showToast("No tienes permiso para cambiar esto");
       let m=$("woRespModal");if(!m){m=document.createElement("div");m.id="woRespModal";m.className="modal-backdrop hidden";m.addEventListener("click",e=>{if(e.target===m)closeModal("woRespModal")});document.body.appendChild(m)}
       const sel=new Set(b.responsables||[]),team=state.woTeam||[];
-      m.innerHTML=`<div class="modal" style="width:min(420px,100%)"><div class="modal-head"><div><h3>👤 Responsables</h3><small>📁 ${escapeHTML(b.name)} · toca a una o varias personas</small></div><button type="button" class="modal-close" onclick="closeModal('woRespModal')">×</button></div><div class="wo-rlist">${team.map(p=>`<label class="wo-ropt"><input type="checkbox" value="${p.id}"${sel.has(p.id)?" checked":""}><i style="background:${woRC(p.id)}">${escapeHTML(woIni(p))}</i><span>${escapeHTML(p.full_name||p.email)}</span></label>`).join("")||`<div class="empty">No hay personas en Usuarios.</div>`}</div><div class="modal-actions"><button type="button" class="btn secondary" onclick="closeModal('woRespModal')">Cancelar</button><button type="button" class="btn primary" id="woRespSave">Guardar</button></div></div>`;
-      $("woRespSave").onclick=async()=>{const ids=[...m.querySelectorAll("input:checked")].map(x=>x.value);const btn=$("woRespSave");btn.disabled=true;const {error}=await db.from("production_boards").update({responsables:ids}).eq("id",id);btn.disabled=false;if(error)return alert(error.message);b.responsables=ids;closeModal("woRespModal");renderProduction();showToast(ids.length?"Responsables guardados":"Tablero sin responsables")};
+      m.innerHTML=`<div class="modal" style="width:min(420px,100%)"><div class="modal-head"><div><h3>👤 Responsables</h3><small>${escapeHTML(label||"")} · toca a una o varias personas</small></div><button type="button" class="modal-close" onclick="closeModal('woRespModal')">×</button></div><div class="wo-rlist">${team.map(p=>`<label class="wo-ropt"><input type="checkbox" value="${p.id}"${sel.has(p.id)?" checked":""}><i style="background:${woRC(p.id)}">${escapeHTML(woIni(p))}</i><span>${escapeHTML(p.full_name||p.email)}</span></label>`).join("")||`<div class="empty">No hay personas en Usuarios.</div>`}</div><div class="modal-actions"><button type="button" class="btn secondary" onclick="closeModal('woRespModal')">Cancelar</button><button type="button" class="btn primary" id="woRespSave">Guardar</button></div></div>`;
+      $("woRespSave").onclick=async()=>{const ids=[...m.querySelectorAll("input:checked")].map(x=>x.value);const btn=$("woRespSave");btn.disabled=true;const {error}=await db.from(tbl).update({responsables:ids}).eq("id",id);btn.disabled=false;if(error)return alert(error.message);b.responsables=ids;closeModal("woRespModal");renderProduction();if(woCB&&!$("woCardModal").classList.contains("hidden"))woRenderCard();showToast(ids.length?"Responsables guardados":"Tablero sin responsables")};
       openModal("woRespModal")}
     Object.assign(window,{woRespPick});
     // V9.09: venta rápida, comprobantes y niveles de acceso
@@ -5476,6 +5477,7 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       const can=hasPermission("work_orders.update"),f=hasPermission("payments.view")?orderFinancial(o):null;
       const menu=[`<button type="button" onclick="window.woOpenCard('${o.id}')">🗂 Abrir tarjeta</button>`,`<button type="button" onclick="window.openWorkOrder('${o.id}')">📄 Abrir pedido completo</button>`];
       if(can&&!o.archived_at&&o.status!=="cancelled"&&o.status!=="delivered")menu.push(woDateMenu(o.id,o.promised_date));
+      if(can)menu.push(`<button type="button" onclick="window.woRespPick('${o.id}','o')">👤 Responsables</button>`);
       if(can&&!o.archived_at&&WO_NEXT[o.status])menu.push(`<button type="button" onclick="window.changeWorkOrderStatus('${o.id}','${WO_NEXT[o.status]}')">${WO_NEXT_TXT[o.status]}</button>`);
       if(can&&!o.archived_at&&WO_PREV[o.status])menu.push(`<button type="button" onclick="window.changeWorkOrderStatus('${o.id}','${WO_PREV[o.status]}')">← Volver un paso</button>`);
       if(can&&o.status==="in_production")menu.push(`<button type="button" onclick="window.changeWorkOrderStatus('${o.id}','finishing')">✂ Marcar: en acabados</button>`);
@@ -5496,6 +5498,7 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       const menu=[`<button type="button" onclick="window.woOpenCard('${key}')">🗂 Abrir tarjeta</button>`],lo=woOrderOf(t);
       if(lo){menu.push(`<button type="button" onclick="window.openWorkOrder('${lo.id}')">📄 Abrir pedido completo</button>`);if(hasPermission("payments.view"))menu.push(`<button type="button" onclick="window.openPaymentHistory('${lo.id}')">Ver pagos</button>`);if(hasPermission("payments.create")&&lo.status!=="cancelled"&&orderFinancial(lo).balance>.01)menu.push(`<button type="button" onclick="window.openPaymentModal('${lo.id}')">💵 Registrar abono</button>`)}
       if(can&&!t.archived_at)menu.push(woDateMenu(key,t.due_date));
+      if(can)menu.push(`<button type="button" onclick="window.woRespPick('${t.id}','t')">👤 Responsables</button>`);
       if(can)menu.push(`<button type="button" onclick="window.woComplete('${t.id}')">${t.completed_at?"○ Quitar “lista”":"✓ Marcar como lista"}</button>`);
       if(can&&t.archived_at)menu.push(`<hr><button type="button" onclick="window.woArchive(['${key}'],false)">↩ Sacar del archivo (volver al tablero)</button>`);
       if(can&&!t.archived_at){menu.push('<hr><small class="wo-menu-label">Mover a:</small>'+WO_COLS.filter(c=>c.k!==t.col).map(c=>`<button type="button" onclick="window.woMoveTo('${key}','${c.k}')">${c.t}</button>`).join(''));menu.push(woBoardMenu(key,t.board_id));menu.push(`<hr><button type="button" onclick="window.woArchive(['${key}'],true)">📦 Archivar</button>`)}
@@ -5513,13 +5516,14 @@ ${d.notes?`<div style="margin:12px 24px 0;padding:12px 14px;border-radius:12px;b
       if(items.length)bd.push(`<span class="tb" title="Productos del pedido">📦 ${items.length}</span>`);
       if(o.archived_at)bd.push('<span class="tb">📦 Archivada</span>');
       if(!woBoard&&b)bd.push(`<span class="tb">📁 ${escapeHTML(b.name)}</span>`);
-      if(who)bd.push(`<span class="tb who" title="${escapeHTML(who)}">${escapeHTML(woInitials(who))}</span>`);
+      bd.push(woRespDots(o));
+      if(who&&!(o.responsables||[]).length)bd.push(`<span class="tb who" title="${escapeHTML(who)}">${escapeHTML(woInitials(who))}</span>`);
       const badges=bd.filter(Boolean).join("");
       return `<article data-woid="${o.id}" class="wo-card tc${can&&!o.archived_at&&o.status!=="cancelled"?" wo-drag":""}${o.status==="cancelled"?" cancelled":""}" onclick="if(!event.target.closest('button,a'))window.woOpenCard('${o.id}')"><div class="tc-title"><span>${escapeHTML(workOrderRecipient(o))}</span>${woQtyPill(woOrderQty(o,items))}</div>${badges?`<div class="tc-badges">${badges}</div>`:""}<span class="table-actions tc-edit"><button class="row-menu-btn" type="button" aria-haspopup="menu" aria-label="Acciones rápidas" title="Acciones rápidas" onclick="window.toggleRowMenu(this)">✎</button><span class="row-menu-source" hidden>${woOrderMenu(o)}</span></span></article>`;
     }
     function woTaskCard(t){
       const can=hasPermission("work_orders.update"),key="t:"+t.id,b=t.board_id&&woBoardById(t.board_id),done=!!t.completed_at,lo=woOrderOf(t);
-      const bd=[t.col!=="done"||done?woDueBadge(t.due_date,done):"",t.notes?'<span class="tb" title="Tiene descripción">≡</span>':"",woClBadge(t),t.archived_at?'<span class="tb">📦 Archivada</span>':"",!woBoard&&b?`<span class="tb">📁 ${escapeHTML(b.name)}</span>`:""].filter(Boolean).join("");
+      const bd=[t.col!=="done"||done?woDueBadge(t.due_date,done):"",t.notes?'<span class="tb" title="Tiene descripción">≡</span>':"",woClBadge(t),t.archived_at?'<span class="tb">📦 Archivada</span>':"",woRespDots(t),!woBoard&&b?`<span class="tb">📁 ${escapeHTML(b.name)}</span>`:""].filter(Boolean).join("");
       return `<article data-woid="${key}" class="wo-card tc wo-task${can&&!t.archived_at?" wo-drag":""}${done?" complete":""}" onclick="if(!event.target.closest('button,a'))window.woOpenCard('${key}')"><div class="tc-title">${can?`<button type="button" class="tc-check${done?" on":""}" title="${done?"Quitar “lista”":"Marcar como lista"}" onclick="window.woComplete('${t.id}')">✓</button>`:""}<span>${lo?`<small class="tc-client" style="display:block;opacity:.75;font-weight:600">${escapeHTML(workOrderRecipient(lo)||"")}</small>`:""}${escapeHTML(t.title)}</span>${woQtyPill(t.quantity)}</div>${bd?`<div class="tc-badges">${bd}</div>`:""}<span class="table-actions tc-edit"><button class="row-menu-btn" type="button" aria-haspopup="menu" aria-label="Acciones rápidas" title="Acciones rápidas" onclick="window.toggleRowMenu(this)">✎</button><span class="row-menu-source" hidden>${woTaskMenu(t)}</span></span></article>`;
     }
     function woFolderCard(b,rows,k){const t=localISODate(),late=k==="done"?0:rows.filter(r=>{const d=r.__task?r.due_date:r.promised_date;return d&&d<t}).length;return `<article class="wo-folder" onclick="window.woOpenBoard('${b.id}')"><strong>📁 ${escapeHTML(b.name)}</strong><small>${rows.length} tarjeta${rows.length===1?"":"s"}${late?` · <b class="late">⚠️ ${late} atrasada${late===1?"":"s"}</b>`:""} · Abrir →</small></article>`}
